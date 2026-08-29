@@ -1,0 +1,15 @@
+# WordPress core and uploads are never part of this repository — only the
+# custom theme and plugin are.
+/wp-admin/
+/wp-includes/
+/wp-content/uploads/
+/wp-content/upgrade/
+/wp-content/cache/
+/wp-config.php
+*.log
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

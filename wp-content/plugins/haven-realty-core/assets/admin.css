@@ -1,0 +1,168 @@
+/* Haven property editor — minimal styling for the custom meta boxes. */
+
+.haven-fields {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: 4px 20px;
+}
+
+.haven-fields--gallery,
+.haven-fields--seo,
+.haven-fields--status {
+	grid-template-columns: 1fr;
+}
+
+.haven-field {
+	margin: 8px 0 14px;
+}
+
+.haven-field--gallery,
+.haven-field--textarea {
+	grid-column: 1 / -1;
+}
+
+.haven-field__label {
+	display: block;
+	margin-bottom: 4px;
+	font-weight: 600;
+	font-size: 12px;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: #50575e;
+}
+
+.haven-field__desc {
+	display: block;
+	margin-top: 4px;
+	font-size: 12px;
+	color: #787c82;
+}
+
+.haven-field__checkbox {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-weight: 600;
+}
+
+.haven-hint {
+	margin: 12px 0 4px;
+	padding: 10px;
+	border-left: 3px solid #c19d68;
+	background: #f6f7f7;
+	font-size: 12px;
+	color: #50575e;
+}
+
+/* Gallery picker */
+
+.haven-gallery,
+.haven-image {
+	display: block;
+}
+
+.haven-gallery__grid {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 10px;
+	min-height: 4px;
+}
+
+.haven-gallery__item {
+	position: relative;
+	display: block;
+	width: 90px;
+	height: 68px;
+	border-radius: 4px;
+	overflow: hidden;
+	border: 1px solid #dcdcde;
+	background: #f0f0f1;
+	cursor: move;
+}
+
+.haven-gallery__item img,
+.haven-image__preview img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.haven-gallery__remove {
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	width: 20px;
+	height: 20px;
+	line-height: 18px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: rgba(0, 0, 0, 0.65);
+	color: #fff;
+	font-size: 15px;
+	cursor: pointer;
+}
+
+.haven-gallery__remove:hover {
+	background: #b32d2e;
+}
+
+/* Single image picker */
+
+.haven-image__preview {
+	display: block;
+	width: 90px;
+	height: 90px;
+	margin-bottom: 8px;
+	border-radius: 50%;
+	overflow: hidden;
+}
+
+.haven-image__preview:empty {
+	display: none;
+}
+
+/* List table */
+
+.haven-pill {
+	display: inline-block;
+	padding: 2px 9px;
+	border-radius: 99px;
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	background: #f0f0f1;
+	color: #50575e;
+}
+
+.haven-pill--active {
+	background: #edfaef;
+	color: #1f5438;
+}
+
+.haven-pill--pending {
+	background: #fcf9e8;
+	color: #8a6d00;
+}
+
+.haven-pill--sold,
+.haven-pill--rented {
+	background: #f6f7f7;
+	color: #646970;
+}
+
+.column-haven_thumb {
+	width: 72px;
+}
+
+.column-haven_featured {
+	width: 80px;
+	text-align: center;
+}
+
+.haven-col-empty {
+	color: #a7aaad;
+}
