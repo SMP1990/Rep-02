@@ -15,7 +15,7 @@ share nothing and are installed separately.
 A hand-built WooCommerce theme following the Underscores (`_s`) template
 hierarchy. No page builder, no CSS framework, no build step, no SEO plugin.
 
-**Status: Phase 4 of 7 complete** — full WooCommerce integration.
+**Status: Phase 5 of 7 complete** — responsive and touch refinement.
 
 ```
 wp-content/
@@ -121,6 +121,25 @@ galleries, ratings and reviews, cart, checkout, my account, related products
 and up-sells. Both the classic shortcode cart/checkout and WooCommerce's Cart
 and Checkout blocks render correctly.
 
+### Responsive
+
+Mobile-first, verified rather than assumed. Every template is checked for
+horizontal overflow at 320, 360, 390, 414, 430, 480, 640, 768, 834, 1024,
+1280, 1440 and 1920px — 320px being the WCAG reflow floor.
+
+Every interactive control reaches a 44px touch target. Where the design calls
+for a small control — the wishlist heart on a card, the card's cart button —
+the visible size is kept and an invisible pseudo-element carries the hit area.
+The testimonial dots are full-size buttons drawing an 8px dot, because
+overlaying hit areas on 8px dots would make neighbours swallow each other's
+taps. No text is below 10px, and only badges and micro-labels sit that low.
+
+Hover styles that change background, border or shadow are limited to
+`(hover: hover)`, so they cannot latch after a tap on a touch screen; `:active`
+states give touch users their feedback instead. Landscape phones get a
+compact 48px tab bar and no announcement strip, leaving the fixed chrome at
+13% of the viewport.
+
 Add to cart is WooCommerce's own AJAX — the header badge and the off-canvas
 mini cart refresh through cart fragments, with no page reload.
 
@@ -135,7 +154,6 @@ Requires WordPress 6.4+, PHP 7.4+ and WooCommerce 8.0+.
 
 | Phase | Scope |
 |---|---|
-| 5 | Responsive refinement across every breakpoint |
 | 6 | SEO, security, performance, accessibility |
 | 7 | Testing and visual QA against the reference design |
 

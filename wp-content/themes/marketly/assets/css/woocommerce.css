@@ -260,8 +260,8 @@ ul.products li.pcell { margin: 0; list-style: none; }
 	top: 0.625rem;
 	inset-inline-end: 0.625rem;
 	z-index: 3;
-	width: 2.25rem;
-	height: 2.25rem;
+	width: 2.75rem;
+	height: 2.75rem;
 	border: 0;
 	border-radius: var(--r-full);
 	background: rgba(255, 255, 255, 0.92);
@@ -274,7 +274,7 @@ ul.products li.pcell { margin: 0; list-style: none; }
 .woocommerce-product-gallery__trigger::after {
 	content: "\2315";
 	font-size: 1.125rem;
-	line-height: 2.25rem;
+	line-height: 2.75rem;
 }
 
 .summary .product_title {
@@ -802,7 +802,15 @@ input.button:hover { background: var(--brand-dark); color: #fff; box-shadow: var
 
 .woocommerce-form-login__rememberme { display: block; margin-bottom: 0.75rem; font-weight: 500; }
 
-.woocommerce-form__label-for-checkbox { display: flex; align-items: center; gap: 0.5rem; }
+/* The checkbox itself stays its native size; the label is the real target,
+   so it carries the comfortable height instead. */
+.woocommerce-form__label-for-checkbox,
+.woocommerce-form-login__rememberme {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	min-height: 2.75rem;
+}
 .woocommerce-form__input-checkbox { width: auto; min-height: 0; }
 
 .woocommerce-address-fields__field-wrapper { margin-bottom: 0.875rem; }

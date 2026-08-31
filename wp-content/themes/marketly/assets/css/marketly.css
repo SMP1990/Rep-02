@@ -47,7 +47,8 @@
 	--font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
 		Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
 
-	--fs-xs: 0.6875rem;
+	--fs-2xs: 0.625rem;   /* 10px — the floor, for badges and micro-labels */
+	--fs-xs: 0.6875rem;   /* 11px — meta text */
 	--fs-sm: 0.8125rem;
 	--fs-base: 0.9375rem;
 	--fs-md: 1.0625rem;
@@ -276,6 +277,11 @@ body.has-tabbar .site-footer { padding-bottom: calc(var(--tabbar-h) + env(safe-a
 	align-items: center;
 	gap: 0.25rem;
 	flex: none;
+	/* Negative inline margin keeps the text optically aligned with the
+	   heading while the padding grows the tap area to a full 44px. */
+	min-height: 2.75rem;
+	padding-inline: 0.5rem;
+	margin-inline-end: -0.5rem;
 	font-size: var(--fs-sm);
 	font-weight: 600;
 	color: var(--brand);
@@ -475,7 +481,7 @@ body.has-tabbar .site-footer { padding-bottom: calc(var(--tabbar-h) + env(safe-a
 	border-radius: var(--r-full);
 	background: var(--brand);
 	color: #fff;
-	font-size: var(--fs-xs);
+	font-size: var(--fs-2xs);
 	font-weight: 700;
 	line-height: 1.4;
 	letter-spacing: 0.01em;
@@ -719,7 +725,7 @@ label {
 .search-form__control .search-form__input {
 	flex: 1 1 auto;
 	min-width: 0;
-	min-height: 2.5rem;
+	min-height: 2.75rem;
 	padding: 0.5rem 0;
 	border: 0;
 	background: none;
@@ -1005,6 +1011,7 @@ label {
 	justify-content: center;
 	gap: 0.375rem;
 	margin: 0;
+	min-height: 2.75rem;
 	padding-block: 0.625rem;
 	color: #fff;
 	text-align: center;
@@ -1037,8 +1044,8 @@ a.announce__inner:hover { color: #fff; opacity: 0.9; }
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 2.5rem;
-	height: 2.5rem;
+	width: 2.75rem;
+	height: 2.75rem;
 	flex: none;
 	padding: 0;
 	border: 0;
@@ -1058,6 +1065,7 @@ a.announce__inner:hover { color: #fff; opacity: 0.9; }
 	display: inline-flex;
 	align-items: center;
 	gap: 0.625rem;
+	min-height: 2.75rem;
 	min-width: 0;
 	margin-inline-end: auto;
 	color: var(--ink);
@@ -1402,7 +1410,7 @@ body.is-locked { overflow: hidden; }
 	gap: 0.1875rem;
 	min-width: 0;
 	color: var(--muted);
-	font-size: 0.625rem;
+	font-size: var(--fs-xs);
 	font-weight: 600;
 }
 
@@ -1472,8 +1480,8 @@ body.is-locked { overflow: hidden; }
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 2.25rem;
-	height: 2.25rem;
+	width: 2.75rem;
+	height: 2.75rem;
 	border: 1px solid var(--line);
 	border-radius: var(--r-sm);
 	color: var(--muted);
@@ -1671,7 +1679,7 @@ body.is-locked { overflow: hidden; }
 }
 
 .hero__badge-top,
-.hero__badge-low { font-size: 0.5625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+.hero__badge-low { font-size: var(--fs-2xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
 .hero__badge-value { font-size: 1.125rem; font-weight: 800; }
 
 .hero__trust {
@@ -1724,7 +1732,7 @@ body.is-locked { overflow: hidden; }
 	.hero__title { font-size: var(--fs-3xl); }
 	.hero__badge { width: 6.5rem; height: 6.5rem; }
 	.hero__badge-value { font-size: 1.625rem; }
-	.hero__badge-top, .hero__badge-low { font-size: 0.625rem; }
+	.hero__badge-top, .hero__badge-low { font-size: var(--fs-xs); }
 }
 
 /* ---------------------------------------------------------- Flash deal */
@@ -1820,7 +1828,7 @@ body.is-locked { overflow: hidden; }
 }
 
 .deal__unit-label {
-	font-size: 0.5625rem;
+	font-size: var(--fs-2xs);
 	font-weight: 700;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
@@ -2029,6 +2037,10 @@ body.is-locked { overflow: hidden; }
 .promo__sub { margin: 0 0 0.125rem; font-size: var(--fs-base); font-weight: 700; }
 .promo__note { margin: 0 0 0.875rem; font-size: var(--fs-xs); opacity: 0.85; }
 
+/* The banner's call to action is a primary tap target, so it keeps the full
+   44px height even though it uses the small button's type scale. */
+.promo__cta { min-height: 2.75rem; padding-inline: 1rem; }
+
 .promo__media {
 	position: absolute;
 	inset-block: 0;
@@ -2095,18 +2107,8 @@ body.is-locked { overflow: hidden; }
 
 .tmdots { display: flex; justify-content: center; gap: 0.375rem; margin-top: 0.875rem; }
 
-.tmdot {
-	width: 0.5rem;
-	height: 0.5rem;
-	padding: 0;
-	border: 0;
-	border-radius: var(--r-full);
-	background: var(--line-2);
-	cursor: pointer;
-	transition: background var(--dur) var(--ease), width var(--dur) var(--ease);
-}
-
-.tmdot.is-current { width: 1.25rem; background: var(--brand); }
+/* Sizing and the visible dot are defined in the Phase 5 block below, where
+   the button becomes a full-size target with the dot drawn by ::before. */
 
 @media (min-width: 48em) {
 	.tmcard { grid-template-columns: 15rem 1fr; align-items: center; gap: 1.5rem; padding: 1.25rem 1.5rem; }
@@ -2154,4 +2156,220 @@ body.is-locked { overflow: hidden; }
 
 	.newsletter__form { min-width: 22rem; }
 	.newsletter__notice { grid-column: 1 / -1; }
+}
+
+/* ==========================================================================
+   Phase 5 — responsive and touch refinement
+   ========================================================================== */
+
+/* ------------------------------------------ Hit areas for small controls */
+
+/* Some controls are deliberately small in the design: the wishlist heart on
+   a card, the card's cart button, the testimonial dots. Rather than inflate
+   them and break the layout, an invisible pseudo-element extends the tap
+   area to 44px while the visible control keeps its drawn size. */
+.pcard__fav,
+.pcard__cart { position: relative; }
+
+.pcard__fav::after,
+.pcard__cart::after {
+	content: "";
+	position: absolute;
+	/* Centred on the control and grown to 44x44. inset is deliberately not
+	   used here: with width and height also set it over-constrains the box. */
+	top: 50%;
+	inset-inline-start: 50%;
+	width: 2.75rem;
+	height: 2.75rem;
+	transform: translate(-50%, -50%);
+}
+
+/* The dots are drawn by a pseudo-element so the button itself can be a full
+   44px target. Expanding their hit area with an overlay instead would make
+   neighbouring dots overlap by 20px and swallow each other's taps. */
+.tmdots { gap: 0; }
+
+.tmdot {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.75rem;
+	height: 2.75rem;
+	padding: 0;
+	border: 0;
+	border-radius: var(--r-sm);
+	background: none;
+	cursor: pointer;
+}
+
+.tmdot::before {
+	content: "";
+	width: 0.5rem;
+	height: 0.5rem;
+	border-radius: var(--r-full);
+	background: var(--line-2);
+	transition: background var(--dur) var(--ease), width var(--dur) var(--ease);
+}
+
+.tmdot.is-current::before { width: 1.25rem; background: var(--brand); }
+
+/* WooCommerce's own controls that ship smaller than a comfortable target. */
+.woocommerce-ordering select,
+.woocommerce-ordering .orderby { min-height: 2.75rem; }
+
+.show-password-input {
+	width: 2.75rem;
+	height: 2.75rem;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
+/* Select2 renders the checkout's country and state fields; without
+   WooCommerce's stylesheet it collapses to a 28px strip. */
+.select2-container .select2-selection--single {
+	display: flex;
+	align-items: center;
+	height: 2.75rem;
+	padding: 0 0.875rem;
+	border: 1px solid var(--line);
+	border-radius: var(--r-sm);
+	background: var(--surface);
+}
+
+.select2-container .select2-selection--single .select2-selection__rendered {
+	padding: 0;
+	color: var(--ink);
+	line-height: 1.4;
+}
+
+.select2-container .select2-selection--single .select2-selection__arrow { height: 100%; }
+
+.select2-container--open .select2-selection--single {
+	border-color: var(--brand);
+	box-shadow: 0 0 0 3px var(--brand-tint-2);
+}
+
+.select2-dropdown {
+	border: 1px solid var(--line);
+	border-radius: var(--r-sm);
+	background: var(--surface);
+	box-shadow: var(--shadow-lg);
+}
+
+.select2-container .select2-results__option { padding: 0.5rem 0.875rem; font-size: var(--fs-sm); }
+.select2-container .select2-results__option--highlighted { background: var(--brand); color: #fff; }
+.select2-container .select2-search__field { min-height: 2.5rem; padding: 0.375rem 0.5rem; }
+
+/* Native checkboxes and radios draw at ~13px; the label is the real target,
+   but the box itself should still be tappable. */
+input[type="checkbox"],
+input[type="radio"] {
+	width: 1.125rem;
+	height: 1.125rem;
+	min-height: 0;
+	margin-inline-end: 0.25rem;
+	accent-color: var(--brand);
+}
+
+/* ------------------------------------------------- Touch vs pointer input */
+
+/* On a touch screen the :hover state latches after a tap and stays until the
+   next tap elsewhere, which reads as a stuck selection. Anything that changes
+   background, border or shadow on hover is therefore limited to devices that
+   actually have a pointer; :active below gives touch users their feedback. */
+@media (hover: none) {
+	.card:hover,
+	.pcard:hover {
+		border-color: var(--line);
+		box-shadow: none;
+	}
+
+	.btn:hover,
+	.btn--outline:hover,
+	.btn--accent:hover,
+	.btn--dark:hover { box-shadow: none; }
+
+	.btn--ghost:hover,
+	.action:hover,
+	.hamburger:hover { background: none; }
+
+	.action:hover { color: var(--ink-2); }
+
+	.cattile:hover .cattile__media {
+		border-color: var(--line);
+		box-shadow: none;
+	}
+
+	.pcard__fav:hover { background: rgba(255, 255, 255, 0.9); color: var(--muted); }
+
+	.footer__social a:hover,
+	.drawer__social a:hover {
+		background: none;
+		border-color: var(--line);
+		color: var(--muted);
+	}
+
+	.section__more:hover { gap: 0.25rem; }
+}
+
+/* Pressed feedback, which works on both touch and pointer. */
+.btn:active,
+.woocommerce .button:active,
+a.button:active,
+button.button:active { transform: translateY(1px); filter: brightness(0.95); }
+
+.action:active,
+.hamburger:active,
+.tabbar__item:active { background: var(--brand-tint); }
+
+.pcard:active { border-color: var(--brand-tint-2); }
+
+.pcard__fav:active { transform: scale(0.9); }
+
+.cattile:active .cattile__media { border-color: var(--brand); }
+
+/* Stop the grey flash iOS paints over tapped elements; the states above
+   replace it with something that matches the design. */
+a, button, input, select, textarea, [role="tab"] {
+	-webkit-tap-highlight-color: transparent;
+}
+
+/* -------------------------------------------------- Short viewports */
+
+/* Landscape phones have roughly 360px of height. The tab bar is the only
+   permanently fixed chrome, so it gives some of it back here. */
+@media (max-height: 30rem) and (max-width: 63.9375em) {
+	:root { --tabbar-h: 3rem; }
+
+	.tabbar__item { gap: 0; font-size: var(--fs-2xs); }
+	.tabbar__icon .icon { width: 1.125rem; height: 1.125rem; }
+
+	.announce { display: none; }
+
+	.header-bar__inner { padding-block: 0.5rem; }
+}
+
+/* ---------------------------------------------------- Bottom clearance */
+
+/* The tab bar clears the last footer row exactly; this adds breathing room
+   so the legal line is not flush against it. */
+body.has-tabbar .site-footer {
+	padding-bottom: calc(var(--tabbar-h) + 0.75rem + env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 64em) {
+	body.has-tabbar .site-footer { padding-bottom: 0; }
+}
+
+/* ------------------------------------------------------- Large screens */
+
+/* Past the container width the page stops growing, so the rails gain a
+   column rather than stretching five cards ever wider. */
+@media (min-width: 100em) {
+	.rail { grid-auto-columns: calc((100% - 5rem) / 6); }
+}
+
+/* Keep running text to a comfortable measure on very wide screens. */
+@media (min-width: 90em) {
+	.hero__text { max-width: 38rem; }
 }
