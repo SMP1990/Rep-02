@@ -64,6 +64,12 @@ function marketly_icon_paths() {
 		'filter'        => '<path d="M3 5h18"/><path d="M6.5 12h11"/><path d="M10 19h4"/>',
 		'trash'         => '<path d="M4 7h16"/><path d="M9.5 7V4.5h5V7"/><path d="M6 7l1 13.2a1.6 1.6 0 0 0 1.6 1.3h6.8A1.6 1.6 0 0 0 17 20.2L18 7"/>',
 		'eye'           => '<path d="M2 12s3.8-6.5 10-6.5S22 12 22 12s-3.8 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
+
+		// Social — filled marks, so they read at small sizes in the footer.
+		'facebook'      => '<path d="M14 8.5V6.9c0-.8.2-1.2 1.4-1.2h1.5V2.8c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8v2H8.4v3.2H11V21h3v-8.3h2.6l.4-3.2Z" fill="currentColor" stroke="none"/>',
+		'instagram'     => '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.2" fill="currentColor" stroke="none"/>',
+		'x'             => '<path d="M3 3h4.2l5 6.7L17.6 3H21l-7.1 8.2L21.4 21H17l-5.3-7.1L5.6 21H2.2l7.6-8.7Z" fill="currentColor" stroke="none"/>',
+		'youtube'       => '<rect x="2.5" y="5.5" width="19" height="13" rx="4"/><path d="M10.2 9.4v5.2l4.6-2.6Z" fill="currentColor" stroke="none"/>',
 	);
 
 	/**
@@ -269,4 +275,206 @@ function marketly_format_count( $count, $threshold = 100 ) {
  */
 function marketly_tel( $phone ) {
 	return preg_replace( '/[^0-9+]/', '', (string) $phone );
+}
+
+/* ------------------------------------------------------- Storefront URLs */
+
+/**
+ * Resolve one of the theme's scaffolded pages to a URL.
+ *
+ * Looked up by slug and cached per request, so the header, drawer and tab bar
+ * asking for the same page costs one query rather than three.
+ *
+ * @param string $slug Page slug, e.g. wishlist.
+ * @return string URL, or an empty string when the page does not exist.
+ */
+function marketly_page_url( $slug ) {
+	static $cache = array();
+
+	if ( isset( $cache[ $slug ] ) ) {
+		return $cache[ $slug ];
+	}
+
+	$page             = get_page_by_path( $slug );
+	$cache[ $slug ]   = ( $page instanceof WP_Post ) ? (string) get_permalink( $page ) : '';
+
+	return $cache[ $slug ];
+}
+
+/**
+ * The storefront URL — the WooCommerce shop page, falling back to home.
+ *
+ * @return string
+ */
+function marketly_shop_url() {
+	if ( marketly_has_woocommerce() && function_exists( 'wc_get_page_permalink' ) ) {
+		$url = wc_get_page_permalink( 'shop' );
+
+		if ( $url ) {
+			return $url;
+		}
+	}
+
+	return home_url( '/' );
+}
+
+/**
+ * The account URL — WooCommerce's My Account, falling back to wp-login.
+ *
+ * @return string
+ */
+function marketly_account_url() {
+	if ( marketly_has_woocommerce() && function_exists( 'wc_get_page_permalink' ) ) {
+		$url = wc_get_page_permalink( 'myaccount' );
+
+		if ( $url ) {
+			return $url;
+		}
+	}
+
+	return wp_login_url();
+}
+
+/**
+ * The cart URL, or an empty string when WooCommerce is not active.
+ *
+ * @return string
+ */
+function marketly_cart_url() {
+	if ( marketly_has_woocommerce() && function_exists( 'wc_get_cart_url' ) ) {
+		return (string) wc_get_cart_url();
+	}
+
+	return '';
+}
+
+/**
+ * Whether the announcement bar should render.
+ *
+ * Doubles as the Customizer active_callback for the bar's own fields, so the
+ * message and link controls hide when the bar is switched off.
+ *
+ * @return bool
+ */
+function marketly_announce_is_on() {
+	return (bool) marketly_option( 'announce_enable' ) && '' !== trim( (string) marketly_option( 'announce_text' ) );
+}
+
+/**
+ * The social links the owner has filled in.
+ *
+ * @return array<int, array{icon: string, url: string, label: string}>
+ */
+function marketly_social_links() {
+	$networks = array(
+		'facebook'  => __( 'Facebook', 'marketly' ),
+		'instagram' => __( 'Instagram', 'marketly' ),
+		'x'         => __( 'X', 'marketly' ),
+		'youtube'   => __( 'YouTube', 'marketly' ),
+	);
+
+	$links = array();
+
+	foreach ( $networks as $icon => $label ) {
+		$url = marketly_option( 'social_' . $icon );
+
+		if ( $url ) {
+			$links[] = array(
+				'icon'  => $icon,
+				'url'   => $url,
+				'label' => $label,
+			);
+		}
+	}
+
+	return $links;
+}
+
+/**
+ * Render the brand mark: the custom logo if one is set, otherwise the bag
+ * glyph beside the site name.
+ *
+ * @param array $args tagline (bool), home (bool) - whether to link to home.
+ */
+function marketly_brand( $args = array() ) {
+	$args = wp_parse_args(
+		$args,
+		array(
+			'tagline' => true,
+			'class'   => '',
+		)
+	);
+
+	$tagline = trim( (string) marketly_option( 'brand_tagline' ) );
+	$classes = trim( 'brand ' . $args['class'] );
+	?>
+	<a class="<?php echo esc_attr( $classes ); ?>" href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home">
+		<?php if ( has_custom_logo() ) : ?>
+			<span class="brand__logo">
+				<?php
+				$logo_id = (int) get_theme_mod( 'custom_logo' );
+				echo wp_get_attachment_image(
+					$logo_id,
+					'full',
+					false,
+					array(
+						'class' => 'brand__logo-img',
+						'alt'   => esc_attr( get_bloginfo( 'name' ) ),
+					)
+				);
+				?>
+			</span>
+		<?php else : ?>
+			<span class="brand__mark" aria-hidden="true">
+				<?php marketly_icon( 'bag', array( 'size' => 22 ) ); ?>
+			</span>
+		<?php endif; ?>
+
+		<span class="brand__text">
+			<span class="brand__name"><?php bloginfo( 'name' ); ?></span>
+
+			<?php if ( $args['tagline'] && $tagline ) : ?>
+				<span class="brand__tagline"><?php echo esc_html( $tagline ); ?></span>
+			<?php endif; ?>
+		</span>
+	</a>
+	<?php
+}
+
+/**
+ * The URLs already present in a nav menu location.
+ *
+ * The drawer pairs the owner's menu with a short list of utility links. If
+ * they have put Wishlist or Deals in their menu too, the drawer would show
+ * the same destination twice — the duplicated-navigation problem. This lets
+ * the utility list skip anything the menu already covers.
+ *
+ * @param string $location Registered nav menu location.
+ * @return string[] Normalised URLs.
+ */
+function marketly_menu_urls( $location ) {
+	static $cache = array();
+
+	if ( isset( $cache[ $location ] ) ) {
+		return $cache[ $location ];
+	}
+
+	$urls      = array();
+	$locations = get_nav_menu_locations();
+
+	if ( ! empty( $locations[ $location ] ) ) {
+		$items = wp_get_nav_menu_items( $locations[ $location ] );
+
+		if ( $items ) {
+			foreach ( $items as $item ) {
+				if ( ! empty( $item->url ) ) {
+					$urls[] = untrailingslashit( strtok( $item->url, '?#' ) );
+				}
+			}
+		}
+	}
+
+	$cache[ $location ] = $urls;
+
+	return $urls;
 }

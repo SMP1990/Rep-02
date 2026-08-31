@@ -167,6 +167,12 @@ svg { flex: none; }
 
 ul, ol { padding-inline-start: 1.25rem; }
 
+/* Any class that sets its own display — .badge, .actions, .drawer — outranks
+   the user-agent's [hidden] rule on specificity, which silently turns
+   el.hidden into a no-op. This makes the attribute authoritative so JS can
+   rely on it. */
+[hidden] { display: none !important; }
+
 figure { margin: 0; }
 
 hr {
@@ -973,3 +979,543 @@ label {
 
 .widget a { color: var(--body); font-size: var(--fs-sm); }
 .widget a:hover { color: var(--brand); }
+
+/* ==========================================================================
+   Phase 2 — header, navigation, drawer, tab bar, footer
+   ========================================================================== */
+
+/* --------------------------------------------------- Announcement strip */
+
+.announce {
+	background: var(--brand);
+	color: #fff;
+	font-size: var(--fs-sm);
+	font-weight: 600;
+}
+
+.announce__inner {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.375rem;
+	margin: 0;
+	padding-block: 0.625rem;
+	color: #fff;
+	text-align: center;
+}
+
+a.announce__inner:hover { color: #fff; opacity: 0.9; }
+
+.announce__text { min-width: 0; }
+
+/* ------------------------------------------------------------- Header */
+
+.site-header {
+	background: var(--surface);
+	border-bottom: 1px solid var(--line);
+}
+
+.header-bar__inner {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.75rem;
+	padding-block: 0.75rem;
+}
+
+/* Hamburger — revealed by JS, so a scripting-off visitor is never shown a
+   control that cannot open anything. The tab bar and footer carry navigation
+   in that case. */
+.hamburger {
+	order: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.5rem;
+	height: 2.5rem;
+	flex: none;
+	padding: 0;
+	border: 0;
+	border-radius: var(--r-sm);
+	background: none;
+	color: var(--ink);
+	cursor: pointer;
+	transition: background var(--dur) var(--ease);
+}
+
+.hamburger:hover { background: var(--surface-2); }
+
+/* --------------------------------------------------------------- Brand */
+
+.brand {
+	order: 2;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.625rem;
+	min-width: 0;
+	margin-inline-end: auto;
+	color: var(--ink);
+}
+
+.brand:hover { color: var(--ink); }
+
+.brand__mark {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.5rem;
+	height: 2.5rem;
+	flex: none;
+	border-radius: 0.625rem;
+	background: var(--brand);
+	color: #fff;
+}
+
+.brand__logo-img { max-height: 2.5rem; width: auto; }
+
+.brand__text {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.brand__name {
+	font-size: 1.3125rem;
+	font-weight: 800;
+	line-height: 1.1;
+	letter-spacing: -0.02em;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.brand__tagline {
+	color: var(--muted);
+	font-size: var(--fs-xs);
+	font-weight: 500;
+	line-height: 1.3;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.brand--sm .brand__name { font-size: var(--fs-md); }
+.brand--sm .brand__mark { width: 2.125rem; height: 2.125rem; border-radius: 0.5rem; }
+
+/* ------------------------------------------------------ Header actions */
+
+.actions {
+	order: 3;
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+	flex: none;
+}
+
+.action {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.75rem;
+	height: 2.75rem;
+	border-radius: var(--r-sm);
+	color: var(--ink-2);
+	transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+
+.action:hover {
+	background: var(--brand-tint);
+	color: var(--brand);
+}
+
+/* Keep the count bubble tucked against the glyph, not the 44px hit area. */
+.action .badge--count {
+	top: 0.375rem;
+	inset-inline-end: 0.375rem;
+}
+
+/* ------------------------------------------------------- Header search */
+
+/* Order 4 with a full-width basis drops this onto its own row under the
+   brand on phones — the reference layout — without a second markup block. */
+.header-search {
+	order: 4;
+	flex: 1 0 100%;
+	min-width: 0;
+}
+
+/* --------------------------------------------------- Desktop nav row */
+
+.nav-primary { display: none; }
+
+@media (min-width: 64em) {
+	.header-bar__inner {
+		flex-wrap: nowrap;
+		gap: 1.5rem;
+		padding-block: 1rem;
+	}
+
+	/* The drawer it opens is display:none from here up, so the control would
+	   be dead. The nav row below carries the same links. */
+	.hamburger { display: none; }
+
+	.brand { margin-inline-end: 0; }
+
+	.header-search {
+		order: 3;
+		flex: 1 1 auto;
+		max-width: 42rem;
+		margin-inline: auto;
+	}
+
+	.actions { order: 4; gap: 0.375rem; }
+
+	.nav-primary {
+		display: block;
+		border-top: 1px solid var(--line-2);
+	}
+
+	.nav-primary__inner {
+		display: flex;
+		align-items: center;
+		gap: 1.5rem;
+	}
+
+	.nav-primary__all {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		flex: none;
+		padding: 0.625rem 0.875rem;
+		margin-block: 0.375rem;
+		border-radius: var(--r-sm);
+		background: var(--brand-tint);
+		color: var(--brand);
+		font-size: var(--fs-sm);
+		font-weight: 700;
+	}
+
+	.nav-primary__all:hover { background: var(--brand-tint-2); }
+
+	.nav-primary__list {
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+		flex-wrap: wrap;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.nav-primary__list li { position: relative; }
+
+	.nav-primary__list a {
+		display: block;
+		padding: 0.875rem 0.75rem;
+		color: var(--ink-2);
+		font-size: var(--fs-sm);
+		font-weight: 600;
+	}
+
+	.nav-primary__list a:hover,
+	.nav-primary__list .current-menu-item > a {
+		color: var(--brand);
+	}
+
+	/* One level of dropdown, opened on hover and on keyboard focus so it is
+	   reachable without a pointer. */
+	.nav-primary__list .sub-menu {
+		position: absolute;
+		top: 100%;
+		inset-inline-start: 0;
+		z-index: 60;
+		min-width: 12rem;
+		margin: 0;
+		padding: 0.375rem;
+		list-style: none;
+		background: var(--surface);
+		border: 1px solid var(--line);
+		border-radius: var(--r-md);
+		box-shadow: var(--shadow-lg);
+		opacity: 0;
+		visibility: hidden;
+		transform: translateY(0.25rem);
+		transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease), visibility var(--dur);
+	}
+
+	.nav-primary__list li:hover > .sub-menu,
+	.nav-primary__list li:focus-within > .sub-menu {
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0);
+	}
+
+	.nav-primary__list .sub-menu a {
+		padding: 0.5rem 0.625rem;
+		border-radius: var(--r-xs);
+		font-weight: 500;
+	}
+
+	.nav-primary__list .sub-menu a:hover { background: var(--brand-tint); }
+}
+
+/* --------------------------------------------------------- Drawer */
+
+.drawer {
+	position: fixed;
+	inset: 0;
+	z-index: 300;
+}
+
+.drawer__backdrop {
+	position: absolute;
+	inset: 0;
+	background: rgba(17, 24, 39, 0.45);
+	opacity: 0;
+	transition: opacity var(--dur) var(--ease);
+}
+
+.drawer__panel {
+	position: absolute;
+	inset-block: 0;
+	inset-inline-start: 0;
+	display: flex;
+	flex-direction: column;
+	width: min(20rem, 85vw);
+	background: var(--surface);
+	box-shadow: var(--shadow-xl, 0 24px 56px rgba(17, 24, 39, 0.18));
+	transform: translateX(-100%);
+	transition: transform var(--dur) var(--ease);
+}
+
+.drawer.is-open .drawer__backdrop { opacity: 1; }
+.drawer.is-open .drawer__panel { transform: translateX(0); }
+
+.drawer__head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
+	padding: 0.875rem 1rem;
+	border-bottom: 1px solid var(--line);
+}
+
+.drawer__body {
+	flex: 1 1 auto;
+	overflow-y: auto;
+	padding: 0.75rem 0.5rem 1.5rem;
+	-webkit-overflow-scrolling: touch;
+}
+
+.drawer__menu,
+.drawer__links {
+	list-style: none;
+	margin: 0 0 0.75rem;
+	padding: 0;
+}
+
+.drawer__links {
+	padding-top: 0.75rem;
+	border-top: 1px solid var(--line-2);
+}
+
+.drawer__menu a,
+.drawer__links a {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.75rem;
+	border-radius: var(--r-sm);
+	color: var(--ink-2);
+	font-size: var(--fs-base);
+	font-weight: 600;
+}
+
+.drawer__menu a:hover,
+.drawer__links a:hover {
+	background: var(--brand-tint);
+	color: var(--brand);
+}
+
+.drawer__menu .sub-menu {
+	list-style: none;
+	margin: 0;
+	padding-inline-start: 1.5rem;
+}
+
+.drawer__menu .sub-menu a { font-weight: 500; font-size: var(--fs-sm); }
+
+.drawer__social {
+	display: flex;
+	gap: 0.25rem;
+	padding: 0.75rem 0.25rem 0;
+	border-top: 1px solid var(--line-2);
+}
+
+.drawer__social a {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.5rem;
+	height: 2.5rem;
+	border-radius: var(--r-sm);
+	color: var(--muted);
+}
+
+.drawer__social a:hover { background: var(--brand-tint); color: var(--brand); }
+
+/* Scroll lock while the drawer is open, without the page jumping. */
+body.is-locked { overflow: hidden; }
+
+@media (min-width: 64em) {
+	.drawer { display: none; }
+}
+
+/* --------------------------------------------------- Bottom tab bar */
+
+.tabbar {
+	position: fixed;
+	inset-inline: 0;
+	bottom: 0;
+	z-index: 150;
+	display: grid;
+	grid-auto-flow: column;
+	grid-auto-columns: 1fr;
+	height: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px));
+	padding-bottom: env(safe-area-inset-bottom, 0px);
+	background: var(--surface);
+	border-top: 1px solid var(--line);
+}
+
+.tabbar__item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.1875rem;
+	min-width: 0;
+	color: var(--muted);
+	font-size: 0.625rem;
+	font-weight: 600;
+}
+
+.tabbar__item:hover,
+.tabbar__item.is-current { color: var(--brand); }
+
+.tabbar__icon { position: relative; display: flex; }
+
+.tabbar__icon .badge--count {
+	top: -0.3125rem;
+	inset-inline-end: -0.4375rem;
+}
+
+.tabbar__label {
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+@media (min-width: 64em) {
+	.tabbar { display: none; }
+}
+
+/* ------------------------------------------------------------- Footer */
+
+.site-footer {
+	margin-top: var(--section-gap);
+	background: var(--surface);
+	border-top: 1px solid var(--line);
+}
+
+.footer__inner {
+	display: grid;
+	gap: 1.75rem;
+	padding-block: 2rem;
+}
+
+@media (min-width: 40em) {
+	.footer__inner { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 64em) {
+	.footer__inner {
+		grid-template-columns: 1.6fr repeat(3, minmax(0, 1fr));
+		gap: 2.5rem;
+		padding-block: 3rem;
+	}
+}
+
+.footer__brand .brand { margin-inline-end: 0; }
+
+.footer__about {
+	margin: 0.875rem 0 0;
+	max-width: 32rem;
+	color: var(--body);
+	font-size: var(--fs-sm);
+}
+
+.footer__social {
+	display: flex;
+	gap: 0.375rem;
+	margin-top: 1rem;
+}
+
+.footer__social a {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.25rem;
+	height: 2.25rem;
+	border: 1px solid var(--line);
+	border-radius: var(--r-sm);
+	color: var(--muted);
+}
+
+.footer__social a:hover {
+	border-color: var(--brand);
+	background: var(--brand-tint);
+	color: var(--brand);
+}
+
+.footer__col-title {
+	margin-bottom: 0.75rem;
+	font-size: var(--fs-base);
+	font-weight: 700;
+}
+
+.footer__menu {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.footer__menu li + li { margin-top: 0.5rem; }
+
+.footer__menu a { color: var(--body); font-size: var(--fs-sm); }
+.footer__menu a:hover { color: var(--brand); }
+
+.footer__bar { border-top: 1px solid var(--line-2); }
+
+.footer__bar-inner {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem 1rem;
+	padding-block: 1rem;
+}
+
+.footer__legal,
+.footer__trust {
+	margin: 0;
+	color: var(--muted);
+	font-size: var(--fs-xs);
+}
+
+.footer__trust {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.375rem;
+}

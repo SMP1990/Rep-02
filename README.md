@@ -15,7 +15,7 @@ share nothing and are installed separately.
 A hand-built WooCommerce theme following the Underscores (`_s`) template
 hierarchy. No page builder, no CSS framework, no build step, no SEO plugin.
 
-**Status: Phase 1 of 7 complete** — theme architecture and foundation.
+**Status: Phase 2 of 7 complete** — header, navigation, footer and mobile tab bar.
 
 ```
 wp-content/
@@ -29,10 +29,20 @@ wp-content/
     ├── inc/setup.php               Dependency guards, head trimming, first run
     ├── inc/template-helpers.php    Inline SVG icons, ratings, section headings
     ├── inc/customizer.php          Panel, defaults registry, sanitisers
-    ├── header.php  footer.php      Page shell (contents land in Phase 2)
+    ├── inc/header-footer.php       Hooks the header/footer parts into place
+    ├── header.php  footer.php      Page shell; fires three actions, no markup
     ├── index.php  archive.php  page.php  single.php  search.php  404.php
     ├── searchform.php  comments.php
-    ├── template-parts/             content, content-search, content-none
+    ├── template-parts/
+    │   ├── announcement.php        Blue strip above the header
+    │   ├── header-bar.php          Hamburger, brand, search, action icons
+    │   ├── header-search.php       One search bar; CSS repositions it
+    │   ├── header-actions.php      Account, wishlist, cart + live badges
+    │   ├── nav-primary.php         Desktop navigation row
+    │   ├── drawer.php              Off-canvas mobile menu
+    │   ├── nav-mobile-bar.php      Fixed bottom tab bar
+    │   ├── footer-main.php         Footer columns, social, legal bar
+    │   └── content*.php            Post, search result, empty state
     └── assets/                     marketly.css, marketly.js
 ```
 
@@ -44,7 +54,10 @@ wp-content/
 3. Activate **Marketly** under Appearance → Themes. On the next page load this
    creates the Home, Wishlist and Deals pages, sets Home as the front page, and
    switches permalinks to `/%postname%/` if they were still plain.
-4. **Appearance → Customize → Marketly Storefront** to set the brand tagline.
+4. **Appearance → Customize → Marketly Storefront** for the brand tagline,
+   announcement bar, header search and footer text/social links.
+5. **Appearance → Menus** and assign the Primary, Mobile and three Footer
+   locations. Every location degrades gracefully when left unassigned.
 
 Requires WordPress 6.4+, PHP 7.4+ and WooCommerce 8.0+.
 
@@ -52,7 +65,6 @@ Requires WordPress 6.4+, PHP 7.4+ and WooCommerce 8.0+.
 
 | Phase | Scope |
 |---|---|
-| 2 | Header, search, navigation, footer, mobile tab bar |
 | 3 | Homepage sections, all wired to live queries |
 | 4 | WooCommerce: shop, product, cart, checkout, account, wishlist |
 | 5 | Responsive refinement across every breakpoint |

@@ -32,6 +32,11 @@ $marketly_search_id = 'search-' . wp_unique_id();
 			autocomplete="off"
 		>
 
+		<?php if ( marketly_has_woocommerce() ) : ?>
+			<?php // A storefront search bar should find products, not blog posts. ?>
+			<input type="hidden" name="post_type" value="product">
+		<?php endif; ?>
+
 		<button type="submit" class="search-form__submit btn btn--icon">
 			<?php marketly_icon( 'search', array( 'size' => 20 ) ); ?>
 			<span class="screen-reader-text"><?php esc_html_e( 'Search', 'marketly' ); ?></span>

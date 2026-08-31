@@ -22,7 +22,24 @@ defined( 'ABSPATH' ) || exit;
  */
 function marketly_defaults() {
 	$defaults = array(
-		'brand_tagline' => __( 'Shop Smart, Live Better', 'marketly' ),
+		// Brand.
+		'brand_tagline'     => __( 'Shop Smart, Live Better', 'marketly' ),
+
+		// Announcement bar.
+		'announce_enable'   => true,
+		'announce_text'     => __( '🎉 Mega Summer Sale is Live! Get Up to 60% OFF', 'marketly' ),
+		'announce_url'      => '',
+
+		// Header.
+		'header_search'     => true,
+
+		// Footer.
+		'footer_about'      => __( 'Millions of products from top brands and trusted sellers, at the best prices.', 'marketly' ),
+		'footer_copyright'  => '',
+		'social_facebook'   => '',
+		'social_instagram'  => '',
+		'social_x'          => '',
+		'social_youtube'    => '',
 	);
 
 	/**
@@ -295,6 +312,137 @@ function marketly_customize_register( $wp_customize ) {
 				},
 			)
 		);
+	}
+
+	/* ------------------------------------------------ Announcement bar */
+
+	$wp_customize->add_section(
+		'marketly_announcement',
+		array(
+			'title'       => __( 'Announcement Bar', 'marketly' ),
+			'description' => __( 'The thin strip above the header. Leave the text empty, or switch it off, to hide the bar entirely.', 'marketly' ),
+			'panel'       => 'marketly',
+			'priority'    => 20,
+		)
+	);
+
+	marketly_customize_field(
+		$wp_customize,
+		'announce_enable',
+		array(
+			'section'  => 'marketly_announcement',
+			'label'    => __( 'Show the announcement bar', 'marketly' ),
+			'type'     => 'checkbox',
+			'sanitize' => 'marketly_sanitize_checkbox',
+			'priority' => 10,
+		)
+	);
+
+	marketly_customize_field(
+		$wp_customize,
+		'announce_text',
+		array(
+			'section'  => 'marketly_announcement',
+			'label'    => __( 'Message', 'marketly' ),
+			'priority' => 20,
+			'active'   => 'marketly_announce_is_on',
+		)
+	);
+
+	marketly_customize_field(
+		$wp_customize,
+		'announce_url',
+		array(
+			'section'     => 'marketly_announcement',
+			'label'       => __( 'Links to', 'marketly' ),
+			'description' => __( 'Optional. With a link set, the whole strip becomes clickable and shows a chevron.', 'marketly' ),
+			'type'        => 'url',
+			'sanitize'    => 'esc_url_raw',
+			'priority'    => 30,
+			'active'      => 'marketly_announce_is_on',
+		)
+	);
+
+	/* --------------------------------------------------------- Header */
+
+	$wp_customize->add_section(
+		'marketly_header',
+		array(
+			'title'    => __( 'Header', 'marketly' ),
+			'panel'    => 'marketly',
+			'priority' => 30,
+		)
+	);
+
+	marketly_customize_field(
+		$wp_customize,
+		'header_search',
+		array(
+			'section'     => 'marketly_header',
+			'label'       => __( 'Show the product search bar', 'marketly' ),
+			'description' => __( 'Searching stays available from the storefront either way; this only controls the bar in the header.', 'marketly' ),
+			'type'        => 'checkbox',
+			'sanitize'    => 'marketly_sanitize_checkbox',
+		)
+	);
+
+	/* --------------------------------------------------------- Footer */
+
+	$wp_customize->add_section(
+		'marketly_footer',
+		array(
+			'title'    => __( 'Footer', 'marketly' ),
+			'panel'    => 'marketly',
+			'priority' => 90,
+		)
+	);
+
+	marketly_customize_field(
+		$wp_customize,
+		'footer_about',
+		array(
+			'section'  => 'marketly_footer',
+			'label'    => __( 'About text', 'marketly' ),
+			'type'     => 'textarea',
+			'sanitize' => 'marketly_sanitize_html',
+			'priority' => 10,
+		)
+	);
+
+	marketly_customize_field(
+		$wp_customize,
+		'footer_copyright',
+		array(
+			'section'     => 'marketly_footer',
+			'label'       => __( 'Copyright line', 'marketly' ),
+			'description' => __( 'Leave empty for “© {year} {site name}. All rights reserved.”', 'marketly' ),
+			'priority'    => 20,
+		)
+	);
+
+	$socials = array(
+		'social_facebook'  => __( 'Facebook URL', 'marketly' ),
+		'social_instagram' => __( 'Instagram URL', 'marketly' ),
+		'social_x'         => __( 'X / Twitter URL', 'marketly' ),
+		'social_youtube'   => __( 'YouTube URL', 'marketly' ),
+	);
+
+	$priority = 30;
+
+	foreach ( $socials as $key => $label ) {
+		marketly_customize_field(
+			$wp_customize,
+			$key,
+			array(
+				'section'  => 'marketly_footer',
+				'label'    => $label,
+				'type'     => 'url',
+				'sanitize' => 'esc_url_raw',
+				'priority' => $priority,
+			)
+		);
+
+		$priority += 10;
 	}
 
 	// Core registers these on the same hook, so depending on callback order

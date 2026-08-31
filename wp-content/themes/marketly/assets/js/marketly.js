@@ -181,6 +181,167 @@
 		i18n: i18n
 	};
 
+	/* ------------------------------------------------------------ wishlist */
+
+	/**
+	 * The wishlist is a per-browser list in localStorage. It needs no account,
+	 * writes nothing to the database and costs no request — the trade-off
+	 * being that it does not follow the shopper to another device.
+	 *
+	 * Every storage call is wrapped: Safari's private mode throws on write,
+	 * and a thrown error here must never take the header down with it.
+	 */
+	var WISHLIST_KEY = 'marketly:wishlist';
+
+	function wishlistRead() {
+		try {
+			var raw = window.localStorage.getItem(WISHLIST_KEY);
+			var ids = readJSON(raw, []);
+
+			return Array.isArray(ids) ? ids.filter(function (id) {
+				return typeof id === 'number' && id > 0;
+			}) : [];
+		} catch (err) {
+			return [];
+		}
+	}
+
+	function wishlistWrite(ids) {
+		try {
+			window.localStorage.setItem(WISHLIST_KEY, JSON.stringify(ids));
+		} catch (err) {
+			/* Storage unavailable or full — the page still works. */
+		}
+	}
+
+	/** Paint every wishlist badge in the header and the tab bar. */
+	function wishlistRender() {
+		var count = wishlistRead().length;
+
+		$$('[data-marketly-wishlist-count]').forEach(function (el) {
+			el.textContent = count > 99 ? '99+' : String(count);
+			el.hidden = count === 0;
+		});
+
+		document.dispatchEvent(new CustomEvent('marketly:wishlist', { detail: { count: count } }));
+	}
+
+	var wishlist = {
+		all: wishlistRead,
+		count: function () {
+			return wishlistRead().length;
+		},
+		has: function (id) {
+			return wishlistRead().indexOf(Number(id)) !== -1;
+		},
+		toggle: function (id) {
+			var ids = wishlistRead();
+			var at = ids.indexOf(Number(id));
+			var added = at === -1;
+
+			if (added) {
+				ids.push(Number(id));
+			} else {
+				ids.splice(at, 1);
+			}
+
+			wishlistWrite(ids);
+			wishlistRender();
+
+			return added;
+		}
+	};
+
+	register('wishlist-badge', function () {
+		wishlistRender();
+
+		// Keep a second tab in step — 'storage' fires only in other tabs.
+		window.addEventListener('storage', function (e) {
+			if (e.key === WISHLIST_KEY) {
+				wishlistRender();
+			}
+		});
+	});
+
+	/* -------------------------------------------------------------- drawer */
+
+	register('drawer', function () {
+		var drawer = $('#marketly-drawer');
+		var opener = $('[data-marketly-drawer-open]');
+
+		if (!drawer || !opener) {
+			return;
+		}
+
+		// The hamburger ships hidden and is revealed here, so a visitor
+		// without JavaScript is never shown a control that does nothing.
+		opener.hidden = false;
+
+		var release = null;
+		var closing = null;
+
+		function open() {
+			clearTimeout(closing);
+			drawer.hidden = false;
+			document.body.classList.add('is-locked');
+			opener.setAttribute('aria-expanded', 'true');
+
+			// Next frame, so the transition has a start state to animate from.
+			requestAnimationFrame(function () {
+				drawer.classList.add('is-open');
+			});
+
+			release = trapFocus(drawer);
+
+			var first = $('.drawer__close', drawer);
+			if (first) {
+				first.focus();
+			}
+		}
+
+		function close() {
+			if (drawer.hidden) {
+				return;
+			}
+
+			drawer.classList.remove('is-open');
+			document.body.classList.remove('is-locked');
+			opener.setAttribute('aria-expanded', 'false');
+
+			// Let the slide-out finish before removing it from the a11y tree.
+			closing = setTimeout(function () {
+				drawer.hidden = true;
+			}, 220);
+
+			if (release) {
+				release();
+				release = null;
+			}
+		}
+
+		opener.addEventListener('click', open);
+
+		on(drawer, 'click', '[data-marketly-drawer-close]', close);
+
+		document.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape' && !drawer.hidden) {
+				close();
+			}
+		});
+
+		// A drawer left open across a resize into the desktop layout would be
+		// hidden by CSS but still holding the scroll lock.
+		window.addEventListener('resize', debounce(function () {
+			if (window.matchMedia('(min-width: 64em)').matches) {
+				close();
+			}
+		}, 150));
+	});
+
+	/* Expose the shared plumbing so later phases add features without
+	   reopening this file. */
+	window.Marketly.wishlist = wishlist;
+
 	if (document.readyState === 'loading') {
 		document.addEventListener('DOMContentLoaded', boot);
 	} else {
