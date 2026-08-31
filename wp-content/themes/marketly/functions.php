@@ -18,6 +18,8 @@ define( 'MARKETLY_URI', get_template_directory_uri() );
 require_once MARKETLY_DIR . '/inc/setup.php';
 require_once MARKETLY_DIR . '/inc/template-helpers.php';
 require_once MARKETLY_DIR . '/inc/customizer.php';
+require_once MARKETLY_DIR . '/inc/customizer-storefront.php';
+require_once MARKETLY_DIR . '/inc/storefront.php';
 require_once MARKETLY_DIR . '/inc/header-footer.php';
 
 /**

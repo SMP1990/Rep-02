@@ -33,6 +33,9 @@ define( 'MARKETLY_CORE_URL', plugin_dir_url( __FILE__ ) );
 function marketly_core_load() {
 	$includes = array(
 		'includes/functions.php',
+		'includes/class-marketly-testimonials.php',
+		'includes/class-marketly-subscribers.php',
+		'includes/class-marketly-forms.php',
 	);
 
 	/**
@@ -49,6 +52,10 @@ function marketly_core_load() {
 			require_once $path;
 		}
 	}
+
+	Marketly_Testimonials::init();
+	Marketly_Subscribers::init();
+	Marketly_Forms::init();
 
 	/**
 	 * Fires once every Marketly Core include is loaded.

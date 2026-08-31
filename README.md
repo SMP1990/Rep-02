@@ -15,13 +15,17 @@ share nothing and are installed separately.
 A hand-built WooCommerce theme following the Underscores (`_s`) template
 hierarchy. No page builder, no CSS framework, no build step, no SEO plugin.
 
-**Status: Phase 2 of 7 complete** — header, navigation, footer and mobile tab bar.
+**Status: Phase 3 of 7 complete** — homepage sections, all wired to live data.
 
 ```
 wp-content/
 ├── plugins/marketly-core/          Data layer (survives a theme switch)
 │   ├── marketly-core.php           Bootstrap, activation, include loader
-│   └── includes/functions.php      IP throttling + honeypot helpers
+│   └── includes/
+│       ├── functions.php           IP throttling + honeypot helpers
+│       ├── class-marketly-testimonials.php  Testimonial post type + meta
+│       ├── class-marketly-subscribers.php   Newsletter store (private CPT)
+│       └── class-marketly-forms.php         Nonce + honeypot + rate limit
 │
 └── themes/marketly/                Presentation layer
     ├── style.css                   Theme header only
@@ -29,6 +33,9 @@ wp-content/
     ├── inc/setup.php               Dependency guards, head trimming, first run
     ├── inc/template-helpers.php    Inline SVG icons, ratings, section headings
     ├── inc/customizer.php          Panel, defaults registry, sanitisers
+    ├── inc/customizer-storefront.php  Hero, deal, shelves, promos, newsletter
+    ├── inc/storefront.php          Live WooCommerce queries + homepage hooks
+    ├── front-page.php              The storefront homepage
     ├── inc/header-footer.php       Hooks the header/footer parts into place
     ├── header.php  footer.php      Page shell; fires three actions, no markup
     ├── index.php  archive.php  page.php  single.php  search.php  404.php
@@ -42,6 +49,17 @@ wp-content/
     │   ├── drawer.php              Off-canvas mobile menu
     │   ├── nav-mobile-bar.php      Fixed bottom tab bar
     │   ├── footer-main.php         Footer columns, social, legal bar
+    │   ├── card-product.php        One product card, two layouts
+    │   ├── card-category.php       Category card with a real product count
+    │   ├── section-categories.php  Category strip from product_cat terms
+    │   ├── section-hero.php        Hero + trust strip
+    │   ├── section-flash-deal.php  Countdown band around one product
+    │   ├── section-popular.php     Popular categories
+    │   ├── section-featured.php    Featured products
+    │   ├── section-promos.php      Two promotion banners
+    │   ├── section-bestsellers.php Ordered by WooCommerce sales
+    │   ├── section-testimonials.php  Testimonial rail + dots
+    │   ├── section-newsletter.php  Signup form
     │   └── content*.php            Post, search result, empty state
     └── assets/                     marketly.css, marketly.js
 ```
@@ -58,6 +76,25 @@ wp-content/
    announcement bar, header search and footer text/social links.
 5. **Appearance → Menus** and assign the Primary, Mobile and three Footer
    locations. Every location degrades gracefully when left unassigned.
+6. Add products, product categories and category images in WooCommerce. The
+   homepage reads all of them live — nothing about a product is stored in the
+   theme, so publishing or editing in wp-admin is the only step needed.
+7. **Testimonials → Add Testimonial** for the review carousel. Signups land
+   under **Testimonials → Subscribers**.
+
+### How the homepage gets its content
+
+| Section | Source |
+|---|---|
+| Announcement, hero, promo banners, newsletter copy | Customizer |
+| Category strip, Popular Categories | Top-level `product_cat` terms + real counts |
+| Flash Deal | A product you pick, plus a deadline. Price, image and link are read from the product, so they never go stale. The band hides itself when the deadline passes. |
+| Featured Products | Products starred in WooCommerce; falls back to newest |
+| Best Sellers | WooCommerce's own `total_sales` counter |
+| Testimonials | Testimonial post type |
+
+Every section removes itself when it has nothing to show, so a store with no
+products yet renders a coherent page rather than a column of empty headings.
 
 Requires WordPress 6.4+, PHP 7.4+ and WooCommerce 8.0+.
 
@@ -65,7 +102,6 @@ Requires WordPress 6.4+, PHP 7.4+ and WooCommerce 8.0+.
 
 | Phase | Scope |
 |---|---|
-| 3 | Homepage sections, all wired to live queries |
 | 4 | WooCommerce: shop, product, cart, checkout, account, wishlist |
 | 5 | Responsive refinement across every breakpoint |
 | 6 | SEO, security, performance, accessibility |

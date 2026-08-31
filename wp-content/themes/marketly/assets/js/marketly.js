@@ -338,6 +338,164 @@
 		}, 150));
 	});
 
+	/* ------------------------------------------------------ wishlist toggle */
+
+	register('wishlist-toggle', function () {
+		var buttons = $$('[data-marketly-fav]');
+
+		if (!buttons.length) {
+			return;
+		}
+
+		/** Reflect stored state onto every card on the page. */
+		function paint() {
+			$$('[data-marketly-fav]').forEach(function (btn) {
+				btn.setAttribute('aria-pressed', wishlist.has(btn.dataset.productId) ? 'true' : 'false');
+			});
+		}
+
+		paint();
+
+		on(document, 'click', '[data-marketly-fav]', function (e, btn) {
+			e.preventDefault();
+
+			var id = Number(btn.dataset.productId);
+
+			if (!id) {
+				return;
+			}
+
+			var added = wishlist.toggle(id);
+
+			btn.setAttribute('aria-pressed', added ? 'true' : 'false');
+			toast(added ? i18n.added : i18n.removed);
+
+			// The same product can appear in more than one shelf.
+			paint();
+		});
+
+		document.addEventListener('marketly:wishlist', paint);
+	});
+
+	/* ----------------------------------------------------------- countdown */
+
+	register('countdown', function () {
+		var timers = $$('[data-marketly-countdown]');
+
+		if (!timers.length) {
+			return;
+		}
+
+		function pad(n) {
+			return n < 10 ? '0' + n : String(n);
+		}
+
+		function tick() {
+			var live = 0;
+
+			timers.forEach(function (timer) {
+				var deadline = Date.parse(timer.dataset.deadline);
+
+				if (isNaN(deadline)) {
+					return;
+				}
+
+				var left = Math.max(0, Math.floor((deadline - Date.now()) / 1000));
+
+				if (left <= 0) {
+					// The offer is over. Removing the whole band beats leaving
+					// a row of zeroes advertising an expired deal; the server
+					// will not render it on the next load either.
+					var section = timer.closest('.deal');
+
+					if (section) {
+						section.hidden = true;
+					}
+
+					return;
+				}
+
+				live++;
+
+				var parts = {
+					days: Math.floor(left / 86400),
+					hours: Math.floor((left % 86400) / 3600),
+					minutes: Math.floor((left % 3600) / 60),
+					seconds: left % 60
+				};
+
+				Object.keys(parts).forEach(function (unit) {
+					var el = timer.querySelector('[data-unit="' + unit + '"]');
+					var next = pad(parts[unit]);
+
+					// Only touch the DOM when the digits actually change.
+					if (el && el.textContent !== next) {
+						el.textContent = next;
+					}
+				});
+			});
+
+			if (live > 0) {
+				window.setTimeout(tick, 1000);
+			}
+		}
+
+		tick();
+	});
+
+	/* -------------------------------------------------------- testimonials */
+
+	register('testimonials', function () {
+		var rail = $('[data-marketly-testimonials]');
+		var dots = $$('[data-marketly-tmdot]');
+
+		if (!rail || !dots.length) {
+			return;
+		}
+
+		var slides = Array.prototype.slice.call(rail.children);
+
+		function select(index) {
+			dots.forEach(function (dot, i) {
+				var current = i === index;
+
+				dot.classList.toggle('is-current', current);
+				dot.setAttribute('aria-selected', current ? 'true' : 'false');
+			});
+		}
+
+		dots.forEach(function (dot, i) {
+			dot.addEventListener('click', function () {
+				if (slides[i]) {
+					// scrollLeft rather than scrollIntoView, which would also
+					// scroll the page vertically to reach the rail.
+					rail.scrollTo({ left: slides[i].offsetLeft - rail.offsetLeft, behavior: 'smooth' });
+				}
+
+				select(i);
+			});
+		});
+
+		// Keep the dots in step when the rail is swiped instead of tapped.
+		rail.addEventListener('scroll', debounce(function () {
+			var middle = rail.scrollLeft + (rail.clientWidth / 2);
+			var nearest = 0;
+			var best = Infinity;
+
+			slides.forEach(function (slide, i) {
+				var centre = slide.offsetLeft - rail.offsetLeft + (slide.clientWidth / 2);
+				var distance = Math.abs(centre - middle);
+
+				if (distance < best) {
+					best = distance;
+					nearest = i;
+				}
+			});
+
+			select(nearest);
+		}, 90));
+	});
+
 	/* Expose the shared plumbing so later phases add features without
 	   reopening this file. */
 	window.Marketly.wishlist = wishlist;
