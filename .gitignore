@@ -17,4 +17,6 @@ Thumbs.db
 # Installable ZIPs are built on demand from wp-content/ — regenerate with:
 #   cd wp-content/plugins && zip -rq ../../dist/haven-realty-core.zip haven-realty-core
 #   cd wp-content/themes  && zip -rq ../../dist/haven-realty.zip haven-realty
+#   cd wp-content/plugins && zip -rq ../../dist/marketly-core.zip marketly-core
+#   cd wp-content/themes  && zip -rq ../../dist/marketly.zip marketly
 /dist/

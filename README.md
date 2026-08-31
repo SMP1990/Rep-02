@@ -1,3 +1,66 @@
+# Rep-02 — WordPress projects
+
+This repository holds two independent, self-contained WordPress projects. They
+share nothing and are installed separately.
+
+| Project | What it is | Where |
+|---|---|---|
+| **Marketly** | A WooCommerce storefront theme + companion plugin. **In development.** | `wp-content/themes/marketly`, `wp-content/plugins/marketly-core` |
+| **Haven Realty Group** | A finished luxury real-estate site. | `wp-content/themes/haven-realty`, `wp-content/plugins/haven-realty-core` |
+
+---
+
+# Marketly — WooCommerce storefront
+
+A hand-built WooCommerce theme following the Underscores (`_s`) template
+hierarchy. No page builder, no CSS framework, no build step, no SEO plugin.
+
+**Status: Phase 1 of 7 complete** — theme architecture and foundation.
+
+```
+wp-content/
+├── plugins/marketly-core/          Data layer (survives a theme switch)
+│   ├── marketly-core.php           Bootstrap, activation, include loader
+│   └── includes/functions.php      IP throttling + honeypot helpers
+│
+└── themes/marketly/                Presentation layer
+    ├── style.css                   Theme header only
+    ├── functions.php               Setup, enqueues, image sizes, menus
+    ├── inc/setup.php               Dependency guards, head trimming, first run
+    ├── inc/template-helpers.php    Inline SVG icons, ratings, section headings
+    ├── inc/customizer.php          Panel, defaults registry, sanitisers
+    ├── header.php  footer.php      Page shell (contents land in Phase 2)
+    ├── index.php  archive.php  page.php  single.php  search.php  404.php
+    ├── searchform.php  comments.php
+    ├── template-parts/             content, content-search, content-none
+    └── assets/                     marketly.css, marketly.js
+```
+
+### Install
+
+1. Copy `wp-content/themes/marketly/` and `wp-content/plugins/marketly-core/`
+   into your WordPress install.
+2. Activate **WooCommerce**, then **Marketly Core** under Plugins.
+3. Activate **Marketly** under Appearance → Themes. On the next page load this
+   creates the Home, Wishlist and Deals pages, sets Home as the front page, and
+   switches permalinks to `/%postname%/` if they were still plain.
+4. **Appearance → Customize → Marketly Storefront** to set the brand tagline.
+
+Requires WordPress 6.4+, PHP 7.4+ and WooCommerce 8.0+.
+
+### Remaining phases
+
+| Phase | Scope |
+|---|---|
+| 2 | Header, search, navigation, footer, mobile tab bar |
+| 3 | Homepage sections, all wired to live queries |
+| 4 | WooCommerce: shop, product, cart, checkout, account, wishlist |
+| 5 | Responsive refinement across every breakpoint |
+| 6 | SEO, security, performance, accessibility |
+| 7 | Testing and visual QA against the reference design |
+
+---
+
 # Haven Realty Group — WordPress
 
 The Haven Realty Group luxury real-estate site, converted from a React 19 / Vite / Firebase single-page app into a server-rendered WordPress site.
