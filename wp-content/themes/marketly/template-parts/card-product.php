@@ -97,10 +97,22 @@ $marketly_rating   = (float) $marketly_product->get_average_rating();
 			// the AJAX hooks stay its responsibility rather than ours. The
 			// label is swapped for the cart glyph by a filter in
 			// inc/storefront.php.
+			//
+			// loop/add-to-cart.php reads `global $product`, which is only set
+			// inside a WooCommerce loop. The homepage shelves are ordinary
+			// queries, so the global is set around the call and restored
+			// afterwards — without this the button silently renders nothing.
 			if ( function_exists( 'woocommerce_template_loop_add_to_cart' ) ) {
-				woocommerce_template_loop_add_to_cart(
-					array( 'class' => 'btn btn--outline btn--icon btn--sm pcard__cart' )
-				);
+				$marketly_prev_product = isset( $GLOBALS['product'] ) ? $GLOBALS['product'] : null;
+				$GLOBALS['product']    = $marketly_product;
+
+				// No class argument: passing one REPLACES WooCommerce's own
+				// class list, which is where add_to_cart_button and
+				// ajax_add_to_cart live. The theme's classes are appended
+				// through woocommerce_loop_add_to_cart_args instead.
+				woocommerce_template_loop_add_to_cart();
+
+				$GLOBALS['product'] = $marketly_prev_product;
 			}
 			?>
 		</div>

@@ -39,7 +39,9 @@ if ( marketly_has_woocommerce() && function_exists( 'WC' ) && WC()->cart ) {
 	<?php endif; ?>
 
 	<?php if ( $marketly_cart_url ) : ?>
-		<a class="action" href="<?php echo esc_url( $marketly_cart_url ); ?>">
+		<?php // Stays a real link; JavaScript upgrades the click to the panel. ?>
+		<a class="action action--cart" href="<?php echo esc_url( $marketly_cart_url ); ?>"
+			aria-expanded="false" aria-controls="marketly-minicart">
 			<?php marketly_icon( 'cart', array( 'size' => 23 ) ); ?>
 
 			<span class="badge badge--count marketly-cart-count"<?php echo $marketly_cart_count ? '' : ' hidden'; ?>>

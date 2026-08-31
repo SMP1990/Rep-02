@@ -263,11 +263,102 @@
 		});
 	});
 
+	/* --------------------------------------------------------- panel helper */
+
+	/**
+	 * Wire an off-canvas panel: open, close, Escape, backdrop, focus trap and
+	 * scroll lock. Shared by the navigation drawer and the mini cart so the
+	 * two behave identically and the logic exists once.
+	 */
+	function setupPanel(options) {
+		var panel = $(options.panel);
+
+		if (!panel) {
+			return null;
+		}
+
+		var release = null;
+		var closing = null;
+		var opener = null;
+
+		function open(trigger) {
+			clearTimeout(closing);
+			opener = trigger || opener;
+			panel.hidden = false;
+			document.body.classList.add('is-locked');
+
+			if (opener && opener.hasAttribute('aria-expanded')) {
+				opener.setAttribute('aria-expanded', 'true');
+			}
+
+			// Next frame, so the transition has a start state to animate from.
+			requestAnimationFrame(function () {
+				panel.classList.add('is-open');
+			});
+
+			release = trapFocus(panel);
+
+			var first = $('.drawer__close', panel);
+
+			if (first) {
+				first.focus();
+			}
+		}
+
+		function close() {
+			if (panel.hidden) {
+				return;
+			}
+
+			panel.classList.remove('is-open');
+			document.body.classList.remove('is-locked');
+
+			if (opener && opener.hasAttribute('aria-expanded')) {
+				opener.setAttribute('aria-expanded', 'false');
+			}
+
+			// Let the slide-out finish before removing it from the a11y tree.
+			closing = setTimeout(function () {
+				panel.hidden = true;
+			}, 220);
+
+			if (release) {
+				release();
+				release = null;
+			}
+		}
+
+		on(panel, 'click', options.closeSelector, close);
+
+		document.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape' && !panel.hidden) {
+				close();
+			}
+		});
+
+		if (options.closeOnDesktop) {
+			// A panel left open across a resize into the desktop layout would
+			// be hidden by CSS but still holding the scroll lock.
+			window.addEventListener('resize', debounce(function () {
+				if (window.matchMedia('(min-width: 64em)').matches) {
+					close();
+				}
+			}, 150));
+		}
+
+		return { open: open, close: close, el: panel };
+	}
+
 	/* -------------------------------------------------------------- drawer */
 
 	register('drawer', function () {
-		var drawer = $('#marketly-drawer');
 		var opener = $('[data-marketly-drawer-open]');
+
+		var drawer = setupPanel({
+			panel: '#marketly-drawer',
+			closeSelector: '[data-marketly-drawer-close]',
+			closeOnDesktop: true
+		});
 
 		if (!drawer || !opener) {
 			return;
@@ -277,65 +368,45 @@
 		// without JavaScript is never shown a control that does nothing.
 		opener.hidden = false;
 
-		var release = null;
-		var closing = null;
+		opener.addEventListener('click', function () {
+			drawer.open(opener);
+		});
+	});
 
-		function open() {
-			clearTimeout(closing);
-			drawer.hidden = false;
-			document.body.classList.add('is-locked');
-			opener.setAttribute('aria-expanded', 'true');
+	/* ----------------------------------------------------------- mini cart */
 
-			// Next frame, so the transition has a start state to animate from.
-			requestAnimationFrame(function () {
-				drawer.classList.add('is-open');
-			});
+	register('minicart', function () {
+		var cart = setupPanel({
+			panel: '#marketly-minicart',
+			closeSelector: '[data-marketly-minicart-close]',
+			closeOnDesktop: false
+		});
 
-			release = trapFocus(drawer);
-
-			var first = $('.drawer__close', drawer);
-			if (first) {
-				first.focus();
-			}
+		if (!cart) {
+			return;
 		}
 
-		function close() {
-			if (drawer.hidden) {
+		// The header icon stays a real link to the cart page. Intercepting the
+		// click keeps it working with scripting off, and modified clicks
+		// (new tab, middle button) are left alone deliberately.
+		on(document, 'click', '.action--cart', function (e, link) {
+			if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) {
 				return;
 			}
 
-			drawer.classList.remove('is-open');
-			document.body.classList.remove('is-locked');
-			opener.setAttribute('aria-expanded', 'false');
-
-			// Let the slide-out finish before removing it from the a11y tree.
-			closing = setTimeout(function () {
-				drawer.hidden = true;
-			}, 220);
-
-			if (release) {
-				release();
-				release = null;
-			}
-		}
-
-		opener.addEventListener('click', open);
-
-		on(drawer, 'click', '[data-marketly-drawer-close]', close);
-
-		document.addEventListener('keydown', function (e) {
-			if (e.key === 'Escape' && !drawer.hidden) {
-				close();
-			}
+			e.preventDefault();
+			cart.open(link);
 		});
 
-		// A drawer left open across a resize into the desktop layout would be
-		// hidden by CSS but still holding the scroll lock.
-		window.addEventListener('resize', debounce(function () {
-			if (window.matchMedia('(min-width: 64em)').matches) {
-				close();
-			}
-		}, 150));
+		// WooCommerce announces a successful AJAX add over jQuery, which it
+		// has already loaded on these pages. jQuery's custom events do not
+		// reach addEventListener, so this listens the same way rather than
+		// adding jQuery of its own.
+		if (window.jQuery) {
+			window.jQuery(document.body).on('added_to_cart', function () {
+				cart.open();
+			});
+		}
 	});
 
 	/* ------------------------------------------------------ wishlist toggle */
@@ -494,6 +565,79 @@
 
 			select(nearest);
 		}, 90));
+	});
+
+	/* ------------------------------------------------------- wishlist page */
+
+	register('wishlist-page', function () {
+		var target = $('[data-marketly-wishlist-page]');
+		var empty = $('[data-marketly-wishlist-empty]');
+
+		if (!target) {
+			return;
+		}
+
+		function showEmpty() {
+			target.innerHTML = '';
+			target.setAttribute('aria-busy', 'false');
+
+			if (empty) {
+				empty.hidden = false;
+			}
+		}
+
+		var ids = wishlist.all();
+
+		if (!ids.length) {
+			showEmpty();
+			return;
+		}
+
+		var url = (data.restUrl || '') + 'wishlist?ids=' + encodeURIComponent(ids.join(','));
+
+		fetch(url, { credentials: 'same-origin' })
+			.then(function (res) {
+				if (!res.ok) {
+					throw new Error('HTTP ' + res.status);
+				}
+
+				return res.json();
+			})
+			.then(function (payload) {
+				if (!payload || !payload.count) {
+					showEmpty();
+					return;
+				}
+
+				target.innerHTML = payload.html;
+				target.classList.add('grid', 'pcols');
+				target.setAttribute('aria-busy', 'false');
+
+				if (empty) {
+					empty.hidden = true;
+				}
+
+				// Drop ids the store no longer has — deleted, unpublished or
+				// hidden — so the list does not quietly rot.
+				if (Array.isArray(payload.found) && payload.found.length !== ids.length) {
+					wishlistWrite(ids.filter(function (id) {
+						return payload.found.indexOf(id) !== -1;
+					}));
+					wishlistRender();
+				}
+
+				document.dispatchEvent(new CustomEvent('marketly:wishlist'));
+			})
+			.catch(function () {
+				// The saved list is intact; only this render failed.
+				target.setAttribute('aria-busy', 'false');
+				target.innerHTML = '';
+
+				var note = document.createElement('p');
+				note.className = 'notice-inline notice-inline--error';
+				note.textContent = i18n.loadError || 'Could not load your saved products.';
+				target.appendChild(note);
+			});
 	});
 
 	/* Expose the shared plumbing so later phases add features without

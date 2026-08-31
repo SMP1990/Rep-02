@@ -20,6 +20,10 @@ require_once MARKETLY_DIR . '/inc/template-helpers.php';
 require_once MARKETLY_DIR . '/inc/customizer.php';
 require_once MARKETLY_DIR . '/inc/customizer-storefront.php';
 require_once MARKETLY_DIR . '/inc/storefront.php';
+
+if ( class_exists( 'WooCommerce' ) ) {
+	require_once MARKETLY_DIR . '/inc/woocommerce.php';
+}
 require_once MARKETLY_DIR . '/inc/header-footer.php';
 
 /**
@@ -144,6 +148,7 @@ function marketly_enqueue_assets() {
 				'minutes'   => __( 'Mins', 'marketly' ),
 				'seconds'   => __( 'Secs', 'marketly' ),
 				'expired'   => __( 'This deal has ended', 'marketly' ),
+				'loadError' => __( 'We couldn’t load your saved products. Please refresh and try again.', 'marketly' ),
 			),
 		)
 	);

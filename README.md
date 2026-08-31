@@ -15,7 +15,7 @@ share nothing and are installed separately.
 A hand-built WooCommerce theme following the Underscores (`_s`) template
 hierarchy. No page builder, no CSS framework, no build step, no SEO plugin.
 
-**Status: Phase 3 of 7 complete** — homepage sections, all wired to live data.
+**Status: Phase 4 of 7 complete** — full WooCommerce integration.
 
 ```
 wp-content/
@@ -35,7 +35,12 @@ wp-content/
     ├── inc/customizer.php          Panel, defaults registry, sanitisers
     ├── inc/customizer-storefront.php  Hero, deal, shelves, promos, newsletter
     ├── inc/storefront.php          Live WooCommerce queries + homepage hooks
+    ├── inc/woocommerce.php         Woo hooks, assets, fragments, wishlist API
     ├── front-page.php              The storefront homepage
+    ├── template-wishlist.php       Wishlist page template
+    ├── template-deals.php          On-sale products with pagination
+    ├── woocommerce/
+    │   └── content-product.php     The theme's ONLY Woo template override
     ├── inc/header-footer.php       Hooks the header/footer parts into place
     ├── header.php  footer.php      Page shell; fires three actions, no markup
     ├── index.php  archive.php  page.php  single.php  search.php  404.php
@@ -60,6 +65,7 @@ wp-content/
     │   ├── section-bestsellers.php Ordered by WooCommerce sales
     │   ├── section-testimonials.php  Testimonial rail + dots
     │   ├── section-newsletter.php  Signup form
+    │   ├── mini-cart.php           Off-canvas cart panel
     │   └── content*.php            Post, search result, empty state
     └── assets/                     marketly.css, marketly.js
 ```
@@ -96,13 +102,39 @@ wp-content/
 Every section removes itself when it has nothing to show, so a store with no
 products yet renders a coherent page rather than a column of empty headings.
 
+### WooCommerce
+
+Hooks, not template overrides. The theme ships exactly one WooCommerce
+template — `woocommerce/content-product.php` — and it holds no markup of its
+own: it defers to the same card partial the homepage uses, so a product looks
+identical on the shop, in a category, in related products and on the front
+page. Wrappers, columns, breadcrumbs and the loop are all handled through
+filters and actions.
+
+WooCommerce's own three stylesheets (~112KB) are dequeued and replaced by
+`assets/css/woocommerce.css` (~28KB), which loads only where WooCommerce
+markup appears. Product card styles stay in the main stylesheet because the
+homepage needs them.
+
+Supported: shop and category archives, single products with variations,
+galleries, ratings and reviews, cart, checkout, my account, related products
+and up-sells. Both the classic shortcode cart/checkout and WooCommerce's Cart
+and Checkout blocks render correctly.
+
+Add to cart is WooCommerce's own AJAX — the header badge and the off-canvas
+mini cart refresh through cart fragments, with no page reload.
+
+The wishlist is a per-browser list in `localStorage`: no account needed, no
+database writes, and nothing to migrate. The Wishlist page asks a read-only
+REST route to render cards for whatever ids the browser holds, and ids that no
+longer resolve to a published, catalogue-visible product are pruned.
+
 Requires WordPress 6.4+, PHP 7.4+ and WooCommerce 8.0+.
 
 ### Remaining phases
 
 | Phase | Scope |
 |---|---|
-| 4 | WooCommerce: shop, product, cart, checkout, account, wishlist |
 | 5 | Responsive refinement across every breakpoint |
 | 6 | SEO, security, performance, accessibility |
 | 7 | Testing and visual QA against the reference design |
