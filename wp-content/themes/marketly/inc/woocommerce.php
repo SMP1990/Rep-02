@@ -397,7 +397,7 @@ function marketly_wishlist_response( $request ) {
 			get_template_part(
 				'template-parts/card',
 				'product',
-				array( 'product' => $by_id[ $id ], 'layout' => 'v' )
+				array( 'product' => $by_id[ $id ], 'layout' => 'v', 'heading' => 'h2' )
 			);
 		}
 	}
@@ -412,3 +412,52 @@ function marketly_wishlist_response( $request ) {
 		)
 	);
 }
+
+/* --------------------------------------------------- Gallery script weight */
+
+/**
+ * Skip the product gallery libraries when there is no gallery.
+ *
+ * The zoom, slider and lightbox libraries together are about 62KB of
+ * JavaScript, enqueued on every product page because the theme declares
+ * support for them. A product with a single image has nothing to slide
+ * through, zoom into or open in a lightbox, so on those pages the libraries
+ * are pure weight.
+ *
+ * The three flags are filtered as well as the scripts dequeued: WooCommerce's
+ * single-product script reads them to decide whether to initialise, and
+ * removing the libraries without clearing the flags would leave it calling
+ * methods that no longer exist.
+ */
+function marketly_trim_gallery_scripts() {
+	if ( ! function_exists( 'is_product' ) || ! is_product() ) {
+		return;
+	}
+
+	$product = wc_get_product( get_queried_object_id() );
+
+	if ( ! $product || $product->get_gallery_image_ids() ) {
+		return; // A real gallery — leave everything in place.
+	}
+
+	foreach ( array( 'zoom', 'flexslider', 'photoswipe', 'photoswipe-ui-default' ) as $handle ) {
+		wp_dequeue_script( $handle );
+	}
+
+	wp_dequeue_style( 'photoswipe' );
+	wp_dequeue_style( 'photoswipe-default-skin' );
+
+	// WooCommerce prints PhotoSwipe's dialog markup in the footer regardless
+	// of whether its script loaded, and that markup is hidden by PhotoSwipe's
+	// own stylesheet. Dropping the CSS without the markup leaves the dialog's
+	// toolbar rendered across the page as six stray buttons.
+	// Registered by WC_Frontend_Scripts::load_scripts() with add_action's
+	// default priority, so the removal must use 10 — naming any other
+	// priority makes remove_action a silent no-op.
+	remove_action( 'wp_footer', 'woocommerce_photoswipe', 10 );
+
+	add_filter( 'woocommerce_single_product_zoom_enabled', '__return_false' );
+	add_filter( 'woocommerce_single_product_flexslider_enabled', '__return_false' );
+	add_filter( 'woocommerce_single_product_photoswipe_enabled', '__return_false' );
+}
+add_action( 'wp_enqueue_scripts', 'marketly_trim_gallery_scripts', 99 );

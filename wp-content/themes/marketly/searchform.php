@@ -12,7 +12,15 @@ defined( 'ABSPATH' ) || exit;
 
 $marketly_search_id = 'search-' . wp_unique_id();
 ?>
-<form role="search" method="get" class="search-form" action="<?php echo esc_url( home_url( '/' ) ); ?>">
+<?php
+// Several search forms can appear on one page — the header and an empty
+// state, say — and two unnamed search landmarks are ambiguous to a screen
+// reader, so each is labelled.
+$marketly_search_label = isset( $args['label'] ) ? $args['label'] : __( 'Search products', 'marketly' );
+?>
+<form role="search" method="get" class="search-form"
+	aria-label="<?php echo esc_attr( $marketly_search_label ); ?>"
+	action="<?php echo esc_url( home_url( '/' ) ); ?>">
 	<label class="screen-reader-text" for="<?php echo esc_attr( $marketly_search_id ); ?>">
 		<?php esc_html_e( 'Search for:', 'marketly' ); ?>
 	</label>

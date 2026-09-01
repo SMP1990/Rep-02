@@ -21,7 +21,10 @@ get_header();
 		</p>
 
 		<div class="error-404__search">
-			<?php get_search_form(); ?>
+			<?php
+			// Distinct from the header's search landmark on the same page.
+			get_search_form( array( 'label' => __( 'Search from the not-found page', 'marketly' ) ) );
+			?>
 		</div>
 
 		<p class="error-404__actions">

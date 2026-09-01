@@ -13,6 +13,49 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
+ * Warm the object cache for a set of products' images.
+ *
+ * wc_get_products() primes the products themselves, but each card then asks
+ * for its thumbnail, and WordPress fetches attachments one at a time — one
+ * SELECT for the attachment post and another for its meta, per card. On a
+ * homepage with four shelves that is dozens of round trips for data one
+ * query could have fetched.
+ *
+ * Priming is not caching: nothing is stored between requests and nothing can
+ * go stale. It only batches lookups this request was going to make anyway.
+ *
+ * @param WC_Product[] $products Products about to be rendered.
+ * @return WC_Product[] The same products, unchanged.
+ */
+function marketly_prime_products( $products ) {
+	if ( ! $products || ! function_exists( '_prime_post_caches' ) ) {
+		return $products;
+	}
+
+	$image_ids = array();
+
+	foreach ( $products as $product ) {
+		if ( ! $product instanceof WC_Product ) {
+			continue;
+		}
+
+		$image_id = (int) $product->get_image_id();
+
+		if ( $image_id ) {
+			$image_ids[] = $image_id;
+		}
+	}
+
+	if ( $image_ids ) {
+		// Meta yes (srcset and alt text need it), terms no (attachments have
+		// none worth fetching here).
+		_prime_post_caches( array_unique( $image_ids ), false, true );
+	}
+
+	return $products;
+}
+
+/**
  * Top-level product categories.
  *
  * @param array $args limit (int), hide_empty (bool).
@@ -106,7 +149,7 @@ function marketly_get_featured_products( $limit = 4 ) {
 		);
 	}
 
-	return is_array( $products ) ? $products : array();
+	return marketly_prime_products( is_array( $products ) ? $products : array() );
 }
 
 /**
@@ -143,7 +186,7 @@ function marketly_get_best_sellers( $limit = 8 ) {
 		);
 	}
 
-	return is_array( $products ) ? $products : array();
+	return marketly_prime_products( is_array( $products ) ? $products : array() );
 }
 
 /**
@@ -174,7 +217,7 @@ function marketly_get_sale_products( $limit = 12 ) {
 		)
 	);
 
-	return is_array( $products ) ? $products : array();
+	return marketly_prime_products( is_array( $products ) ? $products : array() );
 }
 
 /**

@@ -19,13 +19,19 @@
 	/* Amber accent — promo banner, deal button, hero eyebrow and disc */
 	--accent: #f5a623;
 	--accent-dark: #d98c0c;
-	--accent-ink: #7a4a00;
+	--accent-ink: #5c3600;  /* on --accent this is 5.23:1; #7a4a00 was 3.69 */
 	--accent-tint: #fff5e2;
 
 	/* Feedback */
-	--sale: #e5342b;
+	--sale: #d0271e;        /* white on this is 5.26:1; #e5342b was 4.32 */
 	--sale-tint: #fdecec;
-	--star: #fbbf24;
+	/* Rating stars. A star glyph is a graphic with a text equivalent — the
+	   markup carries role="img" and "Rated N out of 5", and the review count
+	   sits beside it — so the rating is never conveyed by colour alone.
+	   Reaching 3:1 against white would require roughly #a87604, which stops
+	   reading as a rating star; this is deepened from the reference's #fbbf24
+	   as far as that identity allows. */
+	--star: #d99b06;
 	--star-track: #dfe3ea;
 	--success: #0f9d58;
 	--success-tint: #e8f6ee;
@@ -638,7 +644,7 @@ label {
 .is-hidden { display: none !important; }
 
 .price { color: var(--ink); font-weight: 700; }
-.price del { color: var(--muted-2); font-weight: 500; text-decoration: line-through; }
+.price del { color: var(--muted); font-weight: 500; text-decoration: line-through; }
 .price ins { text-decoration: none; }
 
 /* Respect the visitor's motion preference — every transition here is
@@ -918,7 +924,7 @@ label {
 
 .error-404__code {
 	margin: 0;
-	color: var(--brand-tint-2);
+	color: #6b8ce0; /* 3.06:1 on --page; --brand-tint-2 was 1.13 */
 	font-size: clamp(4rem, 18vw, 7rem);
 	font-weight: 800;
 	line-height: 1;
@@ -1779,7 +1785,7 @@ body.is-locked { overflow: hidden; }
 .deal__sub,
 .deal__label {
 	margin: 0;
-	color: rgba(255, 255, 255, 0.82);
+	color: rgba(255, 255, 255, 0.88);
 	font-size: var(--fs-xs);
 }
 
@@ -1794,7 +1800,7 @@ body.is-locked { overflow: hidden; }
 .deal__price .amount { color: #fff; font-size: var(--fs-lg); font-weight: 800; }
 
 .deal__price del,
-.deal__price del .amount { color: rgba(255, 255, 255, 0.6); font-size: var(--fs-sm); font-weight: 500; }
+.deal__price del .amount { color: rgba(255, 255, 255, 0.82); font-size: var(--fs-sm); font-weight: 500; }
 
 .deal__name { margin: 0 0 0.625rem; font-size: var(--fs-sm); }
 .deal__name a { color: rgba(255, 255, 255, 0.9); }
@@ -1832,7 +1838,9 @@ body.is-locked { overflow: hidden; }
 	font-weight: 700;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
-	color: rgba(255, 255, 255, 0.75);
+	/* Measured at 4.48:1 on the panel at 95% white — 0.02 short of AA for
+	   10px text. Full white clears it at 4.78:1. */
+	color: #fff;
 }
 
 @media (min-width: 48em) {
@@ -2035,7 +2043,7 @@ body.is-locked { overflow: hidden; }
 
 .promo__title { margin: 0 0 0.25rem; font-size: var(--fs-lg); font-weight: 800; letter-spacing: -0.02em; }
 .promo__sub { margin: 0 0 0.125rem; font-size: var(--fs-base); font-weight: 700; }
-.promo__note { margin: 0 0 0.875rem; font-size: var(--fs-xs); opacity: 0.85; }
+.promo__note { margin: 0 0 0.875rem; font-size: var(--fs-xs); }
 
 /* The banner's call to action is a primary tap target, so it keeps the full
    44px height even though it uses the small button's type scale. */
@@ -2372,4 +2380,58 @@ body.has-tabbar .site-footer {
 /* Keep running text to a comfortable measure on very wide screens. */
 @media (min-width: 90em) {
 	.hero__text { max-width: 38rem; }
+}
+
+/* ==========================================================================
+   Phase 6 — accessibility
+   ========================================================================== */
+
+/* A link inside running text must be distinguishable without relying on
+   colour alone (WCAG 1.4.1), so links in prose carry an underline. Links that
+   sit on their own as navigation or buttons are already distinguishable by
+   position and shape. */
+.entry__content a:not(.btn):not(.button),
+.comment-form a,
+.comment-notes a,
+.comments a:not(.btn),
+.woocommerce-privacy-policy-text a,
+.woocommerce-terms-and-conditions-wrapper a,
+.field__hint a,
+.footer__about a {
+	text-decoration: underline;
+	text-underline-offset: 0.15em;
+}
+
+/* The testimonial rail is scrolled by keyboard, so it takes focus. Its ring
+   is drawn just inside the bleed so it is not clipped by the overflow. */
+.tmrail:focus-visible {
+	outline: 2px solid var(--brand);
+	outline-offset: -2px;
+	border-radius: var(--r-md);
+}
+
+/* Forced-colours mode replaces the palette wholesale; these keep shapes that
+   are drawn with backgrounds from disappearing entirely. */
+@media (forced-colors: active) {
+	.btn,
+	.badge,
+	.action,
+	.tabbar__item,
+	.pcard,
+	.card {
+		border: 1px solid currentColor;
+	}
+
+	.rating__fill { forced-color-adjust: none; }
+
+	/* Focus on the search field is drawn as a ring on its container, and
+	   forced-colours mode strips box-shadow — so the field takes a real
+	   outline there instead of losing its indicator entirely. */
+	.search-form__control:focus-within,
+	input:focus,
+	select:focus,
+	textarea:focus {
+		outline: 2px solid Highlight;
+		outline-offset: 1px;
+	}
 }

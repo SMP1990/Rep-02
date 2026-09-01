@@ -24,7 +24,13 @@ $marketly_uid = wp_unique_id( 'tm-' );
 			<?php esc_html_e( 'What our customers say', 'marketly' ); ?>
 		</h2>
 
-		<div class="tmrail" data-marketly-testimonials>
+		<?php
+		// tabindex makes the rail scrollable by keyboard. Its children are
+		// quotes, not links, so without it there is nothing to tab to and the
+		// second and third reviews are unreachable without a pointer.
+		?>
+		<div class="tmrail" data-marketly-testimonials tabindex="0" role="group"
+			aria-label="<?php esc_attr_e( 'Customer reviews', 'marketly' ); ?>">
 			<?php foreach ( $marketly_items as $marketly_i => $marketly_item ) : ?>
 				<?php
 				$marketly_role   = (string) get_post_meta( $marketly_item->ID, '_marketly_role', true );
@@ -64,11 +70,15 @@ $marketly_uid = wp_unique_id( 'tm-' );
 		</div>
 
 		<?php if ( count( $marketly_items ) > 1 ) : ?>
-			<div class="tmdots" role="tablist" aria-label="<?php esc_attr_e( 'Choose a review', 'marketly' ); ?>">
+			<?php
+			// Plain buttons, not a tablist: there are no tab panels here, only
+			// a scrolling group, and role="tab" without role="tabpanel"
+			// promises a relationship the markup does not have.
+			?>
+			<div class="tmdots" role="group" aria-label="<?php esc_attr_e( 'Choose a review', 'marketly' ); ?>">
 				<?php foreach ( $marketly_items as $marketly_i => $marketly_item ) : ?>
 					<button type="button" class="tmdot<?php echo 0 === $marketly_i ? ' is-current' : ''; ?>"
-						role="tab" aria-selected="<?php echo 0 === $marketly_i ? 'true' : 'false'; ?>"
-						aria-controls="<?php echo esc_attr( $marketly_uid . '-' . $marketly_i ); ?>"
+						<?php echo 0 === $marketly_i ? ' aria-current="true"' : ''; ?>
 						data-marketly-tmdot="<?php echo esc_attr( (string) $marketly_i ); ?>">
 						<span class="screen-reader-text">
 							<?php

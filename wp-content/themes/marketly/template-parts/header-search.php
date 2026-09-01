@@ -18,5 +18,5 @@ if ( ! marketly_option( 'header_search' ) ) {
 }
 ?>
 <div class="header-search">
-	<?php get_search_form(); ?>
+	<?php get_search_form( array( 'label' => __( 'Search products', 'marketly' ) ) ); ?>
 </div>

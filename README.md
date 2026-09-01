@@ -15,7 +15,7 @@ share nothing and are installed separately.
 A hand-built WooCommerce theme following the Underscores (`_s`) template
 hierarchy. No page builder, no CSS framework, no build step, no SEO plugin.
 
-**Status: Phase 5 of 7 complete** — responsive and touch refinement.
+**Status: Phase 6 of 7 complete** — SEO, security, performance, accessibility.
 
 ```
 wp-content/
@@ -34,6 +34,7 @@ wp-content/
     ├── inc/template-helpers.php    Inline SVG icons, ratings, section headings
     ├── inc/customizer.php          Panel, defaults registry, sanitisers
     ├── inc/customizer-storefront.php  Hero, deal, shelves, promos, newsletter
+    ├── inc/seo.php                 Meta, canonical, OG, JSON-LD (plugin-safe)
     ├── inc/storefront.php          Live WooCommerce queries + homepage hooks
     ├── inc/woocommerce.php         Woo hooks, assets, fragments, wishlist API
     ├── front-page.php              The storefront homepage
@@ -121,6 +122,74 @@ galleries, ratings and reviews, cart, checkout, my account, related products
 and up-sells. Both the classic shortcode cart/checkout and WooCommerce's Cart
 and Checkout blocks render correctly.
 
+### SEO
+
+Hand-coded, no plugin — and deliberately narrow, because two systems writing
+the same tag is worse than either alone.
+
+- **It stands down entirely** when Yoast, Rank Math, SEOPress, All in One SEO,
+  The SEO Framework or Slim SEO is active. Verified by simulating Yoast: the
+  theme emits nothing, and everything returns when it is removed.
+- **It does not duplicate WooCommerce.** WooCommerce already outputs Product,
+  Offer, AggregateRating, Review and BreadcrumbList JSON-LD — confirmed in the
+  page source, not assumed. The theme adds only what is missing: Organization
+  (OnlineStore), WebSite with a search action, and Article for blog posts.
+- Meta descriptions with a real fallback chain — a product's short description,
+  then its excerpt, then content, then the footer blurb, then the tagline — so
+  no page ships without one.
+- Canonicals on archives and the shop, which WordPress core leaves alone.
+- Open Graph and Twitter cards with real image dimensions.
+- `noindex, follow` on search results, filtered catalogue permutations and the
+  wishlist, which renders from browser storage and so looks empty to a crawler.
+
+### Security
+
+Every superglobal is sanitised at the point of use. Every write checks a
+nonce, autosave, revision state and a capability. No direct SQL anywhere, and
+no dynamic code execution. The only unescaped output is theme-authored SVG
+from a fixed table, annotated where it occurs. The wishlist REST route is
+read-only, validates its input against `^[0-9]+(,[0-9]+)*$`, caps the list at
+48 and returns only published, catalogue-visible products — a draft product
+was confirmed not to leak through it.
+
+Recommended on the server, not as plugins: `define('DISALLOW_FILE_EDIT', true)`
+in `wp-config.php`, HTTPS enforced, a non-`wp_` table prefix, hosting-level
+login-attempt limiting, and off-server backups.
+
+### Performance
+
+Measured, not assumed. A product page went from 442KB over 26 requests to
+352KB over 19, and from four render-blocking scripts to one:
+
+- WooCommerce's zoom, slider and lightbox libraries (~62KB) are skipped on
+  products that have no gallery to show them. Products that do have one keep
+  the full set. PhotoSwipe's dialog markup is removed alongside its
+  stylesheet, since that markup is what the stylesheet hides.
+- jQuery Migrate is dropped on the front end — 13KB of render-blocking shim
+  for APIs nothing here uses. It stays in wp-admin.
+- Product image lookups are primed in one query instead of one per card.
+- WooCommerce's own stylesheets (~112KB) were already replaced in Phase 4.
+
+A persistent object cache (Redis or Memcached) at the hosting level is still
+the right answer for query volume; that is a server concern, not a plugin.
+
+### Accessibility
+
+Audited with axe-core across ten templates at WCAG 2.1 AA. Ten violation
+types at the start, one at the end — the rating star's gold, kept
+deliberately and explained in the stylesheet, since the rating is also
+carried by an `aria-label` and the visible review count.
+
+Fixed along the way: contrast on the sale badge, amber buttons, struck-through
+prices, countdown labels and the 404 numeral, each against measured ratios
+rather than guesses; a testimonial rail that could not be reached by keyboard;
+`role="tab"` used without any tab panel; product card headings that skipped a
+level on archives; two identically-named search landmarks on one page; and
+links in prose distinguished only by colour. The skip link is the first tab
+stop and moves focus into `main`, and every focusable control shows a visible
+ring — including in forced-colours mode, where `box-shadow` indicators are
+stripped by the OS.
+
 ### Responsive
 
 Mobile-first, verified rather than assumed. Every template is checked for
@@ -154,7 +223,6 @@ Requires WordPress 6.4+, PHP 7.4+ and WooCommerce 8.0+.
 
 | Phase | Scope |
 |---|---|
-| 6 | SEO, security, performance, accessibility |
 | 7 | Testing and visual QA against the reference design |
 
 ---

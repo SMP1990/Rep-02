@@ -19,6 +19,6 @@ defined( 'ABSPATH' ) || exit;
 	</p>
 
 	<div class="empty-state__search">
-		<?php get_search_form(); ?>
+		<?php get_search_form( array( 'label' => __( 'Search again', 'marketly' ) ) ); ?>
 	</div>
 </section>

@@ -19,6 +19,7 @@ require_once MARKETLY_DIR . '/inc/setup.php';
 require_once MARKETLY_DIR . '/inc/template-helpers.php';
 require_once MARKETLY_DIR . '/inc/customizer.php';
 require_once MARKETLY_DIR . '/inc/customizer-storefront.php';
+require_once MARKETLY_DIR . '/inc/seo.php';
 require_once MARKETLY_DIR . '/inc/storefront.php';
 
 if ( class_exists( 'WooCommerce' ) ) {
@@ -158,6 +159,26 @@ function marketly_enqueue_assets() {
 	}
 }
 add_action( 'wp_enqueue_scripts', 'marketly_enqueue_assets' );
+
+/**
+ * Drop jQuery Migrate on the front end.
+ *
+ * It exists to shim jQuery APIs removed in 3.0 and logs warnings about them.
+ * Nothing in this theme uses jQuery at all, and current WooCommerce does not
+ * need the shim — it is 13KB of render-blocking script for compatibility with
+ * code that is not here. It stays in wp-admin, where a plugin might rely on it.
+ */
+function marketly_drop_jquery_migrate( $scripts ) {
+	if ( is_admin() || empty( $scripts->registered['jquery'] ) ) {
+		return;
+	}
+
+	$scripts->registered['jquery']->deps = array_diff(
+		$scripts->registered['jquery']->deps,
+		array( 'jquery-migrate' )
+	);
+}
+add_action( 'wp_default_scripts', 'marketly_drop_jquery_migrate' );
 
 /**
  * Drop the block library stylesheets on pages that render no blocks.

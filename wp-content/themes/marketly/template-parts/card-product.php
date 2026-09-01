@@ -9,7 +9,10 @@
  *
  * Every value is read from the WC_Product — nothing here is hard-coded.
  *
- * @param array $args product (WC_Product), layout (h|v), eager (bool).
+ * @param array $args product (WC_Product), layout (h|v), eager (bool),
+ *                    heading (h2|h3). Homepage shelves sit under a section
+ *                    h2 so their cards are h3; an archive's cards follow the
+ *                    page h1 directly, so there they are h2.
  *
  * @package Marketly
  */
@@ -28,6 +31,10 @@ $marketly_id       = $marketly_product->get_id();
 $marketly_discount = marketly_discount_percent( $marketly_product );
 $marketly_reviews  = (int) $marketly_product->get_review_count();
 $marketly_rating   = (float) $marketly_product->get_average_rating();
+
+$marketly_heading = ( isset( $args['heading'] ) && in_array( $args['heading'], array( 'h2', 'h3' ), true ) )
+	? $args['heading']
+	: 'h3';
 ?>
 <article class="pcard pcard--<?php echo esc_attr( $marketly_layout ); ?>">
 
@@ -77,11 +84,11 @@ $marketly_rating   = (float) $marketly_product->get_average_rating();
 	</div>
 
 	<div class="pcard__body">
-		<h3 class="pcard__title">
+		<<?php echo esc_attr( $marketly_heading ); ?> class="pcard__title">
 			<a href="<?php echo esc_url( $marketly_product->get_permalink() ); ?>">
 				<?php echo esc_html( $marketly_product->get_name() ); ?>
 			</a>
-		</h3>
+		</<?php echo esc_attr( $marketly_heading ); ?>>
 
 		<?php if ( $marketly_reviews > 0 ) : ?>
 			<?php marketly_rating_stars( $marketly_rating, $marketly_reviews ); ?>

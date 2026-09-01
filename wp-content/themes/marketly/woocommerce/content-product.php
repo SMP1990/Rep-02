@@ -32,6 +32,8 @@ if ( empty( $product ) || ! $product->is_visible() ) {
 		array(
 			'product' => $product,
 			'layout'  => 'v',
+			// Archive cards follow the page h1, with no section heading between.
+			'heading' => 'h2',
 		)
 	);
 	?>

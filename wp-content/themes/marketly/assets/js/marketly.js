@@ -531,7 +531,14 @@
 				var current = i === index;
 
 				dot.classList.toggle('is-current', current);
-				dot.setAttribute('aria-selected', current ? 'true' : 'false');
+
+				// aria-current, not aria-selected: these are buttons in a
+				// group, not tabs owning panels.
+				if (current) {
+					dot.setAttribute('aria-current', 'true');
+				} else {
+					dot.removeAttribute('aria-current');
+				}
 			});
 		}
 
