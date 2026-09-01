@@ -2011,6 +2011,15 @@ body.is-locked { overflow: hidden; }
 /* Side by side — the Featured Products grid. */
 .pcard--h { flex-direction: row; align-items: stretch; }
 
+/* The vertical card fills its body, so pushing the price to the bottom keeps
+   a row of cards aligned. The horizontal card's height comes from its square
+   image instead, which leaves far more room than the three rows of text need
+   — and pinning the price to the floor of that box opens a gap in the middle
+   of every card. Grouping the rows and centring them is what the reference
+   does. */
+.pcard--h .pcard__body { justify-content: center; }
+.pcard--h .pcard__foot { margin-top: 0; padding-top: 0.125rem; }
+
 /* In this layout the reference puts the wishlist heart at the far right of
    the card, level with the title, rather than over the image. Making the
    media a static box hands both overlays to the card as their containing
