@@ -62,6 +62,10 @@ function marketly_icon_paths() {
 		'minus'         => '<path d="M5 12h14"/>',
 		'check'         => '<path d="m20 6-11 11-5-5"/>',
 		'filter'        => '<path d="M3 5h18"/><path d="M6.5 12h11"/><path d="M10 19h4"/>',
+		'sliders'       => '<path d="M4 6h10"/><path d="M18 6h2"/><path d="M4 12h4"/><path d="M12 12h8"/><path d="M4 18h10"/><path d="M18 18h2"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="16" cy="18" r="2"/>',
+		'flame'         => '<path d="M12 22a6 6 0 0 0 6-6c0-4-3-5.5-3-9-2.5 1.5-3 4-3 4s-1-1.2-1-3c-2.5 2-5 4.6-5 8a6 6 0 0 0 6 6Z"/>',
+		'award'         => '<circle cx="12" cy="9" r="5.5"/><path d="m8.4 13.6-1.4 7.6 5-2.6 5 2.6-1.4-7.6"/>',
+		'percent'       => '<path d="M19 5 5 19"/><circle cx="7.5" cy="7.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/>',
 		'trash'         => '<path d="M4 7h16"/><path d="M9.5 7V4.5h5V7"/><path d="M6 7l1 13.2a1.6 1.6 0 0 0 1.6 1.3h6.8A1.6 1.6 0 0 0 17 20.2L18 7"/>',
 		'eye'           => '<path d="M2 12s3.8-6.5 10-6.5S22 12 22 12s-3.8 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
 

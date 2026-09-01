@@ -234,8 +234,12 @@ class Marketly_Demo {
 			}
 		}
 
-		foreach ( (array) ( $tracked['terms'] ?? array() ) as $term_id ) {
-			wp_delete_term( (int) $term_id, 'product_cat' );
+		foreach ( (array) ( $tracked['terms'] ?? array() ) as $term ) {
+			// Imports before brands were tracked stored a bare product_cat id.
+			$taxonomy = is_array( $term ) ? (string) $term[0] : 'product_cat';
+			$term_id  = is_array( $term ) ? (int) $term[1] : (int) $term;
+
+			wp_delete_term( $term_id, $taxonomy );
 		}
 
 		foreach ( (array) ( $tracked['mods'] ?? array() ) as $mod ) {
@@ -378,7 +382,7 @@ class Marketly_Demo {
 				// Only track terms this import created, so removing the demo
 				// never deletes a category the shop already had.
 				if ( ! $existing ) {
-					$tracked['terms'][] = $term_id;
+					$tracked['terms'][] = array( 'product_cat', $term_id );
 				}
 
 				$thumb = self::image(
@@ -430,6 +434,15 @@ class Marketly_Demo {
 
 		if ( class_exists( 'WC_Product_Simple' ) ) {
 			foreach ( marketly_demo_products() as $index => $item ) {
+				// A catalogue in which every item is reduced, every item is
+				// in stock and nothing scores below 4.6 is a catalogue no
+				// shop has ever had — and it leaves the filters with nothing
+				// to separate, since every option matches everything. The
+				// spread below restores the variation a real shop has. It is
+				// keyed to the product's position, so an import is
+				// repeatable, and it only ever relaxes the source data.
+				$item = self::vary( $item, $index );
+
 				$product = new WC_Product_Simple();
 				$product->set_name( $item['name'] );
 				$product->set_slug( $item['slug'] );
@@ -474,12 +487,19 @@ class Marketly_Demo {
 				}
 
 				if ( $item['tags'] ) {
-					$product->set_tag_ids( self::tag_ids( $item['tags'] ) );
+					$product->set_tag_ids( self::term_ids( $item['tags'], 'product_tag', $tracked ) );
 				}
 
-				// Brand, colourways, sizes and the specification table all
-				// become product attributes, so they show in Additional
-				// Information and can be filtered on.
+				// The brand goes to WooCommerce's own product_brand taxonomy
+				// where one exists, which is what the catalogue filter queries
+				// and what brand-aware plugins and feeds read. Colourways,
+				// sizes and the specification table stay as per-product
+				// attributes: they are descriptive, not something the shop
+				// browses by, so they do not warrant global taxonomies.
+				$brand_ids = $item['brand']
+					? self::term_ids( array( $item['brand'] ), 'product_brand', $tracked )
+					: array();
+
 				$attributes = array();
 
 				if ( $item['brand'] ) {
@@ -509,6 +529,10 @@ class Marketly_Demo {
 				}
 
 				$tracked['products'][] = $product_id;
+
+				if ( $brand_ids ) {
+					wp_set_object_terms( $product_id, $brand_ids, 'product_brand' );
+				}
 
 				$main = self::image( $item['image'], $item['name'], $tracked );
 
@@ -546,6 +570,45 @@ class Marketly_Demo {
 			}
 		}
 
+		// WooCommerce defers term counting while products are being written,
+		// so without this every brand, category and tag would still read as
+		// empty — and anything that lists non-empty terms, the catalogue
+		// filter included, would find nothing to show.
+		foreach ( array( 'product_cat', 'product_tag', 'product_brand' ) as $taxonomy ) {
+			if ( ! taxonomy_exists( $taxonomy ) ) {
+				continue;
+			}
+
+			// Term-taxonomy ids, not term ids: that is what both WordPress's
+			// own counter and WooCommerce's replacement expect to be handed.
+			$terms = get_terms(
+				array(
+					'taxonomy'   => $taxonomy,
+					'hide_empty' => false,
+				)
+			);
+
+			if ( is_wp_error( $terms ) || ! $terms ) {
+				continue;
+			}
+
+			$tt_ids = array();
+
+			foreach ( $terms as $term ) {
+				$tt_ids[] = (int) $term->term_taxonomy_id;
+			}
+
+			wp_update_term_count_now( $tt_ids, $taxonomy );
+		}
+
+		// WooCommerce serves term counts from its own cache, which still
+		// holds the figures from before this import ran.
+		delete_transient( 'wc_term_counts' );
+
+		if ( function_exists( 'wc_delete_product_transients' ) ) {
+			wc_delete_product_transients();
+		}
+
 		self::testimonials( $tracked );
 		self::presentation( $tracked, $deal_id );
 
@@ -559,23 +622,73 @@ class Marketly_Demo {
 	}
 
 	/**
-	 * Resolve tag names to product_tag ids, creating any that are missing.
+	 * Give one product the variation a real catalogue has.
 	 *
-	 * @param string[] $names Tag names.
+	 * Deterministic on the product's position: the same import always
+	 * produces the same shop, so a screenshot or a support question still
+	 * describes what the next person will see.
+	 *
+	 * @param array $item  Product data.
+	 * @param int   $index Position in the catalogue.
+	 * @return array
+	 */
+	private static function vary( $item, $index ) {
+		// Two lines in five sell at their full price. Flash-deal lines keep
+		// their reduction whatever their position: those are the ones the
+		// storefront is built around.
+		if ( ! $item['flash_deal'] && $index % 5 >= 3 ) {
+			$item['price'] = $item['regular'];
+		}
+
+		// Two lines are sold out, and two more are down to their last few —
+		// which is what makes the low-stock notice and the in-stock filter
+		// mean anything.
+		if ( 7 === $index % 19 ) {
+			$item['stock'] = 0;
+		} elseif ( 4 === $index % 11 ) {
+			$item['stock'] = 2 + ( $index % 3 );
+		}
+
+		// Ratings fan out below the source figure rather than above it: a
+		// demo should not invent praise a product never received.
+		$shift          = array( 0.0, 0.0, -0.4, -0.9, 0.0, -1.3, -0.6, 0.0 );
+		$item['rating'] = max( 1.0, round( $item['rating'] + $shift[ $index % 8 ], 1 ) );
+
+		return $item;
+	}
+
+	/**
+	 * Resolve term names to ids in a taxonomy, creating any that are missing.
+	 *
+	 * Terms this import creates are recorded against their taxonomy so that
+	 * removing the demo can delete them again; terms the shop already had are
+	 * used but never tracked, and so survive a removal.
+	 *
+	 * @param string[] $names    Term names.
+	 * @param string   $taxonomy Taxonomy.
+	 * @param array    $tracked  Tracking array, by reference.
 	 * @return int[]
 	 */
-	private static function tag_ids( $names ) {
+	private static function term_ids( $names, $taxonomy, &$tracked ) {
+		if ( ! taxonomy_exists( $taxonomy ) ) {
+			return array();
+		}
+
 		$ids = array();
 
 		foreach ( $names as $name ) {
-			$term = term_exists( $name, 'product_tag' );
+			$existing = term_exists( $name, $taxonomy );
+			$term     = $existing ? $existing : wp_insert_term( $name, $taxonomy );
 
-			if ( ! $term ) {
-				$term = wp_insert_term( $name, 'product_tag' );
+			if ( is_wp_error( $term ) ) {
+				continue;
 			}
 
-			if ( ! is_wp_error( $term ) ) {
-				$ids[] = (int) ( is_array( $term ) ? $term['term_id'] : $term );
+			$term_id = (int) ( is_array( $term ) ? $term['term_id'] : $term );
+			$ids[]   = $term_id;
+
+			if ( ! $existing ) {
+				$tracked['terms'][] = array( $taxonomy, $term_id );
 			}
 		}
 

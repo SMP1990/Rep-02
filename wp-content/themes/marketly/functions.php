@@ -24,6 +24,7 @@ require_once MARKETLY_DIR . '/inc/storefront.php';
 
 if ( class_exists( 'WooCommerce' ) ) {
 	require_once MARKETLY_DIR . '/inc/woocommerce.php';
+	require_once MARKETLY_DIR . '/inc/filters.php';
 }
 require_once MARKETLY_DIR . '/inc/header-footer.php';
 

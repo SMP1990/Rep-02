@@ -1,0 +1,1068 @@
+/**
+ * Catalogue filters.
+ *
+ * Loaded only on the shop, product archives and — when the storefront strip
+ * is switched on — the homepage. One panel serves every screen size: below
+ * 64em it is an off-canvas drawer, at and above it a sticky sidebar. There
+ * is no second copy of the markup anywhere.
+ *
+ * @package Marketly
+ */
+
+/* ------------------------------------------------------------- The layout */
+
+.cfilter {
+	display: grid;
+	gap: 1.5rem;
+	align-items: start;
+}
+
+.cfilter__main {
+	/* Grid children default to min-content width, which lets a wide table or
+	   a long product name push the column past the viewport. */
+	min-width: 0;
+}
+
+@media (min-width: 64em) {
+
+	.cfilter {
+		grid-template-columns: 17.5rem minmax(0, 1fr);
+		gap: 2rem;
+	}
+}
+
+/* --------------------------------------------------------------- The panel */
+
+.cfilter__panel {
+	display: flex;
+	flex-direction: column;
+	background: var(--surface);
+	border: 1px solid var(--line);
+	border-radius: var(--r-lg);
+	overflow: hidden;
+	color: var(--ink);
+}
+
+/* Below the sidebar breakpoint the panel is an off-canvas drawer. It is the
+   same element in the same place in the document: only its position changes,
+   so focus order and the form's contents stay intact. */
+@media (max-width: 63.99em) {
+
+	.cfilter__panel--page {
+		position: fixed;
+		/* Above the fixed tab bar (150), on the same level as the theme's
+		   other off-canvas panels — otherwise the tab bar covers the drawer's
+		   own footer, which is where "Show N products" lives. */
+		z-index: 300;
+		inset-block: 0;
+		inset-inline-start: 0;
+		width: min(22rem, 92vw);
+		max-width: 100%;
+		border-radius: 0;
+		border-inline-start: 0;
+		box-shadow: var(--shadow-lg);
+		transform: translateX(-102%);
+		visibility: hidden;
+		transition: transform var(--dur) var(--ease), visibility var(--dur);
+	}
+
+	.cfilter__panel--page.is-open {
+		transform: translateX(0);
+		visibility: visible;
+	}
+
+	/* Without JavaScript there is nothing to open the drawer, so the panel
+	   stays in the flow above the results where it is always reachable. */
+	html:not(.has-js) .cfilter__panel--page {
+		position: static;
+		width: auto;
+		transform: none;
+		visibility: visible;
+		border-radius: var(--r-lg);
+		border-inline-start: 1px solid var(--line);
+		box-shadow: none;
+		margin-block-end: 1.5rem;
+	}
+}
+
+@media (min-width: 64em) {
+
+	.cfilter__panel--page {
+		position: sticky;
+		top: 1rem;
+		max-height: calc(100vh - 2rem);
+	}
+}
+
+/* The screen behind the open drawer. */
+.cfscrim {
+	position: fixed;
+	inset: 0;
+	z-index: 299;
+	background: rgba(17, 24, 39, 0.45);
+	opacity: 0;
+	transition: opacity var(--dur) var(--ease);
+}
+
+.cfscrim.is-open {
+	opacity: 1;
+}
+
+/* ---------------------------------------------------------------- Header */
+
+.cfilter__bar {
+	display: flex;
+	align-items: center;
+	gap: 0.625rem;
+	padding: 0.75rem 0.875rem;
+	border-block-end: 1px solid var(--line-2);
+	background: var(--surface-2);
+}
+
+.cfilter__brandmark {
+	display: grid;
+	place-items: center;
+	flex: 0 0 auto;
+	width: 1.875rem;
+	height: 1.875rem;
+	border-radius: var(--r-sm);
+	background: var(--brand-tint);
+	color: var(--brand);
+}
+
+.cfilter__headings {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.cfilter__title {
+	display: flex;
+	align-items: center;
+	gap: 0.375rem;
+	margin: 0;
+	font-size: var(--fs-sm);
+	font-weight: 700;
+	line-height: var(--lh-tight);
+	color: var(--ink);
+}
+
+.cfilter__badge {
+	display: inline-grid;
+	place-items: center;
+	min-width: 1.125rem;
+	height: 1.125rem;
+	padding-inline: 0.25rem;
+	border-radius: var(--r-full);
+	background: var(--brand);
+	color: #fff;
+	font-size: var(--fs-2xs);
+	font-weight: 700;
+	line-height: 1;
+}
+
+.cfilter__count {
+	margin: 0.125rem 0 0;
+	font-size: var(--fs-xs);
+	color: var(--muted);
+}
+
+.cfilter__reset {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	flex: 0 0 auto;
+	/* 44px of hit area without 44px of visible chrome. */
+	padding: 0.6875rem 0.5rem;
+	margin: -0.4375rem 0;
+	border-radius: var(--r-sm);
+	color: var(--sale);
+	font-size: var(--fs-xs);
+	font-weight: 700;
+	text-decoration: none;
+}
+
+.cfilter__reset:hover,
+.cfilter__reset:focus-visible {
+	background: var(--sale-tint);
+	text-decoration: underline;
+}
+
+.cfilter__reset.is-hidden {
+	display: none;
+}
+
+.cfilter__close {
+	display: none;
+	flex: 0 0 auto;
+	width: 2.75rem;
+	height: 2.75rem;
+	margin: -0.5rem -0.375rem -0.5rem 0;
+	padding: 0;
+	border: 0;
+	background: none;
+	color: var(--muted);
+	cursor: pointer;
+	border-radius: var(--r-sm);
+}
+
+.cfilter__close:hover {
+	background: var(--line-2);
+	color: var(--ink);
+}
+
+/* Only the drawer has anything to close. */
+@media (max-width: 63.99em) {
+
+	html.has-js .cfilter__panel--page .cfilter__close {
+		display: grid;
+		place-items: center;
+	}
+}
+
+/* --------------------------------------------------- Quick preset chips */
+
+.cfquick {
+	padding: 0.625rem 0.875rem 0.75rem;
+	border-block-end: 1px solid var(--line-2);
+}
+
+.cfquick__label {
+	margin: 0 0 0.4375rem;
+	font-size: var(--fs-2xs);
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--muted);
+}
+
+.cfquick__row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.375rem;
+}
+
+.cfchip {
+	/* Contains the visually-hidden input inside it: an absolutely
+	   positioned child with no positioned ancestor resolves against the
+	   initial containing block, escapes any scroll container it sits in,
+	   and is then measured at its static position — which widens the page. */
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3125rem;
+	/* 32px tall, but the label's own padding plus the row gap keeps
+	   neighbouring targets from overlapping at a fingertip's width. */
+	min-height: 2rem;
+	padding: 0.375rem 0.625rem;
+	border: 1px solid var(--line);
+	border-radius: var(--r-full);
+	background: var(--surface);
+	color: var(--body);
+	font-size: var(--fs-xs);
+	font-weight: 600;
+	line-height: 1;
+	cursor: pointer;
+	transition: border-color var(--dur), background-color var(--dur), color var(--dur);
+}
+
+.cfchip:hover {
+	border-color: var(--brand);
+	color: var(--brand);
+}
+
+.cfchip__input {
+	/* Hidden from sight, not from the accessibility tree or the keyboard:
+	   the ring below is drawn on the label when this input is focused. */
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
+.cfchip:has(.cfchip__input:focus-visible) {
+	outline: 2px solid var(--brand);
+	outline-offset: 2px;
+}
+
+.cfchip.is-on {
+	background: var(--brand);
+	border-color: var(--brand);
+	color: #fff;
+}
+
+.cfchip--sale.is-on {
+	background: var(--sale);
+	border-color: var(--sale);
+}
+
+.cfchip--top.is-on {
+	background: var(--brand-darker);
+	border-color: var(--brand-darker);
+}
+
+.cfchip--instock.is-on {
+	background: var(--success);
+	border-color: var(--success);
+}
+
+.cfchip--rating.is-on {
+	background: var(--accent);
+	border-color: var(--accent);
+	color: var(--accent-ink);
+}
+
+/* ------------------------------------------------------- Applied chips */
+
+.cfactive {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.375rem;
+	padding: 0.625rem 0.875rem;
+	background: var(--brand-tint);
+	border-block-end: 1px solid var(--brand-tint-2);
+}
+
+.cfactive__label {
+	font-size: var(--fs-2xs);
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--brand-ink);
+}
+
+.cfactive__chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	min-height: 1.75rem;
+	padding: 0.3125rem 0.5rem;
+	border: 1px solid var(--brand-tint-2);
+	border-radius: var(--r-sm);
+	background: var(--surface);
+	color: var(--brand-ink);
+	font-size: var(--fs-xs);
+	font-weight: 700;
+	line-height: 1;
+	text-decoration: none;
+}
+
+.cfactive__chip:hover,
+.cfactive__chip:focus-visible {
+	border-color: var(--sale);
+	background: var(--sale-tint);
+	color: var(--sale);
+}
+
+/* ------------------------------------------------------------ Sections */
+
+.cfilter__scroll {
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	padding: 0 0.875rem;
+}
+
+.cfsec {
+	border-block-end: 1px solid var(--line-2);
+}
+
+.cfsec:last-child {
+	border-block-end: 0;
+}
+
+.cfsec__head {
+	margin: 0;
+	font-size: inherit;
+	font-weight: inherit;
+}
+
+.cfsec__toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	width: 100%;
+	min-height: 2.75rem;
+	padding: 0.625rem 0;
+	border: 0;
+	background: none;
+	color: var(--ink);
+	font: inherit;
+	text-align: start;
+	cursor: pointer;
+}
+
+.cfsec__title {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4375rem;
+	font-size: var(--fs-xs);
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+.cfsec__icon {
+	color: var(--brand);
+	flex: 0 0 auto;
+}
+
+.cfsec__meta {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3125rem;
+	min-width: 0;
+	color: var(--muted);
+}
+
+.cfsec__summary {
+	overflow: hidden;
+	font-size: var(--fs-xs);
+	font-weight: 600;
+	color: var(--brand);
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.cfsec__chev {
+	flex: 0 0 auto;
+	transition: transform var(--dur) var(--ease);
+}
+
+.cfsec__toggle[aria-expanded="true"] .cfsec__chev {
+	transform: rotate(180deg);
+}
+
+.cfsec__body {
+	padding-block-end: 0.875rem;
+}
+
+/* ------------------------------------------------------- Option lists */
+
+.cflist {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	gap: 0.125rem;
+}
+
+.cflist--scroll {
+	max-height: 13.75rem;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	padding-inline-end: 0.25rem;
+}
+
+.cfopt {
+	/* Contains the visually-hidden input inside it: an absolutely
+	   positioned child with no positioned ancestor resolves against the
+	   initial containing block, escapes any scroll container it sits in,
+	   and is then measured at its static position — which widens the page. */
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	/* 40px, and every one of these sits in a list with nothing beside it,
+	   so the full row width is the target. */
+	min-height: 2.5rem;
+	padding: 0.375rem 0.5rem;
+	margin-inline: -0.5rem;
+	border-radius: var(--r-sm);
+	font-size: var(--fs-sm);
+	color: var(--body);
+	cursor: pointer;
+	transition: background-color var(--dur);
+}
+
+.cfopt:hover {
+	background: var(--surface-2);
+}
+
+.cfopt:has(.cfopt__input:checked) {
+	color: var(--ink);
+	font-weight: 600;
+}
+
+.cfopt:has(.cfopt__input:focus-visible) {
+	outline: 2px solid var(--brand);
+	outline-offset: -2px;
+}
+
+/* An option that would return nothing is dimmed but still operable — it is
+   information about the catalogue, not a broken control. */
+.cfopt.is-empty {
+	opacity: 0.45;
+}
+
+.cfopt__input {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
+.cfopt__mark {
+	position: relative;
+	display: grid;
+	place-items: center;
+	flex: 0 0 auto;
+	width: 1.0625rem;
+	height: 1.0625rem;
+	border: 1.5px solid var(--muted);
+	border-radius: var(--r-full);
+	background: var(--surface);
+	color: transparent;
+	transition: border-color var(--dur), background-color var(--dur);
+}
+
+.cfopt__mark--box {
+	border-radius: var(--r-xs);
+}
+
+.cfopt__mark::after {
+	content: "";
+	width: 0.5rem;
+	height: 0.5rem;
+	border-radius: var(--r-full);
+	background: #fff;
+	transform: scale(0);
+	transition: transform var(--dur) var(--ease);
+}
+
+.cfopt__mark--box::after {
+	display: none;
+}
+
+.cfopt__input:checked + .cfopt__mark {
+	border-color: var(--brand);
+	background: var(--brand);
+	color: #fff;
+}
+
+.cfopt__input:checked + .cfopt__mark::after {
+	transform: scale(1);
+}
+
+.cfopt__name {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.375rem;
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.cfopt__name--stars {
+	gap: 0.375rem;
+}
+
+.cfopt__glyph {
+	flex: 0 0 auto;
+	color: var(--muted);
+}
+
+.cfopt__count {
+	flex: 0 0 auto;
+	font-size: var(--fs-xs);
+	font-weight: 600;
+	color: var(--muted);
+	font-variant-numeric: tabular-nums;
+}
+
+.cflist__none {
+	margin: 0.5rem 0 0;
+	font-size: var(--fs-xs);
+	color: var(--muted);
+}
+
+/* ------------------------------------------------------- Brand search */
+
+.cfsearch {
+	position: relative;
+	margin-block-end: 0.5rem;
+}
+
+.cfsearch__icon {
+	position: absolute;
+	top: 50%;
+	inset-inline-start: 0.5rem;
+	transform: translateY(-50%);
+	color: var(--muted);
+	pointer-events: none;
+}
+
+.cfsearch__input {
+	width: 100%;
+	min-height: 2.25rem;
+	padding: 0.375rem 0.625rem 0.375rem 1.875rem;
+	border: 1px solid var(--line);
+	border-radius: var(--r-sm);
+	background: var(--surface-2);
+	color: var(--ink);
+	font: inherit;
+	font-size: var(--fs-sm);
+}
+
+.cfsearch__input:focus {
+	outline: 2px solid var(--brand);
+	outline-offset: -1px;
+	background: var(--surface);
+}
+
+/* ------------------------------------------------------------- Tags */
+
+.cftags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.375rem;
+}
+
+.cftag {
+	/* Contains the visually-hidden input inside it: an absolutely
+	   positioned child with no positioned ancestor resolves against the
+	   initial containing block, escapes any scroll container it sits in,
+	   and is then measured at its static position — which widens the page. */
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3125rem;
+	min-height: 2rem;
+	padding: 0.375rem 0.625rem;
+	border: 1px solid var(--line);
+	border-radius: var(--r-full);
+	background: var(--surface);
+	color: var(--body);
+	font-size: var(--fs-xs);
+	font-weight: 600;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.cftag:hover {
+	border-color: var(--brand);
+	color: var(--brand);
+}
+
+.cftag.is-on {
+	background: var(--brand);
+	border-color: var(--brand);
+	color: #fff;
+}
+
+.cftag.is-empty {
+	opacity: 0.45;
+}
+
+.cftag__input {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
+.cftag:has(.cftag__input:focus-visible) {
+	outline: 2px solid var(--brand);
+	outline-offset: 2px;
+}
+
+.cftag__count {
+	font-size: var(--fs-2xs);
+	opacity: 0.75;
+	font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------------------------------- Price slider */
+
+/* Two <input type="range"> stacked on one track. Each is a real slider the
+   keyboard drives and a screen reader announces; the pointer-events rules
+   below are what stop the upper one from swallowing every drag meant for
+   the lower. */
+
+.cfprice {
+	position: relative;
+	padding-block-start: 0.875rem;
+}
+
+.cfprice__track {
+	position: relative;
+	height: 0.25rem;
+	margin: 0 0.5rem 1.125rem;
+	border-radius: var(--r-full);
+	background: var(--line);
+}
+
+.cfprice__fill {
+	position: absolute;
+	inset-block: 0;
+	border-radius: var(--r-full);
+	background: var(--brand);
+}
+
+.cfprice__range {
+	position: absolute;
+	/* Centred on the 4px track, whose own centre sits 0.625rem down. */
+	top: -0.375rem;
+	inset-inline: 0;
+	width: 100%;
+	height: 2rem;
+	margin: 0;
+	padding: 0;
+	background: none;
+	appearance: none;
+	-webkit-appearance: none;
+	/* The track is inert; only the thumbs take the pointer. */
+	pointer-events: none;
+}
+
+.cfprice__range::-webkit-slider-runnable-track {
+	height: 2rem;
+	background: none;
+	border: 0;
+}
+
+.cfprice__range::-moz-range-track {
+	height: 2rem;
+	background: none;
+	border: 0;
+}
+
+.cfprice__range::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	pointer-events: auto;
+	width: 1.125rem;
+	height: 1.125rem;
+	margin-top: 0.4375rem;
+	border: 2px solid var(--brand);
+	border-radius: var(--r-full);
+	background: var(--surface);
+	box-shadow: var(--shadow-sm);
+	cursor: grab;
+}
+
+.cfprice__range::-moz-range-thumb {
+	pointer-events: auto;
+	width: 1.125rem;
+	height: 1.125rem;
+	border: 2px solid var(--brand);
+	border-radius: var(--r-full);
+	background: var(--surface);
+	box-shadow: var(--shadow-sm);
+	cursor: grab;
+}
+
+.cfprice__range:focus-visible::-webkit-slider-thumb {
+	outline: 2px solid var(--brand);
+	outline-offset: 2px;
+}
+
+.cfprice__range:focus-visible::-moz-range-thumb {
+	outline: 2px solid var(--brand);
+	outline-offset: 2px;
+}
+
+/* Without the stylesheet's track the two ranges would sit on top of each
+   other unusably, so when there is no script to drive them they fall back
+   to two ordinary, separately labelled sliders. */
+html:not(.has-js) .cfprice__range {
+	position: static;
+	pointer-events: auto;
+	display: block;
+	margin-block-end: 0.5rem;
+}
+
+html:not(.has-js) .cfprice__track {
+	display: none;
+}
+
+.cfprice__fields {
+	display: flex;
+	align-items: flex-end;
+	gap: 0.5rem;
+}
+
+.cfprice__field {
+	flex: 1 1 0;
+	min-width: 0;
+	display: block;
+}
+
+.cfprice__flabel {
+	display: block;
+	margin-block-end: 0.1875rem;
+	font-size: var(--fs-2xs);
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--muted);
+}
+
+.cfprice__input {
+	width: 100%;
+	min-height: 2.25rem;
+	padding: 0.375rem 0.5rem;
+	border: 1px solid var(--line);
+	border-radius: var(--r-sm);
+	background: var(--surface);
+	color: var(--ink);
+	font: inherit;
+	font-size: var(--fs-sm);
+	font-variant-numeric: tabular-nums;
+}
+
+.cfprice__input:focus {
+	outline: 2px solid var(--brand);
+	outline-offset: -1px;
+}
+
+.cfprice__dash {
+	padding-block-end: 0.5rem;
+	color: var(--muted);
+}
+
+/* --------------------------------------------------------- Panel footer */
+
+.cfilter__foot {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.75rem 0.875rem;
+	border-block-start: 1px solid var(--line-2);
+	background: var(--surface-2);
+}
+
+.cfilter__clear {
+	flex: 0 0 auto;
+}
+
+.cfilter__apply {
+	flex: 1 1 auto;
+	justify-content: center;
+}
+
+/* On the desktop sidebar every control applies the moment it changes, so
+   the footer's job is only to offer a way to clear everything. */
+@media (min-width: 64em) {
+
+	html.has-js .cfilter__panel--page .cfilter__apply {
+		display: none;
+	}
+
+	html.has-js .cfilter__panel--page .cfilter__clear {
+		flex: 1 1 auto;
+		justify-content: center;
+	}
+}
+
+/* ------------------------------------------------------------- Trigger */
+
+.cftrigger {
+	margin-block-end: 1rem;
+}
+
+.cftrigger__btn {
+	position: relative;
+}
+
+.cftrigger__badge {
+	display: inline-grid;
+	place-items: center;
+	min-width: 1.125rem;
+	height: 1.125rem;
+	padding-inline: 0.25rem;
+	margin-inline-start: 0.125rem;
+	border-radius: var(--r-full);
+	background: var(--brand);
+	color: #fff;
+	font-size: var(--fs-2xs);
+	font-weight: 700;
+	line-height: 1;
+}
+
+/* The sidebar is on screen at this width, so a button that opens it would
+   be a control with nothing to do. */
+@media (min-width: 64em) {
+
+	.cftrigger {
+		display: none;
+	}
+}
+
+/* And with no script there is no drawer to open either. */
+html:not(.has-js) .cftrigger {
+	display: none;
+}
+
+/* --------------------------------------------------------- Empty state */
+
+.cfempty {
+	display: grid;
+	justify-items: center;
+	gap: 0.75rem;
+	padding: 3rem 1.25rem;
+	text-align: center;
+	background: var(--surface);
+	border: 1px solid var(--line);
+	border-radius: var(--r-lg);
+}
+
+.cfempty__icon {
+	display: grid;
+	place-items: center;
+	width: 3.5rem;
+	height: 3.5rem;
+	border-radius: var(--r-full);
+	background: var(--brand-tint);
+	color: var(--brand);
+}
+
+.cfempty__title {
+	margin: 0;
+	font-size: var(--fs-md);
+	color: var(--ink);
+}
+
+.cfempty__text {
+	margin: 0;
+	max-width: 32rem;
+	font-size: var(--fs-sm);
+	color: var(--body);
+}
+
+.cfempty__chips {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 0.375rem;
+	margin-block: 0.25rem;
+}
+
+/* ------------------------------------------------------ Results region */
+
+.cfilter__results {
+	position: relative;
+	transition: opacity var(--dur);
+}
+
+.cfilter__results[aria-busy="true"] {
+	opacity: 0.45;
+	/* A half-updated grid should not accept clicks meant for the new one. */
+	pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+	.cfilter__panel--page,
+	.cfscrim,
+	.cfsec__chev,
+	.cfopt__mark::after,
+	.cfilter__results {
+		transition: none;
+	}
+}
+
+/* ------------------------------------------------ Storefront filter row */
+
+/* The homepage strip. It reuses the chips from the panel, so a category pill
+   and a status chip look and behave the same in both places. */
+
+.shopby__bar {
+	display: grid;
+	gap: 0.75rem;
+	padding: 0.875rem;
+	margin-block-end: 1.25rem;
+	background: var(--surface);
+	border: 1px solid var(--line);
+	border-radius: var(--r-lg);
+}
+
+/* The category pills scroll sideways rather than wrapping into a block that
+   pushes the products below the fold on a phone. */
+.shopby__scroll {
+	overflow-x: auto;
+	overscroll-behavior-x: contain;
+	scrollbar-width: thin;
+	/* Room for the focus ring, which would otherwise be clipped by the
+	   scroll container. */
+	margin: -0.25rem;
+	padding: 0.25rem;
+}
+
+.shopby__pills {
+	display: flex;
+	gap: 0.375rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	width: max-content;
+}
+
+.shopby__states {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.375rem;
+	padding-block-start: 0.75rem;
+	border-block-start: 1px solid var(--line-2);
+}
+
+.shopby__go {
+	margin-inline-start: auto;
+}
+
+/* With a script the strip applies as you tap, so the button is redundant. */
+html.has-js .shopby__go {
+	display: none;
+}
+
+.shopby__results {
+	position: relative;
+	transition: opacity var(--dur);
+}
+
+.shopby__results[aria-busy="true"] {
+	opacity: 0.45;
+	pointer-events: none;
+}
+
+@media (min-width: 48em) {
+
+	.shopby__bar {
+		grid-template-columns: minmax(0, 1fr) auto;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.shopby__states {
+		padding-block-start: 0;
+		border-block-start: 0;
+		border-inline-start: 1px solid var(--line-2);
+		padding-inline-start: 1rem;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+	.shopby__results {
+		transition: none;
+	}
+}

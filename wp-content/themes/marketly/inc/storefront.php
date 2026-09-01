@@ -403,6 +403,7 @@ foreach ( array(
 	20 => 'hero',
 	30 => 'flash-deal',
 	40 => 'popular',
+	45 => 'shop-by',
 	50 => 'featured',
 	60 => 'promos',
 	70 => 'bestsellers',

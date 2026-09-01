@@ -49,6 +49,7 @@ function marketly_storefront_defaults( $defaults ) {
 
 			// Flash deal.
 			'deal_enable'      => true,
+			'shopby_enable'    => true,
 			'deal_product'     => 0,
 			'deal_ends'        => '',
 			'deal_title'       => __( 'Flash Deal', 'marketly' ),
@@ -288,6 +289,19 @@ function marketly_customize_storefront( $wp_customize ) {
 			)
 		);
 	}
+
+	marketly_customize_field(
+		$wp_customize,
+		'shopby_enable',
+		array(
+			'section'     => 'marketly_shelves',
+			'label'       => __( 'Show the “Shop by what matters” filter row', 'marketly' ),
+			'description' => __( 'A category and status filter over a live product grid, on the homepage. Switching it off also stops the filter script loading there.', 'marketly' ),
+			'type'        => 'checkbox',
+			'sanitize'    => 'marketly_sanitize_checkbox',
+			'priority'    => 40,
+		)
+	);
 
 	/* ---------------------------------------------- Promotion banners */
 
