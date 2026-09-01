@@ -22,7 +22,7 @@ if ( ! marketly_has_woocommerce() || ! function_exists( 'marketly_filter_state' 
 	return;
 }
 
-if ( ! marketly_option( 'shopby_enable', true ) ) {
+if ( ! marketly_option( 'shopby_enable' ) ) {
 	return;
 }
 

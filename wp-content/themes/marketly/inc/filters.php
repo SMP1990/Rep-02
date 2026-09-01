@@ -1518,7 +1518,7 @@ add_action( 'wp_enqueue_scripts', 'marketly_filter_enqueue', 25 );
 function marketly_filter_on_front() {
 	return marketly_has_woocommerce()
 		&& is_front_page()
-		&& (bool) marketly_option( 'shopby_enable', true );
+		&& (bool) marketly_option( 'shopby_enable' );
 }
 
 /* ------------------------------------------------------------ Panel helpers */

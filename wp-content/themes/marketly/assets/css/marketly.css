@@ -332,6 +332,10 @@ body.has-tabbar .site-footer { padding-bottom: calc(var(--tabbar-h) + env(safe-a
 	/* Bleed to the viewport edge so the peek reads as intentional. */
 	margin-inline: calc(var(--gutter) * -1);
 	padding-inline: var(--gutter);
+	/* A snap position is measured from the scrollport edge, not the padding
+	   edge, so without this the first card snaps flush to the viewport and
+	   sits a gutter to the left of the heading above it. */
+	scroll-padding-inline: var(--gutter);
 	padding-bottom: 0.5rem;
 }
 
@@ -1560,6 +1564,7 @@ body.is-locked { overflow: hidden; }
 	margin: 0;
 	padding: 0 var(--gutter);
 	margin-inline: calc(var(--gutter) * -1);
+	scroll-padding-inline: var(--gutter);
 	list-style: none;
 	overflow-x: auto;
 	scroll-snap-type: x proximity;
@@ -1969,6 +1974,13 @@ body.is-locked { overflow: hidden; }
 	line-height: 1.3;
 }
 
+/* The horizontal card puts the wishlist button over the body rather than
+   over the image, so the title reserves its width. Without this the first
+   line of a long product name runs underneath the heart. */
+.pcard--h .pcard__title {
+	padding-inline-end: 2.5rem;
+}
+
 .pcard__title a { color: var(--ink); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .pcard__title a:hover { color: var(--brand); }
 
@@ -2069,6 +2081,19 @@ body.is-locked { overflow: hidden; }
 }
 
 .promo__img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Fade the photograph into the banner instead of ending it on a hard
+   vertical edge, which is what the reference does and what keeps the two
+   halves reading as one card. */
+.promo__media::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(to right, var(--promo-blend, var(--brand-tint)) 0%, rgba(255, 255, 255, 0) 42%);
+	pointer-events: none;
+}
+
+.promo--amber { --promo-blend: var(--accent); }
 
 .promo--amber { background: var(--accent); color: var(--accent-ink); }
 .promo--amber .promo__title, .promo--amber .promo__sub { color: #4a2c00; }
