@@ -320,12 +320,12 @@ class Marketly_Demo {
 	 * @param array  $track Tracking array, by reference.
 	 * @return int Attachment ID, or 0.
 	 */
-	private static function image( $url, $alt, &$track ) {
+	private static function image( $url, $alt, &$track, $art = null ) {
 		$id = $url ? self::sideload( $url, $alt ) : 0;
 
 		if ( ! $id ) {
 			$id = self::attach(
-				Marketly_Demo_Images::product( 'default', '#f2f4f8', '#c3ccda' ),
+				self::draw( $art, $alt ),
 				'marketly-placeholder-' . sanitize_title( $alt ) . '.jpg',
 				$alt
 			);
@@ -336,6 +336,111 @@ class Marketly_Demo {
 		}
 
 		return $id;
+	}
+
+	/**
+	 * Draw the artwork that stands in for a photograph.
+	 *
+	 * A host with no outbound connection, or one that WordPress cannot make
+	 * an HTTP request from, still has to end up with a catalogue that looks
+	 * like a shop. The generator already knows how to draw a shoe, a laptop,
+	 * a sofa and ten other things; this is what decides which one, and in
+	 * what colours, so a grid of products reads as a grid of products rather
+	 * than as forty identical grey rectangles.
+	 *
+	 * @param array|null $art Shape, palette and kind, from self::art().
+	 * @param string     $alt Description, used to guess when nothing is given.
+	 * @return string|false Encoded image, or false when GD is unavailable.
+	 */
+	private static function draw( $art, $alt ) {
+		$art = is_array( $art ) ? $art : self::art( $alt, '' );
+
+		if ( 'avatar' === $art['kind'] ) {
+			return Marketly_Demo_Images::avatar( $art['tint'], $art['subject'] );
+		}
+
+		if ( 'banner' === $art['kind'] ) {
+			// The shapes are drawn a step lighter than the banner rather than
+			// in white, so they read as soft depth instead of cut-out holes.
+			$accent = isset( $art['accent'] ) ? $art['accent'] : '#ffffff';
+
+			return Marketly_Demo_Images::banner( $art['tint'], $art['subject'], $accent );
+		}
+
+		return Marketly_Demo_Images::product( $art['shape'], $art['tint'], $art['subject'] );
+	}
+
+	/**
+	 * Choose a shape and palette for a product.
+	 *
+	 * Read from the product's own name first and its category second, rather
+	 * than from a column added to the catalogue: that way a product the shop
+	 * owner adds later, with no photograph, is drawn as sensibly as one of
+	 * the demo's own.
+	 *
+	 * @param string $name     Product name.
+	 * @param string $category Category name.
+	 * @return array
+	 */
+	private static function art( $name, $category ) {
+		$haystack = strtolower( $name . ' ' . $category );
+
+		// Ordered: the first keyword that matches wins, so the more specific
+		// words come before the general ones they would otherwise be caught by.
+		$shapes = array(
+			'shoe'    => array( 'sneaker', 'trainer', 'boot', 'loafer', 'sandal', 'footwear', 'shoe' ),
+			'watch'   => array( 'watch', 'chronograph', 'smartwatch' ),
+			'laptop'  => array( 'macbook', 'laptop', 'notebook', 'ultrabook' ),
+			'slab'    => array( 'iphone', 'phone', 'tablet', 'ipad', 'monitor', 'display', 'television', 'camera', 'keyboard', 'e-reader' ),
+			'glasses' => array( 'sunglass', 'glasses', 'eyewear', 'aviator', 'spectacle' ),
+			'pair'    => array( 'earbud', 'airpod', 'dumbbell', 'band', 'pair', 'sock', 'glove' ),
+			'orb'     => array( 'headphone', 'speaker', 'fryer', 'kettle', 'pan', 'pot', 'ball', 'rope', 'mat', 'cushion', 'diffuser' ),
+			'tube'    => array( 'perfume', 'parfum', 'serum', 'lipstick', 'cream', 'lotion', 'shampoo', 'cleanser', 'bottle', 'flask', 'oil', 'mist' ),
+			'seat'    => array( 'sofa', 'couch', 'armchair', 'chair', 'stool', 'bench', 'mattress' ),
+			'lamp'    => array( 'lamp', 'light', 'candle', 'lantern', 'sconce' ),
+			'basket'  => array( 'basket', 'bag', 'tote', 'hamper', 'produce', 'coffee', 'tea', 'granola', 'honey', 'grocery' ),
+			'garment' => array( 'jacket', 'sweater', 'shirt', 'coat', 'overshirt', 'cashmere', 'hoodie', 'tee', 'cap', 'hat', 'scarf', 'dress', 'trouser', 'denim' ),
+		);
+
+		$shape = '';
+
+		foreach ( $shapes as $candidate => $words ) {
+			foreach ( $words as $word ) {
+				if ( false !== strpos( $haystack, $word ) ) {
+					$shape = $candidate;
+					break 2;
+				}
+			}
+		}
+
+		// Each category gets a ground and a subject colour of its own, so a
+		// shelf of products does not read as one repeated object.
+		$palettes = array(
+			'electronics' => array( '#eef2f9', '#8d9cb4', 'slab' ),
+			'fashion'     => array( '#f8f1ea', '#c0a68f', 'garment' ),
+			'home'        => array( '#eff4f0', '#9db3a5', 'seat' ),
+			'beauty'      => array( '#fbeef3', '#d3a1b4', 'tube' ),
+			'grocery'     => array( '#f2f7ea', '#a6bf8a', 'basket' ),
+			'sports'      => array( '#edf2fa', '#8ba3c1', 'pair' ),
+		);
+
+		$key = 'electronics';
+
+		foreach ( array_keys( $palettes ) as $candidate ) {
+			if ( false !== strpos( strtolower( $category ), $candidate ) ) {
+				$key = $candidate;
+				break;
+			}
+		}
+
+		list( $tint, $subject, $fallback ) = $palettes[ $key ];
+
+		return array(
+			'kind'    => 'product',
+			'shape'   => $shape ? $shape : $fallback,
+			'tint'    => $tint,
+			'subject' => $subject,
+		);
 	}
 
 	/**
@@ -389,7 +494,8 @@ class Marketly_Demo {
 					$category['image'],
 					/* translators: %s: category name. */
 					sprintf( __( '%s category', 'marketly-core' ), $category['name'] ),
-					$tracked
+					$tracked,
+					self::art( $category['name'], $category['name'] )
 				);
 
 				if ( $thumb ) {
@@ -534,7 +640,9 @@ class Marketly_Demo {
 					wp_set_object_terms( $product_id, $brand_ids, 'product_brand' );
 				}
 
-				$main = self::image( $item['image'], $item['name'], $tracked );
+				$art = self::art( $item['name'], $item['category'] );
+
+				$main = self::image( $item['image'], $item['name'], $tracked, $art );
 
 				if ( $main ) {
 					set_post_thumbnail( $product_id, $main );
@@ -543,7 +651,7 @@ class Marketly_Demo {
 				$gallery = array();
 
 				foreach ( $item['gallery'] as $extra ) {
-					$id = self::image( $extra, $item['name'], $tracked );
+					$id = self::image( $extra, $item['name'], $tracked, $art );
 
 					if ( $id ) {
 						$gallery[] = $id;
@@ -809,7 +917,17 @@ class Marketly_Demo {
 			update_post_meta( $id, Marketly_Testimonials::META_ROLE, $person[1] );
 			update_post_meta( $id, Marketly_Testimonials::META_RATE, 5 );
 
-			$avatar = self::image( $avatars[ $order ], $person[0], $tracked );
+			$avatar = self::image(
+				$avatars[ $order ],
+				$person[0],
+				$tracked,
+				array(
+					'kind'    => 'avatar',
+					'shape'   => '',
+					'tint'    => '#e8eefb',
+					'subject' => '#c9a68b',
+				)
+			);
 
 			if ( $avatar ) {
 				set_post_thumbnail( $id, $avatar );
@@ -824,14 +942,46 @@ class Marketly_Demo {
 	 * @param int   $deal_id Product for the flash deal.
 	 */
 	private static function presentation( &$tracked, $deal_id ) {
+		// Each banner carries the palette its drawn stand-in should use, so a
+		// blue banner never ends up with amber artwork sitting on it when the
+		// photograph cannot be fetched.
 		$banners = array(
-			'hero_image'   => array( 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1400&q=80', __( 'A selection of products', 'marketly-core' ) ),
-			'promo1_image' => array( 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=1200&q=80', __( 'Summer collection', 'marketly-core' ) ),
-			'promo2_image' => array( 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=80', __( 'Home essentials', 'marketly-core' ) ),
+			'hero_image'   => array(
+				'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1400&q=80',
+				__( 'A selection of products', 'marketly-core' ),
+				'#e7eefc',
+				'#c6d6f5',
+				'#f5f9ff',
+			),
+			'promo1_image' => array(
+				'https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=1200&q=80',
+				__( 'Summer collection', 'marketly-core' ),
+				'#f7cf90',
+				'#eab558',
+				'#fdf1da',
+			),
+			'promo2_image' => array(
+				'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=80',
+				__( 'Home essentials', 'marketly-core' ),
+				'#dfe8fb',
+				'#bcd0f2',
+				'#f3f8ff',
+			),
 		);
 
 		foreach ( $banners as $mod => $banner ) {
-			$id = self::image( $banner[0], $banner[1], $tracked );
+			$id = self::image(
+				$banner[0],
+				$banner[1],
+				$tracked,
+				array(
+					'kind'    => 'banner',
+					'shape'   => '',
+					'tint'    => $banner[2],
+					'subject' => $banner[3],
+					'accent'  => $banner[4],
+				)
+			);
 
 			if ( $id ) {
 				set_theme_mod( 'marketly_' . $mod, $id );
