@@ -10,8 +10,9 @@ defined( 'ABSPATH' ) || exit;
 <div class="header-bar">
 	<div class="container header-bar__inner">
 
+		<?php // Shown by CSS only when the document is scripted; see header.php. ?>
 		<button type="button" class="hamburger" aria-expanded="false" aria-controls="marketly-drawer"
-			data-marketly-drawer-open hidden>
+			data-marketly-drawer-open>
 			<?php marketly_icon( 'menu', array( 'size' => 24 ) ); ?>
 			<span class="screen-reader-text"><?php esc_html_e( 'Open menu', 'marketly' ); ?></span>
 		</button>

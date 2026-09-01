@@ -1042,10 +1042,14 @@ a.announce__inner:hover { color: #fff; opacity: 0.9; }
 	padding-block: 0.75rem;
 }
 
-/* Hamburger — revealed by JS, so a scripting-off visitor is never shown a
-   control that cannot open anything. The tab bar and footer carry navigation
-   in that case. */
-.hamburger {
+/* Hamburger — shown only when the document is scripted, so a visitor without
+   JavaScript is never offered a control that cannot open anything. The class
+   is set in the head before first paint, so the space is reserved from the
+   start and nothing shifts. The tab bar and footer carry navigation when it
+   is absent. */
+.hamburger { display: none; }
+
+.has-js .hamburger {
 	order: 1;
 	display: inline-flex;
 	align-items: center;
@@ -1062,7 +1066,7 @@ a.announce__inner:hover { color: #fff; opacity: 0.9; }
 	transition: background var(--dur) var(--ease);
 }
 
-.hamburger:hover { background: var(--surface-2); }
+.has-js .hamburger:hover { background: var(--surface-2); }
 
 /* --------------------------------------------------------------- Brand */
 
@@ -1178,7 +1182,7 @@ a.announce__inner:hover { color: #fff; opacity: 0.9; }
 
 	/* The drawer it opens is display:none from here up, so the control would
 	   be dead. The nav row below carries the same links. */
-	.hamburger { display: none; }
+	.has-js .hamburger { display: none; }
 
 	.brand { margin-inline-end: 0; }
 

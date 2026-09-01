@@ -16,6 +16,15 @@ defined( 'ABSPATH' ) || exit;
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="profile" href="https://gmpg.org/xfn/11">
+	<?php
+	// Marks the document as scripted before the first paint, so controls that
+	// only work with JavaScript can be shown by CSS rather than revealed
+	// afterwards. Revealing the hamburger from the deferred script instead
+	// inserted a button into the header row after the page was already
+	// visible, which wrapped the row and shifted everything below it — 0.23
+	// of cumulative layout shift on a throttled phone.
+	?>
+	<script>document.documentElement.className+=" has-js";</script>
 	<?php wp_head(); ?>
 </head>
 

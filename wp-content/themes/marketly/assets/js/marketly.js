@@ -364,10 +364,8 @@
 			return;
 		}
 
-		// The hamburger ships hidden and is revealed here, so a visitor
-		// without JavaScript is never shown a control that does nothing.
-		opener.hidden = false;
-
+		// Visibility is CSS's job now — the has-js class is set in the head
+		// before first paint, so revealing it here would only shift the page.
 		opener.addEventListener('click', function () {
 			drawer.open(opener);
 		});

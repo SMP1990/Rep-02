@@ -129,9 +129,10 @@ identical on the shop, in a category, in related products and on the front
 page. Wrappers, columns, breadcrumbs and the loop are all handled through
 filters and actions.
 
-WooCommerce's own three stylesheets (~112KB) are dequeued and replaced by
-`assets/css/woocommerce.css` (~28KB), which loads only where WooCommerce
-markup appears. Product card styles stay in the main stylesheet because the
+WooCommerce's own three stylesheets are dequeued and replaced by
+`assets/css/woocommerce.css`, which loads only where WooCommerce markup
+appears — 113KB down to 27KB raw, or **14KB down to 6KB gzipped**, which is
+the number that matters since every real host compresses CSS. Product card styles stay in the main stylesheet because the
 homepage needs them.
 
 Supported: shop and category archives, single products with variations,
@@ -178,17 +179,44 @@ login-attempt limiting, and off-server backups.
 Measured, not assumed. A product page went from 442KB over 26 requests to
 352KB over 19, and from four render-blocking scripts to one:
 
-- WooCommerce's zoom, slider and lightbox libraries (~62KB) are skipped on
-  products that have no gallery to show them. Products that do have one keep
+- WooCommerce's zoom, slider and lightbox libraries (66KB raw, 23KB gzipped)
+  are skipped on products that have no gallery to show them. Products that do have one keep
   the full set. PhotoSwipe's dialog markup is removed alongside its
   stylesheet, since that markup is what the stylesheet hides.
-- jQuery Migrate is dropped on the front end — 13KB of render-blocking shim
-  for APIs nothing here uses. It stays in wp-admin.
+- jQuery Migrate is dropped on the front end — 13KB raw, 5KB gzipped, of
+  render-blocking shim for APIs nothing here uses. It stays in wp-admin.
 - Product image lookups are primed in one query instead of one per card.
 - WooCommerce's own stylesheets (~112KB) were already replaced in Phase 4.
 
 A persistent object cache (Redis or Memcached) at the hosting level is still
 the right answer for query volume; that is a server concern, not a plugin.
+
+**Measured**, throttled to Slow 4G with a 4x CPU slowdown on a 390px viewport:
+
+| | home | shop | product |
+|---|---|---|---|
+| First Contentful Paint | 3.1s | 2.0s | 1.9s |
+| Largest Contentful Paint | 3.4s | 2.5s | 2.7s |
+| Cumulative Layout Shift | **0** | **0** | **0** |
+
+Two caveats on those timings, both in the same direction: they come from PHP's
+single-threaded development server on SQLite, which sends everything
+uncompressed. The homepage is 137KB raw and 12KB gzipped, so roughly 125KB of
+that transfer does not exist on a real host. Treat the layout-shift figure as
+representative and the timings as a pessimistic floor.
+
+Gzipped — which is what actually travels — the theme's own assets are:
+
+| | every page | store pages |
+|---|---|---|
+| `marketly.css` | 13KB | 13KB |
+| `marketly.js` | 5KB | 5KB |
+| `woocommerce.css` | — | 6KB |
+
+Inline SVG icons are 47% of the raw homepage HTML but only **2.5KB gzipped**,
+because the same handful of icons repeat and compress almost completely away.
+That is the trade the icon system was making: bytes in the document in
+exchange for zero requests, zero font files and no layout shift.
 
 ### Accessibility
 
