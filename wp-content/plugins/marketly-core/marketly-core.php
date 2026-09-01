@@ -36,6 +36,8 @@ function marketly_core_load() {
 		'includes/class-marketly-testimonials.php',
 		'includes/class-marketly-subscribers.php',
 		'includes/class-marketly-forms.php',
+		'includes/class-marketly-demo-images.php',
+		'includes/class-marketly-demo.php',
 	);
 
 	/**
@@ -56,6 +58,10 @@ function marketly_core_load() {
 	Marketly_Testimonials::init();
 	Marketly_Subscribers::init();
 	Marketly_Forms::init();
+
+	if ( is_admin() ) {
+		Marketly_Demo::init();
+	}
 
 	/**
 	 * Fires once every Marketly Core include is loaded.

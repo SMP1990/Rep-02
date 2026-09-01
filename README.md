@@ -89,6 +89,23 @@ wp-content/
 7. **Testimonials → Add Testimonial** for the review carousel. Signups land
    under **Testimonials → Subscribers**.
 
+### Demo content
+
+**Testimonials → Demo Content → Import** fills an empty store so you can see
+the design working: six categories with images, twenty products with prices,
+sale prices, stock, real customer reviews and sales history, three
+testimonials, and the hero, promo banners and flash deal.
+
+The artwork is drawn at import time with GD — flat placeholder illustrations,
+a few kilobytes each. Bundling photography would mean licensing it and
+carrying megabytes in the plugin; downloading it would break on any site
+without outbound network access. **Replace it with real product photography
+before launch.**
+
+Everything the importer creates is tracked, so **Remove demo content** deletes
+exactly that and leaves anything you added yourself alone. Re-importing
+replaces rather than duplicates.
+
 ### How the homepage gets its content
 
 | Section | Source |
