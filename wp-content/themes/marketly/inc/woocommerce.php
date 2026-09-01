@@ -167,7 +167,8 @@ function marketly_is_shop_context() {
 		return false;
 	}
 
-	return is_woocommerce() || is_cart() || is_checkout() || is_account_page() || is_front_page();
+	return is_woocommerce() || is_cart() || is_checkout() || is_account_page() || is_front_page()
+		|| is_page_template( 'template-deals.php' ) || is_page_template( 'template-wishlist.php' );
 }
 
 /**
