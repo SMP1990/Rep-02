@@ -36,6 +36,7 @@ function marketly_core_load() {
 		'includes/class-marketly-testimonials.php',
 		'includes/class-marketly-subscribers.php',
 		'includes/class-marketly-forms.php',
+		'includes/demo-catalogue.php',
 		'includes/class-marketly-demo-images.php',
 		'includes/class-marketly-demo.php',
 	);

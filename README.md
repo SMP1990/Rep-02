@@ -91,20 +91,29 @@ wp-content/
 
 ### Demo content
 
-**Testimonials → Demo Content → Import** fills an empty store so you can see
-the design working: six categories with images, twenty products with prices,
-sale prices, stock, real customer reviews and sales history, three
-testimonials, and the hero, promo banners and flash deal.
+**Testimonials → Demo Content → Import** fills an empty store with real
+merchandise, not placeholders: six categories and **thirty-nine products** —
+footwear, outerwear, jewellery, watches, handbags, cameras, monitors,
+furniture, lighting, beauty, groceries and sports equipment.
 
-The artwork is drawn at import time with GD — flat placeholder illustrations,
-a few kilobytes each. Bundling photography would mean licensing it and
-carrying megabytes in the plugin; downloading it would break on any site
-without outbound network access. **Replace it with real product photography
-before launch.**
+Each product carries a brand, colourways, sizes, a specification table, a
+feature list, tags, stock level, a sale price and reviews, so the Additional
+Information tab, the Reviews tab and the discount badges all have real content
+behind them.
 
-Everything the importer creates is tracked, so **Remove demo content** deletes
-exactly that and leaves anything you added yourself alone. Re-importing
-replaces rather than duplicates.
+Photography is downloaded from Unsplash — whose licence permits commercial use
+without attribution — into your own media library, so the store serves its own
+copies rather than hotlinking. That is roughly ninety images, so the import
+takes two to three minutes.
+
+**If your server cannot reach the internet**, the import still completes: any
+photograph that cannot be fetched is replaced by a drawn placeholder, so a
+failed download never blocks or half-finishes an import.
+
+Everything created is tracked, so **Remove demo content** deletes exactly that
+and leaves anything you added yourself alone. Re-importing replaces rather than
+duplicates. Demo photography is for previewing the design — replace it with
+your own product photos before launch.
 
 ### How the homepage gets its content
 

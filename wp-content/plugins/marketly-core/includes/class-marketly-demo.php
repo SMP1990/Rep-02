@@ -82,12 +82,16 @@ class Marketly_Demo {
 			<?php endif; ?>
 
 			<p style="max-width:44em">
-				<?php esc_html_e( 'Fills an empty store so you can see the design working: six product categories with images, twenty products with prices, sale prices, ratings and sales history, three customer reviews, and the homepage hero, banners and flash deal.', 'marketly-core' ); ?>
+				<?php esc_html_e( 'Fills an empty store so you can see the design working: six categories, thirty-nine real products across footwear, outerwear, jewellery, electronics, homeware, beauty, grocery and sports — each with photography, brand, colourways, sizes, a specification table, feature list, stock level and reviews — plus the homepage hero, promo banners and flash deal.', 'marketly-core' ); ?>
 			</p>
 
 			<p style="max-width:44em">
-				<strong><?php esc_html_e( 'The artwork is generated placeholder illustration, not photography.', 'marketly-core' ); ?></strong>
-				<?php esc_html_e( 'Replace it with your own product photos before going live.', 'marketly-core' ); ?>
+				<strong><?php esc_html_e( 'This downloads about 90 photographs, so give it two or three minutes.', 'marketly-core' ); ?></strong>
+				<?php esc_html_e( 'They come from Unsplash, whose licence allows commercial use, and are copied into your own media library rather than hotlinked. If your server cannot reach the internet, the import still completes and uses a drawn placeholder wherever a photograph could not be fetched.', 'marketly-core' ); ?>
+			</p>
+
+			<p style="max-width:44em" class="description">
+				<?php esc_html_e( 'Demo photography is for previewing the design. Replace it with your own product photos before you launch.', 'marketly-core' ); ?>
 			</p>
 
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
@@ -242,76 +246,92 @@ class Marketly_Demo {
 	}
 
 	/**
-	 * The demo catalogue.
+	 * Download one image into the media library.
 	 *
-	 * Kept as data so the import logic below stays readable. Sales figures are
-	 * spread deliberately so the Best Sellers row draws from more than one
-	 * category, and roughly three quarters of the range carries a sale price
-	 * so the Deals page and the discount badges have something to show.
+	 * Photography is fetched rather than bundled: it keeps the plugin small
+	 * and means the store ends up serving its own copies instead of
+	 * hotlinking someone else's server. Results are cached per URL so a
+	 * photograph shared between products is only fetched once.
 	 *
-	 * @return array
+	 * @param string $url Remote image URL.
+	 * @param string $alt Alt text.
+	 * @return int Attachment ID, or 0 when the download failed.
 	 */
-	private static function catalogue() {
-		return array(
-			// Category slug, name, tint, subject colour, shape for the tile.
-			'terms'    => array(
-				array( 'Fashion', '#f6efe6', '#c8a678', 'garment' ),
-				array( 'Electronics', '#eaeef7', '#5b6b86', 'slab' ),
-				array( 'Beauty', '#fbecef', '#d1697f', 'tube' ),
-				array( 'Home', '#f2f0ec', '#a89680', 'lamp' ),
-				array( 'Grocery', '#eef4ea', '#7d9b5c', 'basket' ),
-				array( 'Sports', '#ebeef2', '#4c5561', 'pair' ),
+	private static function sideload( $url, $alt ) {
+		static $seen = array();
+
+		if ( isset( $seen[ $url ] ) ) {
+			return $seen[ $url ];
+		}
+
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/media.php';
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+
+		$tmp = download_url( $url, 25 );
+
+		if ( is_wp_error( $tmp ) ) {
+			$seen[ $url ] = 0;
+
+			return 0;
+		}
+
+		// Unsplash serves query strings that are not filenames; give the file
+		// a stable name derived from the photo id instead.
+		$name = 'marketly-' . substr( md5( $url ), 0, 12 ) . '.jpg';
+
+		$id = media_handle_sideload(
+			array(
+				'name'     => $name,
+				'tmp_name' => $tmp,
 			),
-			// Name, category, shape, tint, subject, regular, sale, sales, featured, blurb.
-			'products' => array(
-				array( 'Air Sneakers Running Shoes', 'Fashion', 'shoe', '#f4f6f9', '#dfe3ea', 79.99, 59.99, 320, true, 'Lightweight knit uppers and a cushioned midsole, built for daily miles.' ),
-				array( 'Quilted Puffer Jacket', 'Fashion', 'garment', '#f7f2ea', '#c9a97c', 129.99, 89.99, 180, false, 'Recycled insulation with a water-repellent shell that packs into its own pocket.' ),
-				array( 'Canvas Tote Bag', 'Fashion', 'basket', '#f6f3ec', '#bfae90', 39.99, 0, 95, false, 'Heavyweight organic cotton with reinforced handles and an inner pocket.' ),
-				array( 'Polarised Sunglasses', 'Fashion', 'glasses', '#f2f4f8', '#3f4653', 89.99, 64.99, 210, false, 'Scratch-resistant polarised lenses in a lightweight acetate frame.' ),
-
-				array( 'Premium Wireless Earbuds Pro', 'Electronics', 'pair', '#eef2f8', '#e8ecf2', 99.99, 69.99, 610, true, 'Active noise cancelling, 30-hour battery with the case, and a secure fit.' ),
-				array( 'Smart Watch Series 8', 'Electronics', 'watch', '#eceff6', '#2b2f38', 249.99, 149.99, 430, true, 'Always-on display, heart-rate and sleep tracking, five-day battery.' ),
-				array( 'Pro Max Smartphone 256GB', 'Electronics', 'slab', '#eaedf4', '#3a3f4a', 1299.99, 999.99, 980, false, 'Six-inch OLED, triple camera system and all-day battery in a titanium frame.' ),
-				array( 'Ultrabook Air 13-inch', 'Electronics', 'laptop', '#edf0f6', '#7d879a', 1349.99, 1099.99, 870, false, 'Fanless, under a kilo, and eighteen hours of real-world battery life.' ),
-				array( 'Studio Over-Ear Headphones', 'Electronics', 'orb', '#eff2f7', '#4a5160', 199.99, 149.99, 540, false, 'Closed-back studio monitoring with memory-foam cups and a detachable cable.' ),
-
-				array( 'Matte Lipstick Collection', 'Beauty', 'tube', '#fbeef1', '#c9556e', 29.99, 19.99, 260, true, 'Six long-wear matte shades with a conditioning, non-drying formula.' ),
-				array( 'Vitamin C Face Serum', 'Beauty', 'tube', '#fdf2e9', '#e0a24c', 44.99, 34.99, 300, false, 'Fifteen percent stabilised vitamin C with hyaluronic acid, for daily brightening.' ),
-				array( 'Eau de Parfum 50ml', 'Beauty', 'tube', '#f7eff7', '#9b7fb0', 89.99, 0, 150, false, 'Bergamot, jasmine and cedar. Long-wearing without being loud.' ),
-
-				array( 'Air Fryer 4.5L Digital', 'Home', 'orb', '#f1f2f4', '#3c4048', 99.99, 75.99, 740, false, 'Eight presets, a dishwasher-safe basket and no preheating.' ),
-				array( 'Modern 3-Seater Fabric Sofa', 'Home', 'seat', '#f4f2ee', '#9a8f80', 379.99, 299.99, 500, false, 'Deep foam seats in a stain-resistant weave, with solid beech legs.' ),
-				array( 'Ceramic Table Lamp', 'Home', 'lamp', '#f6f3ed', '#c2ab8a', 69.99, 49.99, 280, false, 'Hand-glazed ceramic base with a linen shade and an inline dimmer.' ),
-				array( 'Non-Stick Cookware Set', 'Home', 'orb', '#f2f3f5', '#5a606b', 149.99, 119.99, 390, false, 'Five pans with a triple-layer non-stick coating, safe to 240C.' ),
-
-				array( 'Single-Origin Coffee Beans 1kg', 'Grocery', 'basket', '#f1f0e9', '#7a5c3e', 34.99, 27.99, 620, false, 'Washed Ethiopian arabica, roasted for filter, shipped within days.' ),
-				array( 'Organic Grocery Basket', 'Grocery', 'basket', '#eff4ea', '#89a86a', 49.99, 39.99, 120, false, 'A weekly box of seasonal organic fruit and vegetables from local growers.' ),
-
-				array( 'Adjustable Dumbbell Set 20kg', 'Sports', 'pair', '#eef0f3', '#454b56', 159.99, 129.99, 150, false, 'Two handles and stackable plates replacing fifteen pairs of fixed weights.' ),
-				array( 'Eco Yoga Mat 6mm', 'Sports', 'garment', '#eef3f1', '#6f9b8c', 49.99, 36.99, 340, false, 'Natural rubber with a closed-cell surface that grips when damp.' ),
-			),
-			// Name, label, quote, avatar tint, figure colour.
-			'reviews'  => array(
-				array( 'Emily Johnson', 'Verified Buyer', 'Great products, fast delivery, and excellent customer service. Marketly is my go-to shopping destination.', '#f6e6dc', '#c79b80' ),
-				array( 'Daniel Rivera', 'Verified Buyer', 'Ordered on Friday and it arrived Monday morning. Packaging was spotless and the price beat everywhere else I looked.', '#e3ebf3', '#7d93ad' ),
-				array( 'Priya Anand', 'Verified Buyer', 'Four orders in and returns have been painless every time. The support team actually replies, which is rarer than it should be.', '#efe7f4', '#a288b8' ),
-			),
+			0,
+			$alt
 		);
+
+		if ( is_wp_error( $id ) ) {
+			// download_url() created the temp file; media_handle_sideload
+			// removes it on success but not on failure.
+			wp_delete_file( $tmp );
+			$seen[ $url ] = 0;
+
+			return 0;
+		}
+
+		update_post_meta( $id, '_wp_attachment_image_alt', sanitize_text_field( $alt ) );
+		$seen[ $url ] = (int) $id;
+
+		return (int) $id;
 	}
 
 	/**
-	 * A few short customer reviews, so ratings correspond to something real.
+	 * An image for a product, falling back to drawn artwork.
 	 *
-	 * @return array
+	 * A store with no outbound network access, or a photograph that has since
+	 * moved, must not stop the import — so a failed download is replaced by a
+	 * generated placeholder rather than left empty.
+	 *
+	 * @param string $url   Remote image URL.
+	 * @param string $alt   Alt text.
+	 * @param array  $track Tracking array, by reference.
+	 * @return int Attachment ID, or 0.
 	 */
-	private static function review_lines() {
-		return array(
-			array( 'Sam O.', 5, 'Exactly as described and arrived quickly. No complaints at all.' ),
-			array( 'Nadia K.', 5, 'Better quality than I expected for the price. Would buy again.' ),
-			array( 'Tom B.', 4, 'Very happy with it. Took a day or two longer to arrive than I hoped.' ),
-			array( 'Chloe M.', 5, 'Second one I have bought. Does the job perfectly.' ),
-			array( 'Ravi S.', 4, 'Good value. The finish is nicer in person than in the photos.' ),
-		);
+	private static function image( $url, $alt, &$track ) {
+		$id = $url ? self::sideload( $url, $alt ) : 0;
+
+		if ( ! $id ) {
+			$id = self::attach(
+				Marketly_Demo_Images::product( 'default', '#f2f4f8', '#c3ccda' ),
+				'marketly-placeholder-' . sanitize_title( $alt ) . '.jpg',
+				$alt
+			);
+		}
+
+		if ( $id ) {
+			$track['attachments'][] = $id;
+		}
+
+		return $id;
 	}
 
 	/**
@@ -320,7 +340,6 @@ class Marketly_Demo {
 	 * @return array Tracked ids.
 	 */
 	private static function import() {
-		$data    = self::catalogue();
 		$tracked = array(
 			'terms'        => array(),
 			'products'     => array(),
@@ -336,38 +355,43 @@ class Marketly_Demo {
 		if ( taxonomy_exists( 'product_cat' ) ) {
 			$order = 1;
 
-			foreach ( $data['terms'] as $term ) {
-				list( $name, $tint, $subject, $shape ) = $term;
-
-				$existing = term_exists( $name, 'product_cat' );
-				$created  = $existing ? $existing : wp_insert_term( $name, 'product_cat' );
+			foreach ( marketly_demo_categories() as $category ) {
+				$existing = term_exists( $category['slug'], 'product_cat' );
+				$created  = $existing
+					? $existing
+					: wp_insert_term(
+						$category['name'],
+						'product_cat',
+						array(
+							'slug'        => $category['slug'],
+							'description' => $category['description'],
+						)
+					);
 
 				if ( is_wp_error( $created ) ) {
 					continue;
 				}
 
-				$term_id           = (int) ( is_array( $created ) ? $created['term_id'] : $created );
-				$term_ids[ $name ] = $term_id;
+				$term_id                       = (int) ( is_array( $created ) ? $created['term_id'] : $created );
+				$term_ids[ $category['name'] ] = $term_id;
 
-				// Only track terms this import actually created, so removal
+				// Only track terms this import created, so removing the demo
 				// never deletes a category the shop already had.
 				if ( ! $existing ) {
 					$tracked['terms'][] = $term_id;
 				}
 
-				$thumb = self::attach(
-					Marketly_Demo_Images::product( $shape, $tint, $subject, 480 ),
-					'marketly-cat-' . sanitize_title( $name ) . '.jpg',
+				$thumb = self::image(
+					$category['image'],
 					/* translators: %s: category name. */
-					sprintf( __( '%s category', 'marketly-core' ), $name )
+					sprintf( __( '%s category', 'marketly-core' ), $category['name'] ),
+					$tracked
 				);
 
 				if ( $thumb ) {
 					update_term_meta( $term_id, 'thumbnail_id', $thumb );
-					$tracked['attachments'][] = $thumb;
 				}
 
-				// WooCommerce sorts category strips on this meta.
 				update_term_meta( $term_id, 'order', $order );
 				++$order;
 			}
@@ -375,36 +399,107 @@ class Marketly_Demo {
 
 		/* -------------------------------------------------- Products */
 
-		$deal_id = 0;
+		$deal_id  = 0;
+		$reviews  = marketly_demo_reviews();
+		$fallback = array(
+			array(
+				'author' => 'Sam O.',
+				'rating' => 5,
+				'title'  => 'Exactly as described',
+				'text'   => 'Arrived quickly and matches the photographs. No complaints at all.',
+			),
+			array(
+				'author' => 'Nadia K.',
+				'rating' => 5,
+				'title'  => 'Better than expected',
+				'text'   => 'The quality is a step above what I expected at this price. Would buy again.',
+			),
+			array(
+				'author' => 'Tom B.',
+				'rating' => 4,
+				'title'  => 'Happy with it',
+				'text'   => 'Does the job well. Took a day longer to arrive than I had hoped.',
+			),
+			array(
+				'author' => 'Chloe M.',
+				'rating' => 5,
+				'title'  => 'Second one I have bought',
+				'text'   => 'Bought one last year and came back for another. That says enough.',
+			),
+		);
 
 		if ( class_exists( 'WC_Product_Simple' ) ) {
-			$lines = self::review_lines();
-
-			foreach ( $data['products'] as $index => $row ) {
-				list( $name, $cat, $shape, $tint, $subject, $regular, $sale, $sales, $featured, $blurb ) = $row;
-
+			foreach ( marketly_demo_products() as $index => $item ) {
 				$product = new WC_Product_Simple();
-				$product->set_name( $name );
+				$product->set_name( $item['name'] );
+				$product->set_slug( $item['slug'] );
 				$product->set_status( 'publish' );
 				$product->set_catalog_visibility( 'visible' );
-				$product->set_sku( 'MKT-' . str_pad( (string) ( $index + 1 ), 3, '0', STR_PAD_LEFT ) );
-				$product->set_regular_price( (string) $regular );
+				$product->set_sku( 'MKT-' . strtoupper( substr( md5( $item['ref'] ), 0, 6 ) ) );
+				$product->set_regular_price( (string) $item['regular'] );
 
-				if ( $sale > 0 ) {
-					$product->set_sale_price( (string) $sale );
+				if ( $item['price'] < $item['regular'] ) {
+					$product->set_sale_price( (string) $item['price'] );
 				}
 
-				$product->set_short_description( $blurb );
-				$product->set_description(
-					$blurb . ' ' . __( 'This is demo content created by the Marketly Core importer — replace the copy and the photograph with your own before launch.', 'marketly-core' )
-				);
-				$product->set_featured( (bool) $featured );
-				$product->set_manage_stock( false );
-				$product->set_stock_status( 'instock' );
+				$product->set_short_description( $item['description'] );
+
+				// Features read as a list on the product page, which is how the
+				// reference application presents them.
+				$body = '<p>' . esc_html( $item['description'] ) . '</p>';
+
+				if ( $item['features'] ) {
+					$body .= '<h3>' . esc_html__( 'Key features', 'marketly-core' ) . '</h3><ul>';
+
+					foreach ( $item['features'] as $feature ) {
+						$body .= '<li>' . esc_html( $feature ) . '</li>';
+					}
+
+					$body .= '</ul>';
+				}
+
+				$product->set_description( $body );
+				$product->set_featured( (bool) $item['featured'] );
 				$product->set_reviews_allowed( true );
 
-				if ( isset( $term_ids[ $cat ] ) ) {
-					$product->set_category_ids( array( $term_ids[ $cat ] ) );
+				if ( $item['stock'] > 0 ) {
+					$product->set_manage_stock( true );
+					$product->set_stock_quantity( (int) $item['stock'] );
+				}
+
+				$product->set_stock_status( $item['stock'] > 0 ? 'instock' : 'outofstock' );
+
+				if ( isset( $term_ids[ $item['category'] ] ) ) {
+					$product->set_category_ids( array( $term_ids[ $item['category'] ] ) );
+				}
+
+				if ( $item['tags'] ) {
+					$product->set_tag_ids( self::tag_ids( $item['tags'] ) );
+				}
+
+				// Brand, colourways, sizes and the specification table all
+				// become product attributes, so they show in Additional
+				// Information and can be filtered on.
+				$attributes = array();
+
+				if ( $item['brand'] ) {
+					$attributes[ __( 'Brand', 'marketly-core' ) ] = array( $item['brand'] );
+				}
+
+				if ( $item['colors'] ) {
+					$attributes[ __( 'Colour', 'marketly-core' ) ] = $item['colors'];
+				}
+
+				if ( $item['sizes'] ) {
+					$attributes[ __( 'Size', 'marketly-core' ) ] = $item['sizes'];
+				}
+
+				foreach ( $item['specs'] as $label => $value ) {
+					$attributes[ $label ] = array( $value );
+				}
+
+				if ( $attributes ) {
+					$product->set_attributes( self::attributes( $attributes ) );
 				}
 
 				$product_id = $product->save();
@@ -415,67 +510,180 @@ class Marketly_Demo {
 
 				$tracked['products'][] = $product_id;
 
-				$image = self::attach(
-					Marketly_Demo_Images::product( $shape, $tint, $subject ),
-					'marketly-' . sanitize_title( $name ) . '.jpg',
-					$name
-				);
+				$main = self::image( $item['image'], $item['name'], $tracked );
 
-				if ( $image ) {
-					set_post_thumbnail( $product_id, $image );
-					$tracked['attachments'][] = $image;
+				if ( $main ) {
+					set_post_thumbnail( $product_id, $main );
 				}
 
-				// Sales history is what the Best Sellers row orders on.
-				update_post_meta( $product_id, 'total_sales', (int) $sales );
+				$gallery = array();
 
-				// Real reviews, so the stars and the count agree with the
-				// Reviews tab instead of being decorative numbers.
-				$count = 3 + ( $index % 3 );
+				foreach ( $item['gallery'] as $extra ) {
+					$id = self::image( $extra, $item['name'], $tracked );
 
-				for ( $i = 0; $i < $count; $i++ ) {
-					$line       = $lines[ ( $index + $i ) % count( $lines ) ];
-					$comment_id = wp_insert_comment(
-						array(
-							'comment_post_ID'      => $product_id,
-							'comment_author'       => $line[0],
-							'comment_author_email' => sanitize_title( $line[0] ) . '@example.com',
-							'comment_content'      => $line[2],
-							'comment_approved'     => 1,
-							'comment_type'         => 'review',
-							'comment_date'         => gmdate( 'Y-m-d H:i:s', time() - ( ( $i + 1 ) * DAY_IN_SECONDS * 3 ) ),
-						)
-					);
-
-					if ( $comment_id ) {
-						update_comment_meta( $comment_id, 'rating', (int) $line[1] );
-						update_comment_meta( $comment_id, 'verified', 1 );
+					if ( $id ) {
+						$gallery[] = $id;
 					}
 				}
 
-				if ( class_exists( 'WC_Comments' ) ) {
-					WC_Comments::get_average_rating_for_product( wc_get_product( $product_id ) );
-					WC_Comments::get_review_count_for_product( wc_get_product( $product_id ) );
+				if ( $gallery ) {
+					update_post_meta( $product_id, '_product_image_gallery', implode( ',', $gallery ) );
 				}
 
-				// The flash deal wants a discounted product with a decent gap.
-				if ( 'Smart Watch Series 8' === $name ) {
+				// Best sellers are ordered on this, so it has to be real.
+				update_post_meta( $product_id, 'total_sales', $item['best_seller'] ? 400 + ( 39 - $index ) * 12 : 20 + $index );
+
+				self::add_reviews(
+					$product_id,
+					isset( $reviews[ $item['ref'] ] ) ? $reviews[ $item['ref'] ] : array_slice( $fallback, $index % 2, 2 + ( $index % 3 ) ),
+					(float) $item['rating'],
+					(int) $item['reviews']
+				);
+
+				if ( ! $deal_id && $item['flash_deal'] && $item['price'] < $item['regular'] ) {
 					$deal_id = $product_id;
 				}
 			}
 		}
 
-		/* ---------------------------------------------- Testimonials */
+		self::testimonials( $tracked );
+		self::presentation( $tracked, $deal_id );
 
-		foreach ( $data['reviews'] as $order => $review ) {
-			list( $person, $label, $quote, $tint, $figure ) = $review;
+		update_option( self::TRACK, $tracked );
 
+		if ( function_exists( 'wc_delete_product_transients' ) ) {
+			wc_delete_product_transients();
+		}
+
+		return $tracked;
+	}
+
+	/**
+	 * Resolve tag names to product_tag ids, creating any that are missing.
+	 *
+	 * @param string[] $names Tag names.
+	 * @return int[]
+	 */
+	private static function tag_ids( $names ) {
+		$ids = array();
+
+		foreach ( $names as $name ) {
+			$term = term_exists( $name, 'product_tag' );
+
+			if ( ! $term ) {
+				$term = wp_insert_term( $name, 'product_tag' );
+			}
+
+			if ( ! is_wp_error( $term ) ) {
+				$ids[] = (int) ( is_array( $term ) ? $term['term_id'] : $term );
+			}
+		}
+
+		return $ids;
+	}
+
+	/**
+	 * Build WC_Product_Attribute objects from a label => values map.
+	 *
+	 * These are custom attributes rather than global taxonomies: a demo
+	 * should not leave a shop with dozens of attribute taxonomies to clean up.
+	 *
+	 * @param array $map Label => array of values.
+	 * @return WC_Product_Attribute[]
+	 */
+	private static function attributes( $map ) {
+		$out      = array();
+		$position = 0;
+
+		foreach ( $map as $label => $values ) {
+			$attribute = new WC_Product_Attribute();
+			$attribute->set_name( $label );
+			$attribute->set_options( (array) $values );
+			$attribute->set_position( $position );
+			$attribute->set_visible( true );
+			$attribute->set_variation( false );
+
+			$out[] = $attribute;
+			++$position;
+		}
+
+		return $out;
+	}
+
+	/**
+	 * Attach reviews to a product.
+	 *
+	 * The aggregate rating and count are written afterwards, so the card and
+	 * the archive show the figures the reference design was drawn with while
+	 * the Reviews tab still contains real, readable reviews.
+	 *
+	 * @param int   $product_id Product.
+	 * @param array $entries    Reviews.
+	 * @param float $rating     Aggregate rating to display.
+	 * @param int   $count      Aggregate count to display.
+	 */
+	private static function add_reviews( $product_id, $entries, $rating, $count ) {
+		foreach ( $entries as $i => $review ) {
+			$comment_id = wp_insert_comment(
+				array(
+					'comment_post_ID'      => $product_id,
+					'comment_author'       => $review['author'],
+					'comment_author_email' => sanitize_title( $review['author'] ) . '@example.com',
+					'comment_content'      => ( ! empty( $review['title'] ) ? $review['title'] . "\n\n" : '' ) . $review['text'],
+					'comment_approved'     => 1,
+					'comment_type'         => 'review',
+					'comment_date'         => gmdate( 'Y-m-d H:i:s', time() - ( ( $i + 1 ) * DAY_IN_SECONDS * 4 ) ),
+				)
+			);
+
+			if ( $comment_id ) {
+				update_comment_meta( $comment_id, 'rating', (int) $review['rating'] );
+				update_comment_meta( $comment_id, 'verified', 1 );
+			}
+		}
+
+		if ( $rating > 0 ) {
+			update_post_meta( $product_id, '_wc_average_rating', $rating );
+		}
+
+		if ( $count > 0 ) {
+			update_post_meta( $product_id, '_wc_review_count', $count );
+			update_post_meta(
+				$product_id,
+				'_wc_rating_count',
+				array(
+					5 => (int) round( $count * 0.8 ),
+					4 => (int) round( $count * 0.2 ),
+				)
+			);
+		}
+	}
+
+	/**
+	 * Create the testimonial entries.
+	 *
+	 * @param array $tracked Tracking array, by reference.
+	 */
+	private static function testimonials( &$tracked ) {
+		$people = array(
+			array( 'Emily Johnson', 'Verified Buyer', 'Great products, fast delivery, and excellent customer service. Marketly is my go-to shopping destination.' ),
+			array( 'Daniel Rivera', 'Verified Buyer', 'Ordered on Friday and it arrived Monday morning. Packaging was spotless and the price beat everywhere else I looked.' ),
+			array( 'Priya Anand', 'Verified Buyer', 'Four orders in and returns have been painless every time. The support team actually replies, which is rarer than it should be.' ),
+		);
+
+		$avatars = array(
+			'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
+			'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+			'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80',
+		);
+
+		foreach ( $people as $order => $person ) {
 			$id = wp_insert_post(
 				array(
 					'post_type'    => Marketly_Testimonials::POST_TYPE,
 					'post_status'  => 'publish',
-					'post_title'   => $person,
-					'post_content' => $quote,
+					'post_title'   => $person[0],
+					'post_content' => $person[2],
 					'menu_order'   => $order,
 				)
 			);
@@ -485,47 +693,41 @@ class Marketly_Demo {
 			}
 
 			$tracked['testimonials'][] = (int) $id;
-
-			update_post_meta( $id, Marketly_Testimonials::META_ROLE, $label );
+			update_post_meta( $id, Marketly_Testimonials::META_ROLE, $person[1] );
 			update_post_meta( $id, Marketly_Testimonials::META_RATE, 5 );
 
-			$avatar = self::attach(
-				Marketly_Demo_Images::avatar( $tint, $figure ),
-				'marketly-avatar-' . sanitize_title( $person ) . '.jpg',
-				$person
-			);
+			$avatar = self::image( $avatars[ $order ], $person[0], $tracked );
 
 			if ( $avatar ) {
 				set_post_thumbnail( $id, $avatar );
-				$tracked['attachments'][] = $avatar;
 			}
 		}
+	}
 
-		/* ------------------------------------- Homepage presentation */
-
+	/**
+	 * Set the hero, banners and flash deal.
+	 *
+	 * @param array $tracked Tracking array, by reference.
+	 * @param int   $deal_id Product for the flash deal.
+	 */
+	private static function presentation( &$tracked, $deal_id ) {
 		$banners = array(
-			'hero_image'   => array( '#eef3ff', '#dbe4fb', '#8aa4e8', __( 'A selection of products', 'marketly-core' ) ),
-			'promo1_image' => array( '#f9b233', '#f5a623', '#ffffff', __( 'Summer collection', 'marketly-core' ) ),
-			'promo2_image' => array( '#dbe7f5', '#cddcef', '#8fa3bd', __( 'Home essentials', 'marketly-core' ) ),
+			'hero_image'   => array( 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1400&q=80', __( 'A selection of products', 'marketly-core' ) ),
+			'promo1_image' => array( 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=1200&q=80', __( 'Summer collection', 'marketly-core' ) ),
+			'promo2_image' => array( 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=80', __( 'Home essentials', 'marketly-core' ) ),
 		);
 
 		foreach ( $banners as $mod => $banner ) {
-			$id = self::attach(
-				Marketly_Demo_Images::banner( $banner[0], $banner[1], $banner[2] ),
-				'marketly-' . str_replace( '_', '-', $mod ) . '.jpg',
-				$banner[3]
-			);
+			$id = self::image( $banner[0], $banner[1], $tracked );
 
 			if ( $id ) {
 				set_theme_mod( 'marketly_' . $mod, $id );
-				$tracked['attachments'][] = $id;
-				$tracked['mods'][]        = 'marketly_' . $mod;
+				$tracked['mods'][] = 'marketly_' . $mod;
 			}
 		}
 
 		if ( $deal_id ) {
 			set_theme_mod( 'marketly_deal_product', $deal_id );
-			// Three days out, so the countdown has something to count.
 			set_theme_mod( 'marketly_deal_ends', wp_date( 'Y-m-d H:i', time() + ( 3 * DAY_IN_SECONDS ) ) );
 			$tracked['mods'][] = 'marketly_deal_product';
 			$tracked['mods'][] = 'marketly_deal_ends';
@@ -537,13 +739,5 @@ class Marketly_Demo {
 			set_theme_mod( 'marketly_' . $mod, $shop );
 			$tracked['mods'][] = 'marketly_' . $mod;
 		}
-
-		update_option( self::TRACK, $tracked );
-
-		if ( function_exists( 'wc_delete_product_transients' ) ) {
-			wc_delete_product_transients();
-		}
-
-		return $tracked;
 	}
 }
