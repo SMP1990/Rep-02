@@ -134,7 +134,7 @@ function marketly_get_icon( $name, $args = array() ) {
  * @param array  $args Optional icon arguments.
  */
 function marketly_icon( $name, $args = array() ) {
-	echo marketly_get_icon( $name, $args ); // phpcs:ignore WordPress.Security.EscapingOutput.OutputNotEscaped -- Theme-authored SVG, escaped internally.
+	echo marketly_get_icon( $name, $args ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Theme-authored SVG, escaped internally.
 }
 
 /**
@@ -192,14 +192,22 @@ function marketly_section_head( $args = array() ) {
  *
  * @param float $rating Rating from 0 to 5.
  * @param int   $count  Optional review count shown beside the stars.
- * @param bool  $echo   Whether to echo. Default true.
- * @return string Markup when $echo is false.
+ * @param bool  $display Whether to print it. "echo" would shadow a language
+ *                       construct.
+ * @return string Markup when $display is false.
  */
-function marketly_rating_stars( $rating, $count = 0, $echo = true ) {
+function marketly_rating_stars( $rating, $count = 0, $display = true ) {
 	$rating  = max( 0, min( 5, (float) $rating ) );
 	$count   = (int) $count;
 	$percent = ( $rating / 5 ) * 100;
-	$star    = marketly_get_icon( 'star', array( 'size' => 14, 'fill' => 'currentColor', 'stroke_width' => 0 ) );
+	$star    = marketly_get_icon(
+		'star',
+		array(
+			'size'         => 14,
+			'fill'         => 'currentColor',
+			'stroke_width' => 0,
+		)
+	);
 
 	$label = sprintf(
 		/* translators: %s: rating out of five, e.g. 4.5. */
@@ -211,8 +219,8 @@ function marketly_rating_stars( $rating, $count = 0, $echo = true ) {
 	?>
 	<div class="rating">
 		<span class="rating__stars" role="img" aria-label="<?php echo esc_attr( $label ); ?>">
-			<span class="rating__track" aria-hidden="true"><?php echo str_repeat( $star, 5 ); // phpcs:ignore WordPress.Security.EscapingOutput.OutputNotEscaped -- Theme-authored SVG. ?></span>
-			<span class="rating__fill" style="width:<?php echo esc_attr( round( $percent, 2 ) ); ?>%" aria-hidden="true"><?php echo str_repeat( $star, 5 ); // phpcs:ignore WordPress.Security.EscapingOutput.OutputNotEscaped -- Theme-authored SVG. ?></span>
+			<span class="rating__track" aria-hidden="true"><?php echo str_repeat( $star, 5 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Theme-authored SVG. ?></span>
+			<span class="rating__fill" style="width:<?php echo esc_attr( round( $percent, 2 ) ); ?>%" aria-hidden="true"><?php echo str_repeat( $star, 5 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Theme-authored SVG. ?></span>
 		</span>
 
 		<?php if ( $count > 0 ) : ?>
@@ -230,11 +238,11 @@ function marketly_rating_stars( $rating, $count = 0, $echo = true ) {
 	<?php
 	$html = (string) ob_get_clean();
 
-	if ( ! $echo ) {
+	if ( ! $display ) {
 		return $html;
 	}
 
-	echo $html; // phpcs:ignore WordPress.Security.EscapingOutput.OutputNotEscaped -- Escaped above.
+	echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped above.
 	return '';
 }
 
@@ -295,8 +303,8 @@ function marketly_page_url( $slug ) {
 		return $cache[ $slug ];
 	}
 
-	$page             = get_page_by_path( $slug );
-	$cache[ $slug ]   = ( $page instanceof WP_Post ) ? (string) get_permalink( $page ) : '';
+	$page           = get_page_by_path( $slug );
+	$cache[ $slug ] = ( $page instanceof WP_Post ) ? (string) get_permalink( $page ) : '';
 
 	return $cache[ $slug ];
 }

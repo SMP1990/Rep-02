@@ -44,7 +44,11 @@ $marketly_uid = wp_unique_id( 'tm-' );
 							echo get_the_post_thumbnail(
 								$marketly_item,
 								'thumbnail',
-								array( 'class' => 'tmcard__avatar', 'loading' => 'lazy', 'alt' => '' )
+								array(
+									'class'   => 'tmcard__avatar',
+									'loading' => 'lazy',
+									'alt'     => '',
+								)
 							);
 							?>
 						<?php endif; ?>

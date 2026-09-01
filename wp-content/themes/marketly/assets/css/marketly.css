@@ -1994,6 +1994,13 @@ body.is-locked { overflow: hidden; }
 
 /* Side by side — the Featured Products grid. */
 .pcard--h { flex-direction: row; align-items: stretch; }
+
+/* In this layout the reference puts the wishlist heart at the far right of
+   the card, level with the title, rather than over the image. Making the
+   media a static box hands both overlays to the card as their containing
+   block; the badge still lands on the image, because the image starts at the
+   card's own left edge. */
+.pcard--h .pcard__media { position: static; }
 .pcard--h .pcard__media { width: 5.5rem; border-radius: var(--r-md) 0 0 var(--r-md); overflow: hidden; }
 .pcard--h .pcard__body { padding-inline-end: 0.5rem; }
 
@@ -2176,7 +2183,10 @@ body.is-locked { overflow: hidden; }
    a card, the card's cart button, the testimonial dots. Rather than inflate
    them and break the layout, an invisible pseudo-element extends the tap
    area to 44px while the visible control keeps its drawn size. */
-.pcard__fav,
+/* Only the cart button needs a containing block for its hit-area overlay.
+   .pcard__fav is already position:absolute in its corner, and setting it to
+   relative here would drop it out of that corner and into normal flow — it
+   ended up below the card entirely. */
 .pcard__cart { position: relative; }
 
 .pcard__fav::after,

@@ -30,7 +30,11 @@ if ( ! $marketly_terms ) {
 									$marketly_image,
 									'marketly-thumb',
 									false,
-									array( 'class' => 'cattile__img', 'loading' => 'lazy', 'alt' => '' )
+									array(
+										'class'   => 'cattile__img',
+										'loading' => 'lazy',
+										'alt'     => '',
+									)
 								);
 								?>
 							<?php else : ?>

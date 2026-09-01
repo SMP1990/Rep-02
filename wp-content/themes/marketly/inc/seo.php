@@ -69,7 +69,7 @@ function marketly_trim_description( $text, $limit = 155 ) {
 	$cut   = mb_substr( $text, 0, $limit );
 	$space = mb_strrpos( $cut, ' ' );
 
-	return rtrim( $space ? mb_substr( $cut, 0, $space ) : $cut, " ,.;:-" ) . '…';
+	return rtrim( $space ? mb_substr( $cut, 0, $space ) : $cut, ' ,.;:-' ) . '…';
 }
 
 /**
@@ -115,7 +115,7 @@ function marketly_meta_description() {
 			if ( '' === $description ) {
 				$description = sprintf(
 					/* translators: %s: category or tag name. */
-					__( 'Browse %s at %s.', 'marketly' ),
+					__( 'Browse %1$s at %2$s.', 'marketly' ),
 					$term->name,
 					get_bloginfo( 'name' )
 				);
@@ -311,8 +311,8 @@ function marketly_robots( $robots ) {
 	$is_wishlist = is_page_template( 'template-wishlist.php' );
 
 	if ( is_search() || is_404() || $filtered || $is_wishlist ) {
-		$robots['noindex']  = true;
-		$robots['follow']   = true;
+		$robots['noindex'] = true;
+		$robots['follow']  = true;
 		unset( $robots['index'] );
 	}
 

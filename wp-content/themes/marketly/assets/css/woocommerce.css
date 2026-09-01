@@ -557,8 +557,23 @@ input.button:hover { background: var(--brand-dark); color: #fff; box-shadow: var
 .button:disabled,
 .button.disabled { opacity: 0.55; pointer-events: none; }
 
-/* The card's icon button must not inherit the block button shape above. */
-.pcard__cart.button { min-height: 2.25rem; padding: 0; }
+/* The card's cart button is an outlined icon square in the design, but the
+   rules above paint every .button solid blue and WooCommerce's own class
+   lands on it too. Restated here so the card keeps its outline. */
+.pcard__cart.button {
+	min-height: 2.25rem;
+	padding: 0;
+	background: var(--surface);
+	border-color: var(--line);
+	color: var(--brand);
+}
+
+.pcard__cart.button:hover {
+	background: var(--brand-tint);
+	border-color: var(--brand);
+	color: var(--brand);
+	box-shadow: none;
+}
 
 /* Woo's own loading/added states on an AJAX button. */
 .add_to_cart_button.loading { opacity: 0.6; pointer-events: none; }

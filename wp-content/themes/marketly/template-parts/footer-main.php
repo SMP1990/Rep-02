@@ -29,7 +29,14 @@ $marketly_columns = array( 'footer-1', 'footer-2', 'footer-3' );
 <div class="container footer__inner">
 
 	<div class="footer__brand">
-		<?php marketly_brand( array( 'tagline' => false, 'class' => 'brand--footer' ) ); ?>
+		<?php
+		marketly_brand(
+			array(
+				'tagline' => false,
+				'class'   => 'brand--footer',
+			)
+		);
+		?>
 
 		<?php if ( $marketly_about ) : ?>
 			<p class="footer__about"><?php echo wp_kses_post( $marketly_about ); ?></p>

@@ -26,7 +26,7 @@ class Marketly_Testimonials {
 	public static function init() {
 		add_action( 'init', array( __CLASS__, 'register' ) );
 		add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_box' ) );
-		add_action( 'save_post_' . self::POST_TYPE, array( __CLASS__, 'save' ), 10, 2 );
+		add_action( 'save_post_' . self::POST_TYPE, array( __CLASS__, 'save' ) );
 		add_filter( 'manage_' . self::POST_TYPE . '_posts_columns', array( __CLASS__, 'columns' ) );
 		add_action( 'manage_' . self::POST_TYPE . '_posts_custom_column', array( __CLASS__, 'column' ), 10, 2 );
 	}
@@ -38,25 +38,25 @@ class Marketly_Testimonials {
 		register_post_type(
 			self::POST_TYPE,
 			array(
-				'labels'             => array(
-					'name'               => __( 'Testimonials', 'marketly-core' ),
-					'singular_name'      => __( 'Testimonial', 'marketly-core' ),
-					'add_new_item'       => __( 'Add Testimonial', 'marketly-core' ),
-					'edit_item'          => __( 'Edit Testimonial', 'marketly-core' ),
-					'search_items'       => __( 'Search testimonials', 'marketly-core' ),
-					'not_found'          => __( 'No testimonials yet.', 'marketly-core' ),
-					'menu_name'          => __( 'Testimonials', 'marketly-core' ),
+				'labels'              => array(
+					'name'          => __( 'Testimonials', 'marketly-core' ),
+					'singular_name' => __( 'Testimonial', 'marketly-core' ),
+					'add_new_item'  => __( 'Add Testimonial', 'marketly-core' ),
+					'edit_item'     => __( 'Edit Testimonial', 'marketly-core' ),
+					'search_items'  => __( 'Search testimonials', 'marketly-core' ),
+					'not_found'     => __( 'No testimonials yet.', 'marketly-core' ),
+					'menu_name'     => __( 'Testimonials', 'marketly-core' ),
 				),
-				'public'             => false,
-				'show_ui'            => true,
-				'show_in_menu'       => true,
-				'publicly_queryable' => false,
+				'public'              => false,
+				'show_ui'             => true,
+				'show_in_menu'        => true,
+				'publicly_queryable'  => false,
 				'exclude_from_search' => true,
-				'has_archive'        => false,
-				'rewrite'            => false,
-				'menu_icon'          => 'dashicons-format-quote',
-				'menu_position'      => 26,
-				'supports'           => array( 'title', 'editor', 'thumbnail', 'page-attributes' ),
+				'has_archive'         => false,
+				'rewrite'             => false,
+				'menu_icon'           => 'dashicons-format-quote',
+				'menu_position'       => 26,
+				'supports'            => array( 'title', 'editor', 'thumbnail', 'page-attributes' ),
 			)
 		);
 
@@ -169,10 +169,9 @@ class Marketly_Testimonials {
 	 *
 	 * Checks nonce, autosave, revision and capability before writing anything.
 	 *
-	 * @param int     $post_id Post ID.
-	 * @param WP_Post $post    Post object.
+	 * @param int $post_id Post ID.
 	 */
-	public static function save( $post_id, $post ) {
+	public static function save( $post_id ) {
 		if ( ! isset( $_POST['marketly_testimonial_nonce'] ) ) {
 			return;
 		}
@@ -195,8 +194,10 @@ class Marketly_Testimonials {
 			? sanitize_text_field( wp_unslash( $_POST['marketly_role'] ) )
 			: '';
 
+		// absint() first: the clamp below is this class's own method, which
+		// the standards checker cannot recognise as a sanitiser.
 		$rating = isset( $_POST['marketly_rating'] )
-			? self::sanitize_rating( wp_unslash( $_POST['marketly_rating'] ) )
+			? self::sanitize_rating( absint( wp_unslash( $_POST['marketly_rating'] ) ) )
 			: 5;
 
 		update_post_meta( $post_id, self::META_ROLE, $role );

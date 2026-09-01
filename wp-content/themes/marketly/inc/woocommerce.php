@@ -65,18 +65,17 @@ add_action( 'init', 'marketly_unhook_loop_defaults' );
  * ajax_add_to_cart with it, which silently turns every card button back into
  * a plain link.
  *
- * @param array      $args    Button arguments.
- * @param WC_Product $product Product.
+ * @param array $args Button arguments.
  * @return array
  */
-function marketly_loop_add_to_cart_args( $args, $product ) {
+function marketly_loop_add_to_cart_args( $args ) {
 	$existing = isset( $args['class'] ) ? (string) $args['class'] : '';
 
 	$args['class'] = trim( $existing . ' btn btn--outline btn--icon btn--sm pcard__cart' );
 
 	return $args;
 }
-add_filter( 'woocommerce_loop_add_to_cart_args', 'marketly_loop_add_to_cart_args', 10, 2 );
+add_filter( 'woocommerce_loop_add_to_cart_args', 'marketly_loop_add_to_cart_args' );
 
 /**
  * Products per row on archives.
@@ -177,6 +176,9 @@ function marketly_is_shop_context() {
  * WooCommerce ships roughly 110KB of CSS across three files, all of it
  * styling components this theme draws itself. Loading both would mean
  * shipping the weight twice and then fighting it with overrides.
+ *
+ * @param array $enqueue Stylesheets WooCommerce intends to enqueue.
+ * @return array
  */
 function marketly_dequeue_woocommerce_styles( $enqueue ) {
 	unset( $enqueue['woocommerce-general'], $enqueue['woocommerce-layout'], $enqueue['woocommerce-smallscreen'] );
@@ -303,16 +305,15 @@ add_filter( 'woocommerce_output_related_products_args', 'marketly_related_args',
 /**
  * Tag WooCommerce's generated form fields so the stylesheet can reach them.
  *
- * @param array  $args Field arguments.
- * @param string $key  Field key.
+ * @param array $args Field arguments.
  * @return array
  */
-function marketly_form_field_args( $args, $key ) {
+function marketly_form_field_args( $args ) {
 	$args['input_class'][] = 'marketly-input';
 
 	return $args;
 }
-add_filter( 'woocommerce_form_field_args', 'marketly_form_field_args', 10, 2 );
+add_filter( 'woocommerce_form_field_args', 'marketly_form_field_args' );
 
 /* ----------------------------------------------------------- Off-canvas */
 
@@ -370,7 +371,12 @@ function marketly_wishlist_response( $request ) {
 	$ids = array_slice( array_unique( $ids ), 0, 48 );
 
 	if ( ! $ids || ! function_exists( 'wc_get_products' ) ) {
-		return rest_ensure_response( array( 'count' => 0, 'html' => '' ) );
+		return rest_ensure_response(
+			array(
+				'count' => 0,
+				'html'  => '',
+			)
+		);
 	}
 
 	$products = wc_get_products(
@@ -397,7 +403,11 @@ function marketly_wishlist_response( $request ) {
 			get_template_part(
 				'template-parts/card',
 				'product',
-				array( 'product' => $by_id[ $id ], 'layout' => 'v', 'heading' => 'h2' )
+				array(
+					'product' => $by_id[ $id ],
+					'layout'  => 'v',
+					'heading' => 'h2',
+				)
 			);
 		}
 	}

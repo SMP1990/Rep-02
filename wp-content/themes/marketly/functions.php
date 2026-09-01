@@ -167,6 +167,8 @@ add_action( 'wp_enqueue_scripts', 'marketly_enqueue_assets' );
  * Nothing in this theme uses jQuery at all, and current WooCommerce does not
  * need the shim — it is 13KB of render-blocking script for compatibility with
  * code that is not here. It stays in wp-admin, where a plugin might rely on it.
+ *
+ * @param WP_Scripts $scripts The scripts registry, passed by reference.
  */
 function marketly_drop_jquery_migrate( $scripts ) {
 	if ( is_admin() || empty( $scripts->registered['jquery'] ) ) {

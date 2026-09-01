@@ -58,7 +58,14 @@ $marketly_utility = array_values(
 		aria-label="<?php esc_attr_e( 'Site menu', 'marketly' ); ?>">
 
 		<div class="drawer__head">
-			<?php marketly_brand( array( 'tagline' => false, 'class' => 'brand--sm' ) ); ?>
+			<?php
+			marketly_brand(
+				array(
+					'tagline' => false,
+					'class'   => 'brand--sm',
+				)
+			);
+			?>
 
 			<button type="button" class="btn btn--ghost btn--icon drawer__close" data-marketly-drawer-close>
 				<?php marketly_icon( 'close', array( 'size' => 22 ) ); ?>

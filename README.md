@@ -15,7 +15,7 @@ share nothing and are installed separately.
 A hand-built WooCommerce theme following the Underscores (`_s`) template
 hierarchy. No page builder, no CSS framework, no build step, no SEO plugin.
 
-**Status: Phase 6 of 7 complete** — SEO, security, performance, accessibility.
+**Status: complete.** Built in seven phases; see the git history for each.
 
 ```
 wp-content/
@@ -219,11 +219,21 @@ longer resolve to a published, catalogue-visible product are pruned.
 
 Requires WordPress 6.4+, PHP 7.4+ and WooCommerce 8.0+.
 
-### Remaining phases
+### Standards
 
-| Phase | Scope |
-|---|---|
-| 7 | Testing and visual QA against the reference design |
+The theme and plugin pass **PHP_CodeSniffer** against the full `WordPress`
+ruleset plus `PHPCompatibilityWP` for PHP 7.4+, with no violations and no
+blanket exclusions. The handful of `phpcs:ignore` annotations are per-line and
+each carries its reason.
+
+To run it yourself:
+
+```bash
+composer require --dev squizlabs/php_codesniffer wp-coding-standards/wpcs \
+  phpcompatibility/phpcompatibility-wp
+vendor/bin/phpcs --standard=WordPress wp-content/themes/marketly \
+  wp-content/plugins/marketly-core
+```
 
 ---
 

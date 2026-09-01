@@ -110,6 +110,7 @@ $marketly_heading = ( isset( $args['heading'] ) && in_array( $args['heading'], a
 			// queries, so the global is set around the call and restored
 			// afterwards — without this the button silently renders nothing.
 			if ( function_exists( 'woocommerce_template_loop_add_to_cart' ) ) {
+				// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- $product is WooCommerce's own global, not one this theme defines.
 				$marketly_prev_product = isset( $GLOBALS['product'] ) ? $GLOBALS['product'] : null;
 				$GLOBALS['product']    = $marketly_product;
 
@@ -120,6 +121,7 @@ $marketly_heading = ( isset( $args['heading'] ) && in_array( $args['heading'], a
 				woocommerce_template_loop_add_to_cart();
 
 				$GLOBALS['product'] = $marketly_prev_product;
+				// phpcs:enable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 			}
 			?>
 		</div>

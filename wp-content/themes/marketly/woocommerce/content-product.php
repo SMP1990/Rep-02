@@ -23,7 +23,7 @@ if ( empty( $product ) || ! $product->is_visible() ) {
 }
 ?>
 <li <?php wc_product_class( 'pcell', $product ); ?>>
-	<?php do_action( 'woocommerce_before_shop_loop_item' ); ?>
+	<?php do_action( 'woocommerce_before_shop_loop_item' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WooCommerce's hook, invoked not defined. ?>
 
 	<?php
 	get_template_part(
@@ -38,5 +38,5 @@ if ( empty( $product ) || ! $product->is_visible() ) {
 	);
 	?>
 
-	<?php do_action( 'woocommerce_after_shop_loop_item' ); ?>
+	<?php do_action( 'woocommerce_after_shop_loop_item' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WooCommerce's hook, invoked not defined. ?>
 </li>

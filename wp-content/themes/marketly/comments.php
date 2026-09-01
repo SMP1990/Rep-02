@@ -58,8 +58,8 @@ if ( post_password_required() ) {
 	<?php
 	comment_form(
 		array(
-			'class_submit'  => 'btn',
-			'title_reply'   => esc_html__( 'Leave a comment', 'marketly' ),
+			'class_submit'         => 'btn',
+			'title_reply'          => esc_html__( 'Leave a comment', 'marketly' ),
 			'comment_notes_before' => '',
 		)
 	);

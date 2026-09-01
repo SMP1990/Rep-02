@@ -35,9 +35,9 @@ defined( 'ABSPATH' ) || exit;
 			// A sensible default before the owner builds a menu under
 			// Appearance → Menus, so the row is never empty.
 			$marketly_defaults = array(
-				marketly_shop_url()               => __( 'Shop', 'marketly' ),
-				marketly_page_url( 'deals' )      => __( 'Deals', 'marketly' ),
-				marketly_page_url( 'wishlist' )   => __( 'Wishlist', 'marketly' ),
+				marketly_shop_url()             => __( 'Shop', 'marketly' ),
+				marketly_page_url( 'deals' )    => __( 'Deals', 'marketly' ),
+				marketly_page_url( 'wishlist' ) => __( 'Wishlist', 'marketly' ),
 			);
 
 			echo '<ul class="nav-primary__list">';

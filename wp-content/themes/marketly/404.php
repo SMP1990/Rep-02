@@ -34,11 +34,11 @@ get_header();
 
 			<?php
 			if ( marketly_has_woocommerce() && function_exists( 'wc_get_page_permalink' ) ) :
-				$shop = wc_get_page_permalink( 'shop' );
+				$marketly_shop = wc_get_page_permalink( 'shop' );
 
-				if ( $shop ) :
+				if ( $marketly_shop ) :
 					?>
-					<a class="btn btn--outline btn--lg" href="<?php echo esc_url( $shop ); ?>">
+					<a class="btn btn--outline btn--lg" href="<?php echo esc_url( $marketly_shop ); ?>">
 						<?php esc_html_e( 'Browse all products', 'marketly' ); ?>
 					</a>
 					<?php

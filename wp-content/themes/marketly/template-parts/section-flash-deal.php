@@ -45,7 +45,13 @@ $marketly_parts = array(
 				tabindex="-1" aria-hidden="true">
 				<?php
 				echo wp_kses_post(
-					$marketly_product->get_image( 'marketly-thumb', array( 'class' => 'deal__img', 'loading' => 'lazy' ) )
+					$marketly_product->get_image(
+						'marketly-thumb',
+						array(
+							'class'   => 'deal__img',
+							'loading' => 'lazy',
+						)
+					)
 				);
 				?>
 			</a>

@@ -75,7 +75,11 @@ $marketly_heading = trim( (string) marketly_option( 'promo_heading' ) );
 								$marketly_banner['image'],
 								'marketly-banner',
 								false,
-								array( 'class' => 'promo__img', 'loading' => 'lazy', 'alt' => '' )
+								array(
+									'class'   => 'promo__img',
+									'loading' => 'lazy',
+									'alt'     => '',
+								)
 							);
 							?>
 						</div>

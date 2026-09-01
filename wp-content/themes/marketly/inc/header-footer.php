@@ -2,9 +2,9 @@
 /**
  * Assembles the header, footer and the off-canvas furniture.
  *
- * header.php and footer.php fire three actions and hold no markup of their
- * own, so the pieces below can be reordered, removed or added to from a child
- * theme without touching a template file.
+ * Three actions are fired by header.php and footer.php, which hold no markup
+ * of their own, so the pieces below can be reordered, removed or added to from
+ * a child theme without touching a template file.
  *
  * @package Marketly
  */

@@ -280,7 +280,11 @@ function marketly_customize_storefront( $wp_customize ) {
 				'description' => $labels[1],
 				'type'        => 'number',
 				'sanitize'    => 'marketly_sanitize_count',
-				'input_attrs' => array( 'min' => 0, 'max' => 24, 'step' => 1 ),
+				'input_attrs' => array(
+					'min'  => 0,
+					'max'  => 24,
+					'step' => 1,
+				),
 			)
 		);
 	}
@@ -312,7 +316,9 @@ function marketly_customize_storefront( $wp_customize ) {
 		$fields = array(
 			"promo{$n}_title" => array(
 				/* translators: %d: banner number. */
-				sprintf( __( 'Banner %d — title', 'marketly' ), $n ), 'text', 'sanitize_text_field',
+				sprintf( __( 'Banner %d — title', 'marketly' ), $n ),
+				'text',
+				'sanitize_text_field',
 			),
 			"promo{$n}_sub"   => array( __( 'Subtitle', 'marketly' ), 'text', 'sanitize_text_field' ),
 			"promo{$n}_note"  => array( __( 'Small print', 'marketly' ), 'text', 'sanitize_text_field' ),

@@ -65,7 +65,11 @@ $marketly_paged = max( 1, (int) get_query_var( 'paged' ) );
 					get_template_part(
 						'template-parts/card',
 						'product',
-						array( 'product' => $marketly_product, 'layout' => 'v', 'heading' => 'h2' )
+						array(
+							'product' => $marketly_product,
+							'layout'  => 'v',
+							'heading' => 'h2',
+						)
 					);
 				}
 			endwhile;

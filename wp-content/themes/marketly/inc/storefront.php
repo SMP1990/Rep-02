@@ -15,8 +15,8 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Warm the object cache for a set of products' images.
  *
- * wc_get_products() primes the products themselves, but each card then asks
- * for its thumbnail, and WordPress fetches attachments one at a time — one
+ * Products themselves are primed by wc_get_products(), but each card then
+ * asks for its thumbnail, and WordPress fetches attachments one at a time — one
  * SELECT for the attachment post and another for its meta, per card. On a
  * homepage with four shelves that is dozens of round trips for data one
  * query could have fetched.
@@ -432,7 +432,8 @@ function marketly_home_page_content() {
 	}
 
 	echo '<section class="section"><div class="container entry__content">';
-	echo apply_filters( 'the_content', $post->post_content ); // phpcs:ignore WordPress.Security.EscapingOutput.OutputNotEscaped -- Passed through the_content, which escapes.
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Core's the_content filter, which escapes and is invoked not defined.
+	echo apply_filters( 'the_content', $post->post_content );
 	echo '</div></section>';
 }
 add_action( 'marketly_homepage', 'marketly_home_page_content', 90 );

@@ -27,11 +27,11 @@ get_header();
 
 		<p class="page-header__desc">
 			<?php
-			$found = (int) $GLOBALS['wp_query']->found_posts;
+			$marketly_found = (int) $GLOBALS['wp_query']->found_posts;
 			printf(
 				/* translators: %s: number of results. */
-				esc_html( _n( '%s result found', '%s results found', $found, 'marketly' ) ),
-				esc_html( number_format_i18n( $found ) )
+				esc_html( _n( '%s result found', '%s results found', $marketly_found, 'marketly' ) ),
+				esc_html( number_format_i18n( $marketly_found ) )
 			);
 			?>
 		</p>

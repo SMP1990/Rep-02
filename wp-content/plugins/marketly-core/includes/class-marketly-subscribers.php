@@ -17,9 +17,9 @@ defined( 'ABSPATH' ) || exit;
  */
 class Marketly_Subscribers {
 
-	const POST_TYPE  = 'marketly_subscriber';
-	const META_IP    = '_marketly_ip_hash';
-	const META_PAGE  = '_marketly_source';
+	const POST_TYPE = 'marketly_subscriber';
+	const META_IP   = '_marketly_ip_hash';
+	const META_PAGE = '_marketly_source';
 
 	/**
 	 * Hook everything up.

@@ -23,23 +23,23 @@ defined( 'ABSPATH' ) || exit;
 function marketly_defaults() {
 	$defaults = array(
 		// Brand.
-		'brand_tagline'     => __( 'Shop Smart, Live Better', 'marketly' ),
+		'brand_tagline'    => __( 'Shop Smart, Live Better', 'marketly' ),
 
 		// Announcement bar.
-		'announce_enable'   => true,
-		'announce_text'     => __( '🎉 Mega Summer Sale is Live! Get Up to 60% OFF', 'marketly' ),
-		'announce_url'      => '',
+		'announce_enable'  => true,
+		'announce_text'    => __( '🎉 Mega Summer Sale is Live! Get Up to 60% OFF', 'marketly' ),
+		'announce_url'     => '',
 
 		// Header.
-		'header_search'     => true,
+		'header_search'    => true,
 
 		// Footer.
-		'footer_about'      => __( 'Millions of products from top brands and trusted sellers, at the best prices.', 'marketly' ),
-		'footer_copyright'  => '',
-		'social_facebook'   => '',
-		'social_instagram'  => '',
-		'social_x'          => '',
-		'social_youtube'    => '',
+		'footer_about'     => __( 'Millions of products from top brands and trusted sellers, at the best prices.', 'marketly' ),
+		'footer_copyright' => '',
+		'social_facebook'  => '',
+		'social_instagram' => '',
+		'social_x'         => '',
+		'social_youtube'   => '',
 	);
 
 	/**
@@ -53,18 +53,19 @@ function marketly_defaults() {
 /**
  * Read a theme setting, falling back to its registered default.
  *
- * @param string $key     Setting key, without the marketly_ prefix.
- * @param mixed  $default Optional explicit fallback.
+ * @param string $key      Setting key, without the marketly_ prefix.
+ * @param mixed  $fallback Optional explicit fallback. "default" would shadow
+ *                         a reserved word.
  * @return mixed
  */
-function marketly_option( $key, $default = null ) {
+function marketly_option( $key, $fallback = null ) {
 	$defaults = marketly_defaults();
 
-	if ( null === $default && isset( $defaults[ $key ] ) ) {
-		$default = $defaults[ $key ];
+	if ( null === $fallback && isset( $defaults[ $key ] ) ) {
+		$fallback = $defaults[ $key ];
 	}
 
-	return get_theme_mod( 'marketly_' . $key, $default );
+	return get_theme_mod( 'marketly_' . $key, $fallback );
 }
 
 /* -------------------------------------------------------------- Sanitisers */

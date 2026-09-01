@@ -90,8 +90,8 @@ class Marketly_Forms {
 	/**
 	 * Redirect back to the submitting page with a status flag.
 	 *
-	 * wp_safe_redirect refuses off-site hosts, so a forged _wp_http_referer
-	 * cannot be used to bounce a visitor somewhere else.
+	 * Off-site hosts are refused by wp_safe_redirect(), so a forged
+	 * _wp_http_referer cannot bounce a visitor somewhere else.
 	 *
 	 * @param string $status Status slug.
 	 */

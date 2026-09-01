@@ -27,7 +27,11 @@ $marketly_value = trim( (string) marketly_option( 'hero_badge_value' ) );
 
 $marketly_trust = array();
 
-foreach ( array( 1 => 'truck', 2 => 'refresh', 3 => 'shield' ) as $marketly_n => $marketly_icon_name ) {
+foreach ( array(
+	1 => 'truck',
+	2 => 'refresh',
+	3 => 'shield',
+) as $marketly_n => $marketly_icon_name ) {
 	$marketly_title = trim( (string) marketly_option( "trust{$marketly_n}_title" ) );
 
 	if ( '' !== $marketly_title ) {

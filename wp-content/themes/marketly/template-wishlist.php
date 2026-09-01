@@ -20,7 +20,10 @@ get_header();
 		<p class="page-header__desc"><?php esc_html_e( 'Products you have saved on this device.', 'marketly' ); ?></p>
 	</header>
 
-	<?php while ( have_posts() ) : the_post(); ?>
+	<?php
+	while ( have_posts() ) :
+		the_post();
+		?>
 		<?php if ( trim( get_the_content() ) ) : ?>
 			<div class="entry__content"><?php the_content(); ?></div>
 		<?php endif; ?>
