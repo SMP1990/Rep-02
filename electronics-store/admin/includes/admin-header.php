@@ -1,9 +1,9 @@
 <?php
 /**
  * Shared <head> + opening <body> + sidebar shell for every admin page.
- * Wireframe stage: markup/styling only. Pages that require this file are
- * expected to have already required config/config.php and, in Phase 2,
- * includes/auth.php to enforce login.
+ * Pages that require this file are expected to have already required
+ * includes/bootstrap.php and includes/auth.php and called
+ * require_admin_login().
  *
  * Expects (optional) $page_title and $active_nav to be set before include.
  */
@@ -46,8 +46,14 @@ $active_nav = $active_nav ?? '';
     <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0">
       <h1 class="font-semibold text-lg text-ink"><?= htmlspecialchars($page_title, ENT_QUOTES, 'UTF-8') ?></h1>
       <div class="flex items-center gap-4">
-        <span class="text-sm text-slate-500">👤 Admin User</span>
-        <a href="/electronics-store/admin/login.php" class="text-sm text-slate-400 hover:text-red-500">Logout</a>
+        <span class="text-sm text-slate-500">👤 <?= e(current_admin_name()) ?></span>
+        <a href="/electronics-store/admin/logout.php" class="text-sm text-slate-400 hover:text-red-500">Logout</a>
       </div>
     </header>
     <main class="flex-1 p-6">
+      <?php foreach (flash_all() as $flash): ?>
+        <div class="mb-4 rounded-lg px-4 py-3 text-sm border
+                    <?= $flash['type'] === 'error' ? 'bg-red-50 border-red-200 text-red-700' : 'bg-green-50 border-green-200 text-green-700' ?>">
+          <?= e($flash['message']) ?>
+        </div>
+      <?php endforeach; ?>

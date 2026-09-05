@@ -1,10 +1,34 @@
 <?php
 /**
- * Admin Login — wireframe stage.
- * Form posts nowhere yet; authentication logic lands in Phase 2
- * (password_verify, session, CSRF token, rate limiting).
+ * Admin Login — verifies credentials against the admins table and starts
+ * a session on success.
  */
-require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../includes/bootstrap.php';
+require_once __DIR__ . '/../includes/auth.php';
+
+if (is_admin_logged_in()) {
+    redirect('/electronics-store/admin/dashboard.php');
+}
+
+$error = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verify_csrf($_POST['csrf_token'] ?? null)) {
+        $error = 'Your session expired. Please try again.';
+    } else {
+        $email = trim($_POST['email'] ?? '');
+        $password = (string) ($_POST['password'] ?? '');
+
+        if ($email === '' || $password === '') {
+            $error = 'Please enter your email and password.';
+        } elseif (admin_attempt_login($email, $password)) {
+            redirect('/electronics-store/admin/dashboard.php');
+        } else {
+            $error = 'Invalid email or password.';
+        }
+    }
+}
+
 $page_title = 'Admin Login — Voltix Electronics';
 ?>
 <!DOCTYPE html>
@@ -12,7 +36,7 @@ $page_title = 'Admin Login — Voltix Electronics';
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><?= htmlspecialchars($page_title, ENT_QUOTES, 'UTF-8') ?></title>
+<title><?= e($page_title) ?></title>
 <meta name="robots" content="noindex, nofollow">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
@@ -32,16 +56,23 @@ $page_title = 'Admin Login — Voltix Electronics';
       Voltix Admin
     </div>
 
-    <form method="post" action="#" class="bg-white rounded-2xl shadow-xl p-8 space-y-5">
+    <form method="post" action="" class="bg-white rounded-2xl shadow-xl p-8 space-y-5">
+      <?= csrf_field() ?>
       <div>
         <h1 class="text-xl font-bold text-ink mb-1">Welcome back</h1>
         <p class="text-sm text-slate-500">Sign in to manage your store.</p>
       </div>
 
+      <?php if ($error): ?>
+        <div class="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-3 py-2">
+          <?= e($error) ?>
+        </div>
+      <?php endif; ?>
+
       <div>
         <label class="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
-        <input type="email" name="email" placeholder="admin@voltix.example"
-               class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand" required>
+        <input type="email" name="email" value="<?= e($_POST['email'] ?? '') ?>" placeholder="admin@voltix.example"
+               class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand" required autofocus>
       </div>
 
       <div>
@@ -50,20 +81,9 @@ $page_title = 'Admin Login — Voltix Electronics';
                class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand" required>
       </div>
 
-      <div class="flex items-center justify-between text-sm">
-        <label class="flex items-center gap-2 text-slate-500">
-          <input type="checkbox" class="rounded border-slate-300 text-brand focus:ring-brand"> Remember me
-        </label>
-        <a href="#" class="text-brand hover:underline">Forgot password?</a>
-      </div>
-
       <button type="submit" class="w-full bg-brand hover:bg-brand-dark text-white font-semibold py-2.5 rounded-lg transition">
         Sign In
       </button>
-
-      <p class="text-xs text-center text-slate-400 pt-2">
-        Authentication is not yet active — this is a UI wireframe only.
-      </p>
     </form>
   </div>
 

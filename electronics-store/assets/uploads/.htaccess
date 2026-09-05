@@ -1,0 +1,13 @@
+# Defense in depth: uploaded files are validated by MIME type and given a
+# random extension-matched filename, but never allow this directory to
+# execute code even if that validation were somehow bypassed.
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+
+<FilesMatch "\.(php|phtml|php\d|pl|py|cgi|sh)$">
+    Require all denied
+</FilesMatch>

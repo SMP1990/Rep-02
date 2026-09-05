@@ -1,7 +1,8 @@
 <?php
 /**
- * Shared <head> + opening <body> for every storefront page.
- * Wireframe stage: markup/styling only, no dynamic data.
+ * Shared <head> + opening <body> for every storefront page. Pages that
+ * require this file are expected to have already required
+ * includes/bootstrap.php.
  *
  * Expects (optional) $page_title to be set before include.
  */
@@ -45,3 +46,12 @@ $page_title = $page_title ?? 'Voltix Electronics';
 <body class="bg-slate-50 text-slate-800 font-sans antialiased">
 
 <?php include __DIR__ . '/navbar.php'; ?>
+
+<?php foreach (flash_all() as $flash): ?>
+  <div class="max-w-7xl mx-auto px-4 pt-4">
+    <div class="rounded-lg px-4 py-3 text-sm border
+                <?= $flash['type'] === 'error' ? 'bg-red-50 border-red-200 text-red-700' : 'bg-green-50 border-green-200 text-green-700' ?>">
+      <?= e($flash['message']) ?>
+    </div>
+  </div>
+<?php endforeach; ?>
