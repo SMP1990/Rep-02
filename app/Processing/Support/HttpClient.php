@@ -20,9 +20,13 @@ namespace App\Processing\Support;
  * This class enforces its own timeout via cURL's own options
  * (CURLOPT_TIMEOUT/CURLOPT_CONNECTTIMEOUT) — this is the "each provider
  * enforces its own network timeout" contract ProviderManager's docblock
- * describes (Phase 4 §4.3).
+ * describes (Phase 4 §4.3). It also enforces a response-size ceiling via
+ * a write-callback abort (not CURLOPT_MAXFILESIZE, which only checks a
+ * Content-Length header that a scraped page often won't send) — a
+ * resource-limit safeguard for shared hosting's memory constraints
+ * (Phase 0 §0.7), generic to any provider, not specific to one platform.
  */
-final class HttpClient
+final class HttpClient implements HttpClientInterface
 {
     public function __construct(
         private readonly int $timeoutSeconds = 15,
@@ -30,6 +34,7 @@ final class HttpClient
         private readonly string $userAgent = 'Mozilla/5.0 (compatible; FetchpointBot/1.0)',
         private readonly int $maxRetries = 2,
         private readonly int $maxRedirects = 5,
+        private readonly int $maxResponseBytes = 10_485_760, // 10 MB
     ) {
     }
 
@@ -86,10 +91,14 @@ final class HttpClient
             $formattedHeaders[] = "{$name}: {$value}";
         }
 
+        $buffer = '';
+        $maxBytes = $this->maxResponseBytes;
+        $exceeded = false;
+
         curl_setopt_array($ch, [
             CURLOPT_CUSTOMREQUEST => $method,
             CURLOPT_NOBODY => $method === 'HEAD',
-            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_RETURNTRANSFER => false,
             CURLOPT_HEADER => false,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_MAXREDIRS => $this->maxRedirects,
@@ -99,13 +108,28 @@ final class HttpClient
             CURLOPT_HTTPHEADER => $formattedHeaders,
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,
+            CURLOPT_WRITEFUNCTION => function ($handle, string $chunk) use (&$buffer, &$exceeded, $maxBytes): int {
+                $buffer .= $chunk;
+                if (strlen($buffer) > $maxBytes) {
+                    $exceeded = true;
+
+                    return -1; // aborts the transfer
+                }
+
+                return strlen($chunk);
+            },
         ]);
 
-        $body = curl_exec($ch);
+        curl_exec($ch);
         $errorNumber = curl_errno($ch);
         $errorMessage = curl_error($ch);
         $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $effectiveUrl = (string) curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
         curl_close($ch);
+
+        if ($exceeded) {
+            throw new HttpRequestException("Response from {$url} exceeded the {$maxBytes}-byte limit.");
+        }
 
         if ($errorNumber !== 0) {
             throw new HttpRequestException("cURL error ({$errorNumber}): {$errorMessage}");
@@ -115,6 +139,6 @@ final class HttpClient
             throw new HttpRequestException("Upstream returned HTTP {$status}.");
         }
 
-        return new HttpResponse($status, [], $body === false ? '' : $body);
+        return new HttpResponse($status, [], $buffer, $effectiveUrl);
     }
 }

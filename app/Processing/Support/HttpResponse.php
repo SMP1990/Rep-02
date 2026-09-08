@@ -15,6 +15,7 @@ final class HttpResponse
         public readonly int $status,
         public readonly array $headers,
         public readonly string $body,
+        public readonly string $effectiveUrl = '',
     ) {
     }
 

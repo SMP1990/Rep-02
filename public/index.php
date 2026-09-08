@@ -24,7 +24,9 @@ use App\Http\Middleware\RateLimitMiddleware;
 use App\Http\Request;
 use App\Http\Response;
 use App\Http\Router;
+use App\Processing\Providers\FacebookProvider;
 use App\Processing\ProviderManager;
+use App\Processing\Support\HttpClient;
 use App\Repositories\AdministratorRepository;
 use App\Repositories\AdvertisementRepository;
 use App\Repositories\ErrorLogRepository;
@@ -45,11 +47,19 @@ Session::start();
 $cache = new FileCacheStore((string) Config::get('cache.path'));
 $rateLimiter = new RateLimiter($cache);
 
-// No provider is registered yet (config/providers.php) — see
-// docs/media-platform/phase-1-technical-architecture.md. ProviderManager
-// with an empty provider list correctly answers every request with
-// UNSUPPORTED_SOURCE, proving the pipeline without any extraction logic.
-$providerManager = new ProviderManager(providers: Config::get('providers.providers', []));
+// Providers are constructed explicitly here, like everything else in
+// this file — ProviderManager takes ProcessingProvider *instances*, not
+// class-name strings, so config/providers.php is documentation of what's
+// registered and why, not a list this file resolves automatically (that
+// was a latent bug: it previously passed the raw config array straight
+// through, which would have fatal-errored the moment a provider was
+// actually listed there — caught while wiring the first real provider).
+$facebookProvider = new FacebookProvider(
+    http: new HttpClient(timeoutSeconds: 12, connectTimeoutSeconds: 4),
+    cache: $cache,
+);
+
+$providerManager = new ProviderManager(providers: [$facebookProvider]);
 
 $processingLog = new ProcessingLogRepository();
 $visitorStats = new VisitorStatsRepository();
