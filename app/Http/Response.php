@@ -45,6 +45,11 @@ final class Response
         return new self($status, ['Content-Type' => 'text/html; charset=utf-8'], $body);
     }
 
+    public function status(): int
+    {
+        return $this->status;
+    }
+
     public function send(): void
     {
         if (!headers_sent()) {

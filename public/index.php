@@ -9,10 +9,12 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\Api\MetadataController;
 use App\Http\Controllers\Api\ProcessController;
+use App\Http\Controllers\PageController;
 use App\Http\Middleware\AdminAuthMiddleware;
 use App\Http\Middleware\CsrfMiddleware;
 use App\Http\Middleware\RateLimitMiddleware;
 use App\Http\Request;
+use App\Http\Response;
 use App\Http\Router;
 use App\Processing\ProviderManager;
 use App\Repositories\AdministratorRepository;
@@ -20,6 +22,7 @@ use App\Support\Config;
 use App\Support\FileCacheStore;
 use App\Support\RateLimiter;
 use App\Support\Session;
+use App\Support\View;
 
 Session::start();
 
@@ -54,7 +57,18 @@ $loginThrottle = new RateLimitMiddleware(
 $csrf = new CsrfMiddleware();
 $adminAuth = new AdminAuthMiddleware();
 
+$pages = new PageController();
+
 $router = new Router();
+
+// Public pages
+$router->get('/', [$pages, 'home']);
+$router->get('/faq', [$pages, 'faq']);
+$router->get('/about', [$pages, 'about']);
+$router->get('/contact', [$pages, 'contact']);
+$router->get('/terms', [$pages, 'terms']);
+$router->get('/privacy', [$pages, 'privacy']);
+$router->get('/copyright', [$pages, 'copyright']);
 
 // Public API
 $router->get('/api/v1/health', new HealthController());
@@ -66,4 +80,15 @@ $router->get('/admin/api/csrf-token', [$authController, 'csrfToken']);
 $router->post('/admin/api/login', [$authController, 'login'], [$loginThrottle]);
 $router->post('/admin/api/logout', [$authController, 'logout'], [$csrf, $adminAuth]);
 
-$router->dispatch(Request::fromGlobals())->send();
+$request = Request::fromGlobals();
+$response = $router->dispatch($request);
+
+// A 404 on a non-API route should render the branded HTML error page
+// (resources/views/errors/404.php), not the JSON envelope every API
+// route uses — Router itself stays API/HTML-agnostic.
+$isApiPath = str_starts_with($request->path(), '/api/') || str_starts_with($request->path(), '/admin/api');
+if ($response->status() === 404 && !$isApiPath) {
+    $response = Response::html(View::render('errors/404', ['title' => 'Page not found — Fetchpoint']), 404);
+}
+
+$response->send();

@@ -1,0 +1,130 @@
+/*
+ * Fetchpoint — original design tokens layered over Bootstrap 5.
+ * Bootstrap 5.3's root-level --bs-primary / --bs-primary-rgb (and the
+ * link-color equivalents) are consumed by utilities and most components,
+ * so redefining them here re-themes the site without a Sass build step.
+ */
+
+:root {
+    --bs-primary: #6d28d9;
+    --bs-primary-rgb: 109, 40, 217;
+    --bs-link-color: #6d28d9;
+    --bs-link-color-rgb: 109, 40, 217;
+    --bs-link-hover-color: #5b21b6;
+    --bs-link-hover-color-rgb: 91, 33, 182;
+
+    --fp-accent: #06b6d4;
+    --fp-bg: #faf9fc;
+    --fp-surface: #ffffff;
+    --fp-border: #e7e5ee;
+    --fp-radius: 0.9rem;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --fp-bg: #121016;
+        --fp-surface: #1b1922;
+        --fp-border: #2c2935;
+    }
+}
+
+body {
+    background-color: var(--fp-bg);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.skip-link {
+    position: absolute;
+    top: -3rem;
+    left: 1rem;
+    z-index: 2000;
+}
+
+.skip-link:focus {
+    top: 1rem;
+}
+
+.brand-accent {
+    color: var(--fp-accent);
+}
+
+.site-header {
+    background-color: var(--fp-surface);
+    border-bottom: 1px solid var(--fp-border);
+}
+
+.hero {
+    padding: 4.5rem 0 3rem;
+}
+
+.fetch-form .input-group > .form-control {
+    border-radius: var(--fp-radius) 0 0 var(--fp-radius);
+}
+
+.fetch-form .input-group > .btn {
+    border-radius: 0 var(--fp-radius) var(--fp-radius) 0;
+}
+
+.fetch-state.d-none {
+    display: none !important;
+}
+
+#state-loading {
+    text-align: center;
+}
+
+.result-card,
+.feature-card {
+    background-color: var(--fp-surface);
+    border: 1px solid var(--fp-border);
+    border-radius: var(--fp-radius);
+    padding: 1.25rem;
+}
+
+.result-thumbnail {
+    width: 96px;
+    height: 96px;
+    object-fit: cover;
+    border-radius: calc(var(--fp-radius) - 0.35rem);
+    flex-shrink: 0;
+}
+
+.step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    background-color: rgba(var(--bs-primary-rgb), 0.12);
+    color: var(--bs-primary);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.how-it-works,
+.features,
+.faq-teaser {
+    border-top: 1px solid var(--fp-border);
+}
+
+.site-footer {
+    background-color: var(--fp-surface);
+    border-top: 1px solid var(--fp-border);
+    padding: 3rem 0 2rem;
+    margin-top: 3rem;
+}
+
+.site-footer a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.site-footer a:hover {
+    color: var(--bs-primary);
+}
+
+.option-btn {
+    width: 100%;
+    text-align: left;
+}

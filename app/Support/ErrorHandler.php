@@ -45,11 +45,24 @@ final class ErrorHandler
             }
 
             $message = $debug ? $e->getMessage() : 'Something went wrong. Please try again.';
+            $path = parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH) ?: '/';
+            $isApiRoute = str_starts_with($path, '/api/') || str_starts_with($path, '/admin/api/');
 
-            Response::json([
-                'success' => false,
-                'error' => ['code' => 'INTERNAL_ERROR', 'message' => $message],
-            ], 500)->send();
+            if ($isApiRoute) {
+                Response::json([
+                    'success' => false,
+                    'error' => ['code' => 'INTERNAL_ERROR', 'message' => $message],
+                ], 500)->send();
+
+                return;
+            }
+
+            try {
+                Response::html(View::render('errors/500', ['title' => 'Something went wrong']), 500)->send();
+            } catch (Throwable) {
+                http_response_code(500);
+                echo 'Something went wrong. Please try again.';
+            }
         });
     }
 }
