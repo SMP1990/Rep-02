@@ -18,3 +18,16 @@ Thumbs.db
 #   cd wp-content/plugins && zip -rq ../../dist/haven-realty-core.zip haven-realty-core
 #   cd wp-content/themes  && zip -rq ../../dist/haven-realty.zip haven-realty
 /dist/
+
+# --- Media Utility Platform (docs/media-platform) ---
+# Runtime/writable and dependency directories — never committed. Structure
+# is preserved with .gitkeep; contents are environment-specific or generated.
+/vendor/
+/.env
+/config/.env
+/storage/cache/*
+!/storage/cache/.gitkeep
+/storage/logs/*
+!/storage/logs/.gitkeep
+/storage/tmp/*
+!/storage/tmp/.gitkeep
