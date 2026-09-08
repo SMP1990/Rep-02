@@ -10,6 +10,7 @@ use App\Processing\Providers\FacebookProvider;
 use App\Processing\Support\HttpClientInterface;
 use App\Processing\Support\HttpRequestException;
 use App\Processing\Support\HttpResponse;
+use App\Processing\Support\InFlightLock;
 use App\Support\CacheStore;
 use PHPUnit\Framework\TestCase;
 
@@ -176,9 +177,48 @@ final class FacebookProviderTest extends TestCase
         self::assertStringStartsWith('https://mbasic.facebook.com/someone/videos/555/', $http->requestedUrls[1]);
     }
 
+    public function testWhenAnotherProcessIsAlreadyResolvingTheSameUrlItWaitsThenFallsBackToItsOwnFetchIfStillUncached(): void
+    {
+        $http = new FakeHttpClient();
+        $http->queue('mbasic.facebook.com', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
+
+        $lockDir = sys_get_temp_dir() . '/fetchpoint-fb-lock-test-' . uniqid('', true);
+        $url = 'https://www.facebook.com/someone/videos/777/';
+        $cacheKey = 'facebook:extract:' . hash('sha256', $url);
+
+        // Simulate a concurrent "leader" already holding the coalescing
+        // lock for this exact URL (see InFlightLockTest for why a second
+        // file handle behaves like a separate process would).
+        if (!is_dir($lockDir)) {
+            mkdir($lockDir, 0755, true);
+        }
+        $lockPath = $lockDir . '/' . hash('sha256', $cacheKey) . '.lock';
+        $externalHandle = fopen($lockPath, 'c');
+        self::assertNotFalse($externalHandle);
+        self::assertTrue(flock($externalHandle, LOCK_EX));
+
+        $provider = new FacebookProvider(
+            $http,
+            new InMemoryCacheStore(),
+            new InFlightLock($lockDir, waitTimeoutSeconds: 1, pollIntervalMicroseconds: 50_000),
+        );
+
+        $result = $provider->fetchMetadata($url);
+
+        flock($externalHandle, LOCK_UN);
+        fclose($externalHandle);
+
+        self::assertTrue($result->success, 'should still succeed via its own independent fetch after giving up waiting');
+        self::assertCount(1, $http->requestedUrls, 'gave up waiting and fetched independently since no leader ever populated the cache');
+    }
+
     private function makeProvider(?HttpClientInterface $http = null): FacebookProvider
     {
-        return new FacebookProvider($http ?? new FakeHttpClient(), new InMemoryCacheStore());
+        return new FacebookProvider(
+            $http ?? new FakeHttpClient(),
+            new InMemoryCacheStore(),
+            new InFlightLock(sys_get_temp_dir() . '/fetchpoint-fb-lock-test-' . uniqid('', true)),
+        );
     }
 }
 

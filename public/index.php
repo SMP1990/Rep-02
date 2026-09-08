@@ -27,6 +27,7 @@ use App\Http\Router;
 use App\Processing\Providers\FacebookProvider;
 use App\Processing\ProviderManager;
 use App\Processing\Support\HttpClient;
+use App\Processing\Support\InFlightLock;
 use App\Repositories\AdministratorRepository;
 use App\Repositories\AdvertisementRepository;
 use App\Repositories\ErrorLogRepository;
@@ -57,6 +58,11 @@ $rateLimiter = new RateLimiter($cache);
 $facebookProvider = new FacebookProvider(
     http: new HttpClient(timeoutSeconds: 12, connectTimeoutSeconds: 4),
     cache: $cache,
+    // Coalesces concurrent requests for the same URL (Phase 8 finding) —
+    // lives alongside the file cache, not inside it, since a lock's
+    // lifecycle (acquire/release) is a different concern from a cached
+    // value's (get/set/expire).
+    lock: new InFlightLock((string) Config::get('cache.path') . '/locks'),
 );
 
 $providerManager = new ProviderManager(providers: [$facebookProvider]);

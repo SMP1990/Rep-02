@@ -12,6 +12,7 @@ use App\Processing\ProcessingProvider;
 use App\Processing\ProcessingResult;
 use App\Processing\Support\HttpClientInterface;
 use App\Processing\Support\HttpRequestException;
+use App\Processing\Support\InFlightLock;
 use App\Support\CacheStore;
 use App\Support\Logger;
 
@@ -34,6 +35,14 @@ use App\Support\Logger;
  * be tested against real public video/Reel URLs before being trusted in
  * production — treat it as "implemented and structurally tested," not
  * "verified working."
+ *
+ * Concurrent requests for the SAME URL are coalesced via InFlightLock
+ * (Phase 8 finding): only one caller actually fetches/parses Facebook's
+ * page at a time; the rest wait (bounded) and then reuse the cached
+ * result instead of each independently hitting Facebook. This only
+ * coalesces the *success* path on purpose — a failed attempt is never
+ * cached, so if the "leader" fails, the next caller in line tries again
+ * independently rather than everyone inheriting one failure.
  */
 final class FacebookProvider implements ProcessingProvider
 {
@@ -42,7 +51,13 @@ final class FacebookProvider implements ProcessingProvider
     public function __construct(
         private readonly HttpClientInterface $http,
         private readonly CacheStore $cache,
+        private readonly InFlightLock $lock,
         private readonly int $priority = 10,
+        // Both injectable only for tests, which can't reach the real host
+        // (and a local test server is plain HTTP, not HTTPS) — production
+        // code never has a reason to override either default.
+        private readonly string $mbasicHost = 'mbasic.facebook.com',
+        private readonly string $mbasicScheme = 'https',
     ) {
     }
 
@@ -100,14 +115,55 @@ final class FacebookProvider implements ProcessingProvider
      */
     private function resolve(string $url): array
     {
-        $cacheKey = 'facebook:extract:' . hash('sha256', $url);
-        $cached = $this->cache->get($cacheKey);
+        $cacheKey = $this->cacheKeyFor($url);
 
-        if (is_array($cached) && isset($cached['options'])) {
-            /** @var array{title: ?string, options: array<int, array{id: string, label: string, url: string}>} $cached */
+        $cached = $this->readCache($cacheKey);
+        if ($cached !== null) {
             return $cached;
         }
 
+        $lock = $this->lock->acquire($cacheKey);
+
+        if ($lock === null) {
+            // Either coalescing wasn't available (lock file couldn't be
+            // opened), or we waited for a concurrent "leader" call — check
+            // whether it populated the cache before falling back to doing
+            // the fetch ourselves.
+            $cached = $this->readCache($cacheKey);
+
+            return $cached ?? $this->fetchAndCache($url, $cacheKey);
+        }
+
+        try {
+            return $this->fetchAndCache($url, $cacheKey);
+        } finally {
+            $this->lock->release($lock);
+        }
+    }
+
+    /** @return array{title: ?string, options: array<int, array{id: string, label: string, url: string}>}|null */
+    private function readCache(string $cacheKey): ?array
+    {
+        $cached = $this->cache->get($cacheKey);
+
+        /** @var array{title: ?string, options: array<int, array{id: string, label: string, url: string}>}|null */
+        return (is_array($cached) && isset($cached['options'])) ? $cached : null;
+    }
+
+    private function cacheKeyFor(string $url): string
+    {
+        return 'facebook:extract:' . hash('sha256', $url);
+    }
+
+    /**
+     * The actual fetch-and-parse work — only ever runs once per URL at a
+     * time thanks to InFlightLock, whether it's called as the lock
+     * "leader" or as a fallback when coalescing wasn't possible.
+     *
+     * @return array{title: ?string, options: array<int, array{id: string, label: string, url: string}>}
+     */
+    private function fetchAndCache(string $url, string $cacheKey): array
+    {
         $canonicalUrl = $this->resolveCanonicalUrl($url);
         $fetchUrl = $this->toMbasicUrl($canonicalUrl);
 
@@ -201,7 +257,7 @@ final class FacebookProvider implements ProcessingProvider
             throw new UpstreamRejectedException('This link could not be parsed.');
         }
 
-        $rebuilt = 'https://mbasic.facebook.com' . ($parts['path'] ?? '/');
+        $rebuilt = $this->mbasicScheme . '://' . $this->mbasicHost . ($parts['path'] ?? '/');
 
         if (isset($parts['query'])) {
             $rebuilt .= '?' . $parts['query'];
