@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Auth;
 
 use App\Repositories\AdministratorRepository;
+use App\Support\Logger;
 use App\Support\Session;
 use DateTimeImmutable;
 
@@ -33,15 +34,27 @@ final class AdminAuthenticator
         $passwordMatches = password_verify($password, $hash);
 
         if ($admin === null || !(bool) $admin['is_active']) {
+            Logger::channel('security')->warning('Admin login failed: unknown or inactive account', [
+                'username' => $username,
+            ]);
+
             return false;
         }
 
         if (!empty($admin['locked_until']) && new DateTimeImmutable($admin['locked_until']) > new DateTimeImmutable()) {
+            Logger::channel('security')->warning('Admin login rejected: account locked', [
+                'username' => $username,
+            ]);
+
             return false;
         }
 
         if (!$passwordMatches) {
             $this->administrators->recordFailedLogin((int) $admin['id'], $this->lockThreshold, $this->lockMinutes);
+
+            Logger::channel('security')->warning('Admin login failed: incorrect password', [
+                'username' => $username,
+            ]);
 
             return false;
         }
@@ -51,6 +64,8 @@ final class AdminAuthenticator
         Session::regenerate();
         $_SESSION['admin_id'] = (int) $admin['id'];
         $_SESSION['admin_username'] = $admin['username'];
+
+        Logger::channel('security')->info('Admin login succeeded', ['username' => $username]);
 
         return true;
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Analytics\RequestRecorder;
 use App\Http\Request;
 use App\Http\Response;
 use App\Processing\Exceptions\ProcessingException;
@@ -17,8 +18,10 @@ use App\Support\Validator;
  */
 final class ProcessController
 {
-    public function __construct(private readonly ProviderManager $providerManager)
-    {
+    public function __construct(
+        private readonly ProviderManager $providerManager,
+        private readonly RequestRecorder $recorder,
+    ) {
     }
 
     public function __invoke(Request $request): Response
@@ -32,11 +35,39 @@ final class ProcessController
             return Response::error('INVALID_INPUT', 'A valid URL and option are required.', 422);
         }
 
+        $startedAt = microtime(true);
+
         try {
             $result = $this->providerManager->process($data['url'], $data['option_id']);
         } catch (ProcessingException $e) {
+            $this->recorder->record(
+                requestType: 'process',
+                url: $data['url'],
+                sourcePlatform: null,
+                providerName: null,
+                optionId: $data['option_id'],
+                success: false,
+                errorCode: $e->getErrorCode(),
+                durationMs: $this->elapsedMs($startedAt),
+                ip: $request->ip(),
+                userAgent: $request->userAgent(),
+            );
+
             return Response::error($e->getErrorCode(), $e->getUserMessage(), MetadataController::statusFor($e));
         }
+
+        $this->recorder->record(
+            requestType: 'process',
+            url: $data['url'],
+            sourcePlatform: $result->sourcePlatform,
+            providerName: $result->providerName,
+            optionId: $data['option_id'],
+            success: true,
+            errorCode: null,
+            durationMs: $this->elapsedMs($startedAt),
+            ip: $request->ip(),
+            userAgent: $request->userAgent(),
+        );
 
         return Response::success([
             'source_platform' => $result->sourcePlatform,
@@ -48,5 +79,10 @@ final class ProcessController
                 'mime_type' => $result->output->mimeType,
             ],
         ]);
+    }
+
+    private function elapsedMs(float $startedAt): int
+    {
+        return (int) ((microtime(true) - $startedAt) * 1000);
     }
 }

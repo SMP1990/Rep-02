@@ -4,8 +4,16 @@ declare(strict_types=1);
 
 require dirname(__DIR__) . '/app/bootstrap.php';
 
+use App\Analytics\RequestRecorder;
 use App\Auth\AdminAuthenticator;
+use App\Http\Controllers\Admin\AdvertisementController;
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\FaqController as AdminFaqController;
+use App\Http\Controllers\Admin\LogController;
+use App\Http\Controllers\Admin\PageController as AdminPageController;
+use App\Http\Controllers\Admin\SeoController;
+use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\Api\MetadataController;
 use App\Http\Controllers\Api\ProcessController;
@@ -18,6 +26,14 @@ use App\Http\Response;
 use App\Http\Router;
 use App\Processing\ProviderManager;
 use App\Repositories\AdministratorRepository;
+use App\Repositories\AdvertisementRepository;
+use App\Repositories\ErrorLogRepository;
+use App\Repositories\FaqRepository;
+use App\Repositories\PageRepository;
+use App\Repositories\ProcessingLogRepository;
+use App\Repositories\SeoSettingsRepository;
+use App\Repositories\SettingsRepository;
+use App\Repositories\VisitorStatsRepository;
 use App\Support\Config;
 use App\Support\FileCacheStore;
 use App\Support\RateLimiter;
@@ -34,6 +50,10 @@ $rateLimiter = new RateLimiter($cache);
 // with an empty provider list correctly answers every request with
 // UNSUPPORTED_SOURCE, proving the pipeline without any extraction logic.
 $providerManager = new ProviderManager(providers: Config::get('providers.providers', []));
+
+$processingLog = new ProcessingLogRepository();
+$visitorStats = new VisitorStatsRepository();
+$recorder = new RequestRecorder($processingLog, $visitorStats);
 
 $administrators = new AdministratorRepository();
 $authenticator = new AdminAuthenticator($administrators);
@@ -56,8 +76,17 @@ $loginThrottle = new RateLimitMiddleware(
 );
 $csrf = new CsrfMiddleware();
 $adminAuth = new AdminAuthMiddleware();
+$adminGuard = [$adminAuth, $csrf]; // order doesn't matter here — CSRF only acts on non-GET
 
 $pages = new PageController();
+
+$dashboard = new DashboardController($processingLog, $visitorStats);
+$settings = new SettingsController(new SettingsRepository());
+$seo = new SeoController(new SeoSettingsRepository());
+$ads = new AdvertisementController(new AdvertisementRepository());
+$adminFaq = new AdminFaqController(new FaqRepository());
+$adminPages = new AdminPageController(new PageRepository());
+$logs = new LogController($processingLog, new ErrorLogRepository());
 
 $router = new Router();
 
@@ -72,13 +101,45 @@ $router->get('/copyright', [$pages, 'copyright']);
 
 // Public API
 $router->get('/api/v1/health', new HealthController());
-$router->post('/api/v1/metadata', new MetadataController($providerManager), [$processingThrottle]);
-$router->post('/api/v1/process', new ProcessController($providerManager), [$processingThrottle]);
+$router->post('/api/v1/metadata', new MetadataController($providerManager, $recorder), [$processingThrottle]);
+$router->post('/api/v1/process', new ProcessController($providerManager, $recorder), [$processingThrottle]);
 
-// Admin API
+// Admin API (JSON — Phase 4, kept for any future JS/SPA/mobile consumer)
 $router->get('/admin/api/csrf-token', [$authController, 'csrfToken']);
 $router->post('/admin/api/login', [$authController, 'login'], [$loginThrottle]);
 $router->post('/admin/api/logout', [$authController, 'logout'], [$csrf, $adminAuth]);
+
+// Admin login (plain HTML form, Post/Redirect/Get — no JS required)
+$router->get('/admin/login', [$authController, 'loginPage']);
+$router->post('/admin/login', [$authController, 'loginSubmit'], [$loginThrottle, $csrf]);
+$router->post('/admin/logout', [$authController, 'logoutSubmit'], $adminGuard);
+
+// Admin dashboard (all protected by session auth + CSRF on every mutation)
+$router->get('/admin', [$dashboard, 'index'], [$adminAuth]);
+
+$router->get('/admin/settings', [$settings, 'edit'], [$adminAuth]);
+$router->post('/admin/settings', [$settings, 'update'], $adminGuard);
+
+$router->get('/admin/seo', [$seo, 'index'], [$adminAuth]);
+$router->post('/admin/seo/{routeKey}', [$seo, 'update'], $adminGuard);
+
+$router->get('/admin/ads', [$ads, 'index'], [$adminAuth]);
+$router->post('/admin/ads', [$ads, 'store'], $adminGuard);
+$router->post('/admin/ads/{id}', [$ads, 'update'], $adminGuard);
+$router->post('/admin/ads/{id}/delete', [$ads, 'destroy'], $adminGuard);
+
+$router->get('/admin/faq', [$adminFaq, 'index'], [$adminAuth]);
+$router->post('/admin/faq', [$adminFaq, 'store'], $adminGuard);
+$router->post('/admin/faq/{id}', [$adminFaq, 'update'], $adminGuard);
+$router->post('/admin/faq/{id}/delete', [$adminFaq, 'destroy'], $adminGuard);
+
+$router->get('/admin/pages', [$adminPages, 'index'], [$adminAuth]);
+$router->post('/admin/pages', [$adminPages, 'store'], $adminGuard);
+$router->post('/admin/pages/{id}', [$adminPages, 'update'], $adminGuard);
+$router->post('/admin/pages/{id}/delete', [$adminPages, 'destroy'], $adminGuard);
+
+$router->get('/admin/logs/processing', [$logs, 'processing'], [$adminAuth]);
+$router->get('/admin/logs/errors', [$logs, 'errors'], [$adminAuth]);
 
 $request = Request::fromGlobals();
 $response = $router->dispatch($request);

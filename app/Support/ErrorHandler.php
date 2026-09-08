@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Support;
 
 use App\Http\Response;
+use App\Repositories\ErrorLogRepository;
 use ErrorException;
 use Throwable;
 
@@ -39,6 +40,18 @@ final class ErrorHandler
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
             ]);
+
+            // Best-effort: the DB may be exactly what's failing here, and
+            // the file log above has already captured full detail either way.
+            try {
+                (new ErrorLogRepository())->record('application', 'critical', $e->getMessage(), [
+                    'exception' => $e::class,
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ]);
+            } catch (Throwable) {
+                // Swallowed intentionally — see comment above.
+            }
 
             if (ob_get_level() > 0) {
                 ob_clean();

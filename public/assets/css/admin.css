@@ -1,0 +1,57 @@
+/* Fetchpoint admin dashboard — reuses app.css's design tokens. */
+
+.admin-shell {
+    display: flex;
+    min-height: 100vh;
+}
+
+.admin-sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background-color: var(--fp-surface);
+    border-right: 1px solid var(--fp-border);
+    padding: 1.5rem 1rem;
+}
+
+.admin-sidebar .nav-link {
+    color: var(--bs-body-color);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.admin-sidebar .nav-link.active {
+    background-color: rgba(var(--bs-primary-rgb), 0.12);
+    color: var(--bs-primary);
+    font-weight: 600;
+}
+
+.admin-main {
+    flex: 1 1 auto;
+    padding: 2rem;
+    min-width: 0;
+}
+
+.stat-card {
+    background-color: var(--fp-surface);
+    border: 1px solid var(--fp-border);
+    border-radius: var(--fp-radius);
+    padding: 1.25rem;
+}
+
+.stat-card .stat-value {
+    font-size: 1.9rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+@media (max-width: 767.98px) {
+    .admin-shell {
+        flex-direction: column;
+    }
+
+    .admin-sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--fp-border);
+    }
+}

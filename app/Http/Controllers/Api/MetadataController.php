@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Analytics\RequestRecorder;
 use App\Http\Request;
 use App\Http\Response;
 use App\Processing\Exceptions\ProcessingException;
@@ -21,8 +22,10 @@ use App\Support\Validator;
  */
 final class MetadataController
 {
-    public function __construct(private readonly ProviderManager $providerManager)
-    {
+    public function __construct(
+        private readonly ProviderManager $providerManager,
+        private readonly RequestRecorder $recorder,
+    ) {
     }
 
     public function __invoke(Request $request): Response
@@ -37,11 +40,39 @@ final class MetadataController
             return Response::error('INVALID_URL', 'Please provide a valid http(s) URL.', 422);
         }
 
+        $startedAt = microtime(true);
+
         try {
             $result = $this->providerManager->fetchMetadata($data['url']);
         } catch (ProcessingException $e) {
+            $this->recorder->record(
+                requestType: 'metadata',
+                url: $data['url'],
+                sourcePlatform: null,
+                providerName: null,
+                optionId: null,
+                success: false,
+                errorCode: $e->getErrorCode(),
+                durationMs: $this->elapsedMs($startedAt),
+                ip: $request->ip(),
+                userAgent: $request->userAgent(),
+            );
+
             return Response::error($e->getErrorCode(), $e->getUserMessage(), self::statusFor($e));
         }
+
+        $this->recorder->record(
+            requestType: 'metadata',
+            url: $data['url'],
+            sourcePlatform: $result->sourcePlatform,
+            providerName: $result->providerName,
+            optionId: null,
+            success: true,
+            errorCode: null,
+            durationMs: $this->elapsedMs($startedAt),
+            ip: $request->ip(),
+            userAgent: $request->userAgent(),
+        );
 
         return Response::success([
             'source_platform' => $result->sourcePlatform,
@@ -69,5 +100,10 @@ final class MetadataController
             'UPSTREAM_REJECTED' => 422,
             default => 502,
         };
+    }
+
+    private function elapsedMs(float $startedAt): int
+    {
+        return (int) ((microtime(true) - $startedAt) * 1000);
     }
 }
