@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /admin/
+
+# Rewritten to a real absolute URL once APP_URL is finalized — see the
+# SEO implementation phase (docs/media-platform).
+Sitemap: /sitemap.xml

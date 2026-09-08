@@ -31,3 +31,5 @@ Thumbs.db
 !/storage/logs/.gitkeep
 /storage/tmp/*
 !/storage/tmp/.gitkeep
+/.phpunit.cache/
+composer.phar
