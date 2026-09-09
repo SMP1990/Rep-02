@@ -20,6 +20,12 @@ declare(strict_types=1);
 
 $SECRET = 'change-me-before-uploading';
 
+// This is a throwaway, secret-gated diagnostic tool (never the live app),
+// so it's safe — and useful — to show raw PHP errors here even though the
+// production app itself always hides them.
+ini_set('display_errors', '1');
+error_reporting(E_ALL);
+
 header('Content-Type: text/plain; charset=utf-8');
 
 if ($SECRET === 'change-me-before-uploading') {
