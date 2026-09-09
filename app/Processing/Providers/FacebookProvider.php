@@ -377,15 +377,21 @@ final class FacebookProvider implements ProcessingProvider
     }
 
     /**
-     * Facebook's real (non-mbasic) pages hydrate themselves from inline
-     * `<script type="application/json">` blocks — dozens of them per page,
-     * each a fragment of the page's own state. The video stream URLs live
-     * as plain string values under a handful of stable key names
-     * (self::HD_KEYS / self::SD_KEYS) somewhere inside that state, at a
-     * depth/shape that Facebook changes often — so instead of matching an
-     * exact JSON path, every candidate block is decoded and walked
-     * recursively for those key names, which is resilient to the
-     * surrounding structure shifting as long as the key names hold.
+     * Facebook's real (non-mbasic) pages embed the video stream URLs as
+     * plain JSON-string key/value pairs (self::HD_KEYS / self::SD_KEYS)
+     * somewhere in the page's inline hydration data. Live production
+     * testing (a real fetched Reel page) showed this data does NOT
+     * reliably live inside a `<script type="application/json">` wrapper —
+     * on that page it was inside an ordinary `<script>` tag invoking
+     * `(new ServerJS()).handle({...})` with a JavaScript object literal
+     * (unquoted outer keys, but proper double-quoted/JSON-escaped string
+     * values at the leaves). Rather than depend on the enclosing script
+     * tag or object shape — which Facebook evidently varies — this scans
+     * the raw HTML body directly for `"key":"value"` occurrences of the
+     * known key names, wherever they appear. Each matched value is a
+     * genuine JSON string body (may contain `\/`, `&`, etc.), so it's
+     * unescaped via json_decode() of the quoted fragment rather than used
+     * raw.
      *
      * @return array<string, string> quality label ('hd'|'sd') => direct URL
      */
@@ -393,51 +399,43 @@ final class FacebookProvider implements ProcessingProvider
     {
         $candidates = [];
 
-        if (preg_match_all('/<script type="application\/json"[^>]*>(.*?)<\/script>/is', $html, $matches) === 0) {
-            return $candidates;
+        foreach (self::HD_KEYS as $key) {
+            $value = $this->extractJsonStringValue($html, $key);
+
+            if ($value !== null) {
+                $candidates['hd'] = $value;
+                break;
+            }
         }
 
-        foreach ($matches[1] as $jsonBlob) {
-            if (!str_contains($jsonBlob, 'playable_url') && !str_contains($jsonBlob, 'browser_native')) {
-                continue;
-            }
+        foreach (self::SD_KEYS as $key) {
+            $value = $this->extractJsonStringValue($html, $key);
 
-            $decoded = json_decode($jsonBlob, true);
-
-            if (is_array($decoded)) {
-                $this->collectVideoUrls($decoded, $candidates);
+            if ($value !== null) {
+                $candidates['sd'] = $value;
+                break;
             }
         }
 
         return $candidates;
     }
 
-    /** @param array<string, string> $candidates */
-    private function collectVideoUrls(array $node, array &$candidates): void
+    /**
+     * Finds the first `"$key":"..."` occurrence in $html and returns its
+     * decoded (unescaped) string value, or null if the key isn't present
+     * or its value is empty/not a string once decoded.
+     */
+    private function extractJsonStringValue(string $html, string $key): ?string
     {
-        if (!isset($candidates['hd'])) {
-            foreach (self::HD_KEYS as $key) {
-                if (isset($node[$key]) && is_string($node[$key]) && $node[$key] !== '') {
-                    $candidates['hd'] = $node[$key];
-                    break;
-                }
-            }
+        $pattern = '/"' . preg_quote($key, '/') . '"\s*:\s*"((?:\\\\.|[^"\\\\])*)"/';
+
+        if (preg_match($pattern, $html, $matches) !== 1) {
+            return null;
         }
 
-        if (!isset($candidates['sd'])) {
-            foreach (self::SD_KEYS as $key) {
-                if (isset($node[$key]) && is_string($node[$key]) && $node[$key] !== '') {
-                    $candidates['sd'] = $node[$key];
-                    break;
-                }
-            }
-        }
+        $decoded = json_decode('"' . $matches[1] . '"');
 
-        foreach ($node as $value) {
-            if (is_array($value)) {
-                $this->collectVideoUrls($value, $candidates);
-            }
-        }
+        return (is_string($decoded) && $decoded !== '') ? $decoded : null;
     }
 
     /**

@@ -16,13 +16,19 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * These tests exercise FacebookProvider's parsing/decision logic against
- * synthetic fixture HTML built to mirror the documented shape of the
- * inline `<script type="application/json">` blocks real facebook.com
- * pages embed their video stream URLs in (see the class docblock on
- * FacebookProvider) — never against real Facebook, since this sandbox's
- * network policy can't reach facebook.com. They prove the parsing logic
- * behaves correctly against that shape; they do NOT prove Facebook's
- * real, current markup still matches it. Real-world verification against
+ * synthetic fixture HTML built to mirror the shapes real facebook.com
+ * pages have been observed embedding their video stream URLs in (see the
+ * class docblock on FacebookProvider) — never against real Facebook,
+ * since this sandbox's network policy can't reach facebook.com. Extraction
+ * scans the raw HTML directly for `"key":"value"` occurrences of the
+ * known key names (self::HD_KEYS / self::SD_KEYS), so it's indifferent to
+ * whatever script tag or object-literal structure surrounds them —
+ * production testing showed that structure varies (a
+ * `<script type="application/json">` block in some cases, a plain
+ * `<script>` tag invoking `(new ServerJS()).handle({...})` with a
+ * JS-object-literal in others). These tests prove the parsing logic
+ * behaves correctly against both observed shapes; they do NOT prove
+ * Facebook's markup won't shift again. Real-world verification against
  * live public URLs is still required before this is trusted in
  * production.
  *
@@ -246,6 +252,39 @@ final class FacebookProviderTest extends TestCase
         }
         self::assertArrayHasKey('hd', $urlById);
         self::assertArrayHasKey('sd', $urlById);
+    }
+
+    public function testFindsVideoUrlsEmbeddedOutsideAnyJsonScriptTag(): void
+    {
+        // Mirrors a real fetched Reel page from production testing: the
+        // video data lives inside a plain <script> tag invoking
+        // `(new ServerJS()).handle({...})` with a JavaScript object
+        // literal — unquoted outer keys (clpData:, gkxData:, __bbox:) —
+        // not inside a <script type="application/json"> block at all.
+        // The leaf values are still proper double-quoted JSON strings.
+        $html = <<<'HTML'
+            <!DOCTYPE html>
+            <html><head><title>Reel by Someone</title></head>
+            <body>
+            <script nonce="uxuDPMPE">requireLazy(["TimeSliceImpl","ServerJS"],function(TimeSlice,ServerJS){(new ServerJS()).handle({require:[["ScheduledServerJS",[],[],{clpData:{},gkxData:{},__bbox:{result:{data:{initial:{"playable_url_quality_hd":"https:\/\/video-cgk1-2.xx.fbcdn.net\/reel-hd.mp4?oh=abc&oe=def","playable_url":"https:\/\/video-cgk1-2.xx.fbcdn.net\/reel-sd.mp4?oh=abc&oe=def"}}}}}]]},"consistency")});</script>
+            </body></html>
+            HTML;
+
+        $http = new FakeHttpClient();
+        $http->queue('facebook.com/reel/998877', new HttpResponse(200, [], $html));
+        $this->queueWarmup($http);
+
+        $provider = $this->makeProvider($http);
+        $metadata = $provider->fetchMetadata('https://www.facebook.com/reel/998877/');
+
+        self::assertTrue($metadata->success);
+        self::assertCount(2, $metadata->options);
+
+        $hdResult = $provider->process('https://www.facebook.com/reel/998877/', 'hd');
+        self::assertSame('https://video-cgk1-2.xx.fbcdn.net/reel-hd.mp4?oh=abc&oe=def', $hdResult->output->url);
+
+        $sdResult = $provider->process('https://www.facebook.com/reel/998877/', 'sd');
+        self::assertSame('https://video-cgk1-2.xx.fbcdn.net/reel-sd.mp4?oh=abc&oe=def', $sdResult->output->url);
     }
 
     public function testTransientHttpFailureBecomesProviderUnavailable(): void

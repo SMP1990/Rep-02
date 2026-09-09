@@ -75,18 +75,17 @@ final class DiagnosticsController
                 break;
             }
         }
-        $jsonBlockCount = preg_match_all('/<script type="application\/json"[^>]*>(.*?)<\/script>/is', $response->body, $jsonMatches);
-        $videoKeyBlockCount = 0;
-        foreach ($jsonMatches[1] ?? [] as $blob) {
-            if (str_contains($blob, 'playable_url') || str_contains($blob, 'browser_native')) {
-                $videoKeyBlockCount++;
+        $videoKeys = ['playable_url_quality_hd', 'browser_native_hd_url', 'playable_url', 'browser_native_sd_url'];
+        $foundKeys = [];
+        foreach ($videoKeys as $key) {
+            if (preg_match('/"' . preg_quote($key, '/') . '"\s*:\s*"/', $response->body) === 1) {
+                $foundKeys[] = $key;
             }
         }
 
         $out .= "--- Same checks FacebookProvider itself makes ---\n";
         $out .= 'Login-wall signal matched: ' . ($matchedLoginSignal !== null ? "YES ('{$matchedLoginSignal}')" : 'no') . "\n";
-        $out .= "application/json script blocks found: {$jsonBlockCount}\n";
-        $out .= "...of which mention playable_url/browser_native: {$videoKeyBlockCount}\n";
+        $out .= 'Video URL keys found anywhere in the raw body: ' . ($foundKeys !== [] ? implode(', ', $foundKeys) : 'none') . "\n";
 
         if (preg_match('/<title>(.*?)<\/title>/is', $response->body, $m) === 1) {
             $out .= 'Page <title>: ' . trim($m[1]) . "\n";
