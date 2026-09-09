@@ -49,12 +49,11 @@ final class DiagnosticsController
             }
         }
 
-        $fetchUrl = $this->toMbasicUrl($canonicalUrl);
-        $out .= "Fetching (exactly what FacebookProvider fetches): {$fetchUrl}\n\n";
+        $out .= "Fetching (exactly what FacebookProvider fetches): {$canonicalUrl}\n\n";
 
         try {
             $start = microtime(true);
-            $response = $http->get($fetchUrl, ['Accept-Language' => 'en-US,en;q=0.9']);
+            $response = $http->get($canonicalUrl, ['Accept-Language' => 'en-US,en;q=0.9']);
             $elapsedMs = (int) round((microtime(true) - $start) * 1000);
         } catch (HttpRequestException $e) {
             $out .= "FAILED — could not reach Facebook at all: {$e->getMessage()}\n";
@@ -76,11 +75,18 @@ final class DiagnosticsController
                 break;
             }
         }
-        $videoRedirectCount = preg_match_all('/href="(\/video_redirect\/\?[^"]+)"/i', $response->body);
+        $jsonBlockCount = preg_match_all('/<script type="application\/json"[^>]*>(.*?)<\/script>/is', $response->body, $jsonMatches);
+        $videoKeyBlockCount = 0;
+        foreach ($jsonMatches[1] ?? [] as $blob) {
+            if (str_contains($blob, 'playable_url') || str_contains($blob, 'browser_native')) {
+                $videoKeyBlockCount++;
+            }
+        }
 
         $out .= "--- Same checks FacebookProvider itself makes ---\n";
         $out .= 'Login-wall signal matched: ' . ($matchedLoginSignal !== null ? "YES ('{$matchedLoginSignal}')" : 'no') . "\n";
-        $out .= "video_redirect links found: {$videoRedirectCount}\n";
+        $out .= "application/json script blocks found: {$jsonBlockCount}\n";
+        $out .= "...of which mention playable_url/browser_native: {$videoKeyBlockCount}\n";
 
         if (preg_match('/<title>(.*?)<\/title>/is', $response->body, $m) === 1) {
             $out .= 'Page <title>: ' . trim($m[1]) . "\n";
@@ -103,17 +109,5 @@ final class DiagnosticsController
         $out .= $showFull ? $response->body : substr($response->body, 0, 3000);
 
         return Response::text($out);
-    }
-
-    private function toMbasicUrl(string $url): string
-    {
-        $parts = parse_url($url);
-        $rebuilt = 'https://mbasic.facebook.com' . ($parts['path'] ?? '/');
-
-        if (isset($parts['query'])) {
-            $rebuilt .= '?' . $parts['query'];
-        }
-
-        return $rebuilt;
     }
 }

@@ -16,13 +16,15 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * These tests exercise FacebookProvider's parsing/decision logic against
- * synthetic fixture HTML built to mirror the documented mbasic.facebook.com
- * markup shape (see the class docblock on FacebookProvider) — never
- * against real Facebook, since this sandbox's network policy can't reach
- * facebook.com. They prove the parsing logic behaves correctly against
- * that shape; they do NOT prove Facebook's real, current markup still
- * matches it. Real-world verification against live public URLs is still
- * required before this is trusted in production.
+ * synthetic fixture HTML built to mirror the documented shape of the
+ * inline `<script type="application/json">` blocks real facebook.com
+ * pages embed their video stream URLs in (see the class docblock on
+ * FacebookProvider) — never against real Facebook, since this sandbox's
+ * network policy can't reach facebook.com. They prove the parsing logic
+ * behaves correctly against that shape; they do NOT prove Facebook's
+ * real, current markup still matches it. Real-world verification against
+ * live public URLs is still required before this is trusted in
+ * production.
  */
 final class FacebookProviderTest extends TestCase
 {
@@ -30,10 +32,7 @@ final class FacebookProviderTest extends TestCase
         <!DOCTYPE html>
         <html><head><title>Sample Cat Video</title></head>
         <body>
-        <div id="video_container">
-        <a href="/video_redirect/?src=https%3A%2F%2Fvideo.example.fbcdn.net%2Fhd.mp4%3Ftoken%3Dabc&fb">HD</a>
-        <a href="/video_redirect/?src=https%3A%2F%2Fvideo.example.fbcdn.net%2Fsd.mp4%3Ftoken%3Dabc&fb">SD</a>
-        </div>
+        <script type="application/json" data-sjs>{"require":[["ScheduledServerJS",[],[],{"__bbox":{"result":{"data":{"video":{"playable_url_quality_hd":"https:\/\/video.example.fbcdn.net\/hd.mp4?token=abc","playable_url":"https:\/\/video.example.fbcdn.net\/sd.mp4?token=abc"}}}}}]]}</script>
         </body></html>
         HTML;
 
@@ -64,7 +63,7 @@ final class FacebookProviderTest extends TestCase
     public function testFetchMetadataParsesTitleAndBothQualityOptions(): void
     {
         $http = new FakeHttpClient();
-        $http->queue('mbasic.facebook.com', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
+        $http->queue('facebook.com/someone/videos/12345', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
 
         $provider = $this->makeProvider($http);
         $result = $provider->fetchMetadata('https://www.facebook.com/someone/videos/12345/');
@@ -77,22 +76,22 @@ final class FacebookProviderTest extends TestCase
         self::assertSame('sd', $result->options[1]->id);
     }
 
-    public function testFetchMetadataRequestsTheMbasicRewrittenUrl(): void
+    public function testFetchMetadataRequestsTheCanonicalUrlDirectlyNotAnyRewrittenOne(): void
     {
         $http = new FakeHttpClient();
-        $http->queue('mbasic.facebook.com', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
+        $http->queue('facebook.com/someone/videos/12345', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
 
         $provider = $this->makeProvider($http);
         $provider->fetchMetadata('https://www.facebook.com/someone/videos/12345/');
 
         self::assertCount(1, $http->requestedUrls);
-        self::assertStringStartsWith('https://mbasic.facebook.com/someone/videos/12345/', $http->requestedUrls[0]);
+        self::assertSame('https://www.facebook.com/someone/videos/12345/', $http->requestedUrls[0]);
     }
 
     public function testLoginWallIsRejectedNotBypassed(): void
     {
         $http = new FakeHttpClient();
-        $http->queue('mbasic.facebook.com', new HttpResponse(200, [], self::HTML_LOGIN_WALL));
+        $http->queue('facebook.com/private/videos/1', new HttpResponse(200, [], self::HTML_LOGIN_WALL));
 
         $provider = $this->makeProvider($http);
 
@@ -108,7 +107,7 @@ final class FacebookProviderTest extends TestCase
         }
 
         $http = new FakeHttpClient();
-        $http->queue('mbasic.facebook.com', new HttpResponse(200, [], self::HTML_LOGIN_WALL));
+        $http->queue('facebook.com/private/videos/1', new HttpResponse(200, [], self::HTML_LOGIN_WALL));
 
         $provider = $this->makeProvider($http);
 
@@ -133,7 +132,7 @@ final class FacebookProviderTest extends TestCase
         }
 
         $http = new FakeHttpClient();
-        $http->queue('mbasic.facebook.com', new HttpResponse(403, [], '<html>blocked</html>'));
+        $http->queue('facebook.com/someone/videos/2', new HttpResponse(403, [], '<html>blocked</html>'));
 
         $provider = $this->makeProvider($http);
 
@@ -153,7 +152,7 @@ final class FacebookProviderTest extends TestCase
     public function testNoVideoFoundIsRejected(): void
     {
         $http = new FakeHttpClient();
-        $http->queue('mbasic.facebook.com', new HttpResponse(200, [], self::HTML_NO_VIDEO));
+        $http->queue('facebook.com/someone/posts/999', new HttpResponse(200, [], self::HTML_NO_VIDEO));
 
         $provider = $this->makeProvider($http);
 
@@ -169,7 +168,7 @@ final class FacebookProviderTest extends TestCase
         }
 
         $http = new FakeHttpClient();
-        $http->queue('mbasic.facebook.com', new HttpResponse(200, [], self::HTML_NO_VIDEO));
+        $http->queue('facebook.com/someone/posts/999', new HttpResponse(200, [], self::HTML_NO_VIDEO));
 
         $provider = $this->makeProvider($http);
 
@@ -186,10 +185,54 @@ final class FacebookProviderTest extends TestCase
         unlink($saved[0]);
     }
 
+    public function testJsonBlocksThatDoNotMentionVideoKeysAreIgnored(): void
+    {
+        $html = <<<'HTML'
+            <!DOCTYPE html>
+            <html><head><title>Unrelated state</title></head>
+            <body>
+            <script type="application/json" data-sjs>{"some_unrelated_state":{"count":42,"nested":{"more":"stuff"}}}</script>
+            </body></html>
+            HTML;
+
+        $http = new FakeHttpClient();
+        $http->queue('facebook.com/someone/posts/1000', new HttpResponse(200, [], $html));
+
+        $provider = $this->makeProvider($http);
+
+        $this->expectException(UpstreamRejectedException::class);
+        $provider->fetchMetadata('https://www.facebook.com/someone/posts/1000/');
+    }
+
+    public function testFallsBackToBrowserNativeKeysWhenPlayableUrlKeysAreAbsent(): void
+    {
+        $html = <<<'HTML'
+            <!DOCTYPE html>
+            <html><head><title>Native keys video</title></head>
+            <body>
+            <script type="application/json" data-sjs>{"__bbox":{"result":{"data":{"video":{"browser_native_hd_url":"https:\/\/video.example.fbcdn.net\/native-hd.mp4","browser_native_sd_url":"https:\/\/video.example.fbcdn.net\/native-sd.mp4"}}}}}</script>
+            </body></html>
+            HTML;
+
+        $http = new FakeHttpClient();
+        $http->queue('facebook.com/someone/videos/native', new HttpResponse(200, [], $html));
+
+        $provider = $this->makeProvider($http);
+        $result = $provider->fetchMetadata('https://www.facebook.com/someone/videos/native/');
+
+        self::assertCount(2, $result->options);
+        $urlById = [];
+        foreach ($result->options as $option) {
+            $urlById[$option->id] = $option;
+        }
+        self::assertArrayHasKey('hd', $urlById);
+        self::assertArrayHasKey('sd', $urlById);
+    }
+
     public function testTransientHttpFailureBecomesProviderUnavailable(): void
     {
         $http = new FakeHttpClient();
-        $http->queue('mbasic.facebook.com', new HttpRequestException('connection reset'));
+        $http->queue('facebook.com/someone/videos/12345', new HttpRequestException('connection reset'));
 
         $provider = $this->makeProvider($http);
 
@@ -200,7 +243,7 @@ final class FacebookProviderTest extends TestCase
     public function testProcessReturnsTheChosenQualityAsOutput(): void
     {
         $http = new FakeHttpClient();
-        $http->queue('mbasic.facebook.com', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
+        $http->queue('facebook.com/someone/videos/12345', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
 
         $provider = $this->makeProvider($http);
         $result = $provider->process('https://www.facebook.com/someone/videos/12345/', 'sd');
@@ -215,7 +258,7 @@ final class FacebookProviderTest extends TestCase
     public function testProcessRejectsAnUnknownOptionId(): void
     {
         $http = new FakeHttpClient();
-        $http->queue('mbasic.facebook.com', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
+        $http->queue('facebook.com/someone/videos/12345', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
 
         $provider = $this->makeProvider($http);
 
@@ -226,7 +269,7 @@ final class FacebookProviderTest extends TestCase
     public function testSecondCallForTheSameUrlUsesTheCacheInsteadOfRefetching(): void
     {
         $http = new FakeHttpClient();
-        $http->queue('mbasic.facebook.com', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
+        $http->queue('facebook.com/someone/videos/12345', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
 
         $provider = $this->makeProvider($http);
         $provider->fetchMetadata('https://www.facebook.com/someone/videos/12345/');
@@ -235,44 +278,44 @@ final class FacebookProviderTest extends TestCase
         self::assertCount(1, $http->requestedUrls, 'second call should be served from cache, not re-fetched');
     }
 
-    public function testFbWatchLinksAreResolvedToTheirCanonicalUrlBeforeRewriting(): void
+    public function testFbWatchLinksAreResolvedToTheirCanonicalUrlBeforeFetching(): void
     {
         $http = new FakeHttpClient();
         $http->queue(
             'fb.watch',
             new HttpResponse(200, [], '', effectiveUrl: 'https://www.facebook.com/someone/videos/555/'),
         );
-        $http->queue('mbasic.facebook.com', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
+        $http->queue('facebook.com/someone/videos/555', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
 
         $provider = $this->makeProvider($http);
         $provider->fetchMetadata('https://fb.watch/abcDEF/');
 
         self::assertCount(2, $http->requestedUrls);
         self::assertStringContainsString('fb.watch', $http->requestedUrls[0]);
-        self::assertStringStartsWith('https://mbasic.facebook.com/someone/videos/555/', $http->requestedUrls[1]);
+        self::assertSame('https://www.facebook.com/someone/videos/555/', $http->requestedUrls[1]);
     }
 
-    public function testShareLinksAreResolvedToTheirCanonicalUrlBeforeRewriting(): void
+    public function testShareLinksAreResolvedToTheirCanonicalUrlBeforeFetching(): void
     {
         $http = new FakeHttpClient();
         $http->queue(
             'web.facebook.com/share/v/',
             new HttpResponse(200, [], '', effectiveUrl: 'https://www.facebook.com/someone/videos/555/'),
         );
-        $http->queue('mbasic.facebook.com', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
+        $http->queue('facebook.com/someone/videos/555', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
 
         $provider = $this->makeProvider($http);
         $provider->fetchMetadata('https://web.facebook.com/share/v/1HGxDqQqVT/');
 
         self::assertCount(2, $http->requestedUrls);
         self::assertStringContainsString('/share/v/', $http->requestedUrls[0]);
-        self::assertStringStartsWith('https://mbasic.facebook.com/someone/videos/555/', $http->requestedUrls[1]);
+        self::assertSame('https://www.facebook.com/someone/videos/555/', $http->requestedUrls[1]);
     }
 
     public function testWhenAnotherProcessIsAlreadyResolvingTheSameUrlItWaitsThenFallsBackToItsOwnFetchIfStillUncached(): void
     {
         $http = new FakeHttpClient();
-        $http->queue('mbasic.facebook.com', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
+        $http->queue('facebook.com/someone/videos/777', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
 
         $lockDir = sys_get_temp_dir() . '/fetchpoint-fb-lock-test-' . uniqid('', true);
         $url = 'https://www.facebook.com/someone/videos/777/';

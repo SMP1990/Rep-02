@@ -24,17 +24,20 @@ use App\Support\Logger;
  * behind a login wall — if the page looks login-gated or unavailable, it
  * throws UpstreamRejectedException rather than working around that.
  *
- * IMPORTANT — read this before relying on it: the extraction technique
- * below (mbasic.facebook.com's `video_redirect` links) is a
- * well-documented public technique, but this sandbox's network policy
- * cannot reach facebook.com, so it has been verified only against
- * synthetic fixture HTML that mirrors the documented markup shape
- * (tests/Unit/Processing/Providers/FacebookProviderTest.php), never
- * against a real, current Facebook response. Facebook is known to change
- * this markup without notice (see the Phase 7b research doc). This must
- * be tested against real public video/Reel URLs before being trusted in
- * production — treat it as "implemented and structurally tested," not
- * "verified working."
+ * EXTRACTION TECHNIQUE (revised after live production debugging): fetches
+ * the real facebook.com/web.facebook.com page directly — not the old
+ * mbasic.facebook.com WAP interface this provider originally used, which
+ * production testing showed doesn't carry this modern JSON embedding at
+ * all and returned a generic error for content types tried (Reels, share
+ * links). The current, real facebook.com page embeds its own video URLs
+ * directly in inline `<script type="application/json">` blocks used to
+ * hydrate the page — a plain HTTP fetch plus JSON parsing, needing no
+ * browser engine, no Python, and no shell access, so it runs on ordinary
+ * PHP shared hosting. This sandbox's network policy still can't reach
+ * facebook.com, so this has only been verified against synthetic fixture
+ * HTML shaped like the documented JSON structure
+ * (tests/Unit/Processing/Providers/FacebookProviderTest.php) — real-world
+ * verification happens on your production server.
  *
  * Concurrent requests for the SAME URL are coalesced via InFlightLock
  * (Phase 8 finding): only one caller actually fetches/parses Facebook's
@@ -48,16 +51,17 @@ final class FacebookProvider implements ProcessingProvider
 {
     private const CACHE_TTL_SECONDS = 300;
 
+    /** JSON keys Facebook uses for the HD stream, checked in this order. */
+    private const HD_KEYS = ['playable_url_quality_hd', 'browser_native_hd_url'];
+
+    /** JSON keys Facebook uses for the SD/default stream, checked in this order. */
+    private const SD_KEYS = ['playable_url', 'browser_native_sd_url'];
+
     public function __construct(
         private readonly HttpClientInterface $http,
         private readonly CacheStore $cache,
         private readonly InFlightLock $lock,
         private readonly int $priority = 10,
-        // Both injectable only for tests, which can't reach the real host
-        // (and a local test server is plain HTTP, not HTTPS) — production
-        // code never has a reason to override either default.
-        private readonly string $mbasicHost = 'mbasic.facebook.com',
-        private readonly string $mbasicScheme = 'https',
     ) {
     }
 
@@ -165,10 +169,9 @@ final class FacebookProvider implements ProcessingProvider
     private function fetchAndCache(string $url, string $cacheKey): array
     {
         $canonicalUrl = $this->resolveCanonicalUrl($url);
-        $fetchUrl = $this->toMbasicUrl($canonicalUrl);
 
         try {
-            $response = $this->http->get($fetchUrl, ['Accept-Language' => 'en-US,en;q=0.9']);
+            $response = $this->http->get($canonicalUrl, ['Accept-Language' => 'en-US,en;q=0.9']);
         } catch (HttpRequestException $e) {
             throw new ProviderUnavailableException('Could not reach Facebook right now.', $e);
         }
@@ -248,13 +251,8 @@ final class FacebookProvider implements ProcessingProvider
 
     /**
      * fb.watch links and /share/... links are both short-link redirectors
-     * to a canonical facebook.com URL — neither has a matching mbasic
-     * route of its own, so rewriting either straight onto mbasic (the
-     * naive path-copy toMbasicUrl() does) fails with mbasic's generic
-     * "Sorry, something went wrong" page instead of the actual content.
-     * Both must be resolved to their real, canonical URL first — by
-     * fetching the *original* (non-mbasic) URL and letting redirects run
-     * their course — before that gets rewritten to mbasic.
+     * to a canonical facebook.com URL — resolve them before fetching, by
+     * fetching the original URL and letting redirects run their course.
      */
     private function resolveCanonicalUrl(string $url): string
     {
@@ -274,23 +272,6 @@ final class FacebookProvider implements ProcessingProvider
         }
 
         return $response->effectiveUrl !== '' ? $response->effectiveUrl : $url;
-    }
-
-    private function toMbasicUrl(string $url): string
-    {
-        $parts = parse_url($url);
-
-        if ($parts === false) {
-            throw new UpstreamRejectedException('This link could not be parsed.');
-        }
-
-        $rebuilt = $this->mbasicScheme . '://' . $this->mbasicHost . ($parts['path'] ?? '/');
-
-        if (isset($parts['query'])) {
-            $rebuilt .= '?' . $parts['query'];
-        }
-
-        return $rebuilt;
     }
 
     private function looksLikeLoginWall(string $html): bool
@@ -317,11 +298,15 @@ final class FacebookProvider implements ProcessingProvider
     }
 
     /**
-     * Looks for mbasic's `video_redirect` links, which historically
-     * expose a direct video URL as a query-encoded `src` parameter (e.g.
-     * `/video_redirect/?src=<url-encoded-mp4-url>...`). See this class's
-     * docblock: this is a documented technique, unverified live in this
-     * environment.
+     * Facebook's real (non-mbasic) pages hydrate themselves from inline
+     * `<script type="application/json">` blocks — dozens of them per page,
+     * each a fragment of the page's own state. The video stream URLs live
+     * as plain string values under a handful of stable key names
+     * (self::HD_KEYS / self::SD_KEYS) somewhere inside that state, at a
+     * depth/shape that Facebook changes often — so instead of matching an
+     * exact JSON path, every candidate block is decoded and walked
+     * recursively for those key names, which is resilient to the
+     * surrounding structure shifting as long as the key names hold.
      *
      * @return array<string, string> quality label ('hd'|'sd') => direct URL
      */
@@ -329,48 +314,51 @@ final class FacebookProvider implements ProcessingProvider
     {
         $candidates = [];
 
-        if (preg_match_all('/href="(\/video_redirect\/\?[^"]+)"/i', $html, $matches) > 0) {
-            foreach ($matches[1] as $index => $relativeLink) {
-                $decoded = html_entity_decode($relativeLink, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-                $query = (string) parse_url($decoded, PHP_URL_QUERY);
-                parse_str($query, $params);
+        if (preg_match_all('/<script type="application\/json"[^>]*>(.*?)<\/script>/is', $html, $matches) === 0) {
+            return $candidates;
+        }
 
-                if (!isset($params['src']) || !is_string($params['src'])) {
-                    continue;
-                }
+        foreach ($matches[1] as $jsonBlob) {
+            if (!str_contains($jsonBlob, 'playable_url') && !str_contains($jsonBlob, 'browser_native')) {
+                continue;
+            }
 
-                $label = $this->guessQualityLabel($html, $relativeLink, (int) $index);
-                $candidates[$label] = $params['src'];
+            $decoded = json_decode($jsonBlob, true);
+
+            if (is_array($decoded)) {
+                $this->collectVideoUrls($decoded, $candidates);
             }
         }
 
         return $candidates;
     }
 
-    private function guessQualityLabel(string $html, string $link, int $index): string
+    /** @param array<string, string> $candidates */
+    private function collectVideoUrls(array $node, array &$candidates): void
     {
-        // The label text (e.g. "HD"/"SD") is the anchor's own text content,
-        // which comes right after the closing `">` of the href we matched —
-        // i.e. strictly *after* $link ends, never before it. Looking
-        // backward risks bleeding into a neighboring link's own label when
-        // two video_redirect links sit close together, which is exactly
-        // what happened here before this was tested against a fixture with
-        // two adjacent links.
-        $position = strpos($html, $link);
-
-        if ($position !== false) {
-            $window = substr($html, $position + strlen($link), 40);
-
-            if (stripos($window, '>HD<') !== false || stripos($window, 'HD Quality') !== false) {
-                return 'hd';
-            }
-
-            if (stripos($window, '>SD<') !== false || stripos($window, 'SD Quality') !== false) {
-                return 'sd';
+        if (!isset($candidates['hd'])) {
+            foreach (self::HD_KEYS as $key) {
+                if (isset($node[$key]) && is_string($node[$key]) && $node[$key] !== '') {
+                    $candidates['hd'] = $node[$key];
+                    break;
+                }
             }
         }
 
-        return $index === 0 ? 'hd' : 'sd';
+        if (!isset($candidates['sd'])) {
+            foreach (self::SD_KEYS as $key) {
+                if (isset($node[$key]) && is_string($node[$key]) && $node[$key] !== '') {
+                    $candidates['sd'] = $node[$key];
+                    break;
+                }
+            }
+        }
+
+        foreach ($node as $value) {
+            if (is_array($value)) {
+                $this->collectVideoUrls($value, $candidates);
+            }
+        }
     }
 
     /**
