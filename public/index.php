@@ -9,6 +9,7 @@ use App\Auth\AdminAuthenticator;
 use App\Http\Controllers\Admin\AdvertisementController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DiagnosticsController;
 use App\Http\Controllers\Admin\FaqController as AdminFaqController;
 use App\Http\Controllers\Admin\LogController;
 use App\Http\Controllers\Admin\PageController as AdminPageController;
@@ -103,6 +104,7 @@ $ads = new AdvertisementController(new AdvertisementRepository());
 $adminFaq = new AdminFaqController(new FaqRepository());
 $adminPages = new AdminPageController(new PageRepository());
 $logs = new LogController($processingLog, new ErrorLogRepository());
+$diagnostics = new DiagnosticsController();
 
 $router = new Router();
 
@@ -156,6 +158,12 @@ $router->post('/admin/pages/{id}/delete', [$adminPages, 'destroy'], $adminGuard)
 
 $router->get('/admin/logs/processing', [$logs, 'processing'], [$adminAuth]);
 $router->get('/admin/logs/errors', [$logs, 'errors'], [$adminAuth]);
+
+// TEMPORARY — remove once the Facebook provider is confirmed working in
+// production. Admin-only (session auth, same as the rest of /admin), so
+// no separate secret key to manage; reuses the app's own bootstrap/
+// autoloading instead of a standalone file, avoiding upload/path issues.
+$router->get('/admin/diagnostics/facebook', [$diagnostics, 'facebook'], [$adminAuth]);
 
 $request = Request::fromGlobals();
 $response = $router->dispatch($request);

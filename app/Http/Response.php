@@ -45,6 +45,11 @@ final class Response
         return new self($status, ['Content-Type' => 'text/html; charset=utf-8'], $body);
     }
 
+    public static function text(string $body, int $status = 200): self
+    {
+        return new self($status, ['Content-Type' => 'text/plain; charset=utf-8'], $body);
+    }
+
     /**
      * 303 (not 302) so a redirect after a POST always becomes a GET on the
      * client — the standard Post/Redirect/Get pattern the admin dashboard's
