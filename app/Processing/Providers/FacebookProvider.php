@@ -181,6 +181,7 @@ final class FacebookProvider implements ProcessingProvider
 
             Logger::channel('processing')->warning('Facebook provider detected a login wall', [
                 'url_hash' => hash('sha256', $url),
+                'fetched_url' => $canonicalUrl,
                 'http_status' => $response->status,
                 'raw_response_saved_as' => $savedAs,
             ]);
@@ -195,6 +196,7 @@ final class FacebookProvider implements ProcessingProvider
 
             Logger::channel('processing')->warning('Facebook provider received a non-success HTTP status', [
                 'url_hash' => hash('sha256', $url),
+                'fetched_url' => $canonicalUrl,
                 'http_status' => $response->status,
                 'raw_response_saved_as' => $savedAs,
             ]);
@@ -210,6 +212,7 @@ final class FacebookProvider implements ProcessingProvider
 
             Logger::channel('processing')->warning('Facebook provider found no video candidates', [
                 'url_hash' => hash('sha256', $url),
+                'fetched_url' => $canonicalUrl,
                 'raw_response_saved_as' => $savedAs,
             ]);
 
