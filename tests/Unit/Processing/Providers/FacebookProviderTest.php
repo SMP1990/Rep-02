@@ -111,6 +111,31 @@ final class FacebookProviderTest extends TestCase
         $provider->fetchMetadata('https://www.facebook.com/someone/posts/999/');
     }
 
+    public function testNoVideoFoundSavesTheRawResponseForDiagnosis(): void
+    {
+        $logDirectory = dirname(__DIR__, 4) . '/storage/logs';
+        foreach (glob($logDirectory . '/facebook-raw-*.html') ?: [] as $stale) {
+            unlink($stale);
+        }
+
+        $http = new FakeHttpClient();
+        $http->queue('mbasic.facebook.com', new HttpResponse(200, [], self::HTML_NO_VIDEO));
+
+        $provider = $this->makeProvider($http);
+
+        try {
+            $provider->fetchMetadata('https://www.facebook.com/someone/posts/999/');
+        } catch (UpstreamRejectedException) {
+            // expected — the save happens before this is thrown
+        }
+
+        $saved = glob($logDirectory . '/facebook-raw-*.html') ?: [];
+        self::assertCount(1, $saved);
+        self::assertSame(self::HTML_NO_VIDEO, file_get_contents($saved[0]));
+
+        unlink($saved[0]);
+    }
+
     public function testTransientHttpFailureBecomesProviderUnavailable(): void
     {
         $http = new FakeHttpClient();

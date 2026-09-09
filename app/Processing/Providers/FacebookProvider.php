@@ -187,8 +187,11 @@ final class FacebookProvider implements ProcessingProvider
         $candidates = $this->extractVideoCandidates($response->body);
 
         if ($candidates === []) {
+            $savedAs = $this->saveRawResponseForDiagnosis($response->body);
+
             Logger::channel('processing')->warning('Facebook provider found no video candidates', [
                 'url_hash' => hash('sha256', $url),
+                'raw_response_saved_as' => $savedAs,
             ]);
 
             throw new UpstreamRejectedException("We couldn't find a downloadable video on this page.");
@@ -344,6 +347,32 @@ final class FacebookProvider implements ProcessingProvider
         }
 
         return $index === 0 ? 'hd' : 'sd';
+    }
+
+    /**
+     * TEMPORARY — remove once the extraction technique is confirmed
+     * working against real Facebook markup in production (see this
+     * class's docblock). Saves the exact raw HTML Facebook sent back
+     * whenever no video links could be found in it, so this can be
+     * diagnosed from storage/logs/ (already reachable via File Manager)
+     * instead of needing a separate diagnostic tool or admin access.
+     *
+     * @return string the saved filename (not the full path — the path is
+     *     already implied by storage/logs/ and doesn't need to appear in
+     *     log output)
+     */
+    private function saveRawResponseForDiagnosis(string $body): string
+    {
+        $logDirectory = dirname(__DIR__, 3) . '/storage/logs';
+
+        if (!is_dir($logDirectory)) {
+            @mkdir($logDirectory, 0755, true);
+        }
+
+        $filename = 'facebook-raw-' . date('Ymd-His') . '-' . bin2hex(random_bytes(3)) . '.html';
+        @file_put_contents($logDirectory . '/' . $filename, $body);
+
+        return $filename;
     }
 
     private function slugFilename(?string $title): string
