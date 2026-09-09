@@ -66,7 +66,7 @@ function toMbasicUrl(string $url): string
 echo "=== Fetchpoint Facebook Diagnostic (web mode) ===\n";
 echo "REMINDER: delete public/fb-diagnostic.php from the server when you're done.\n\n";
 
-$http = new HttpClient(timeoutSeconds: 15, connectTimeoutSeconds: 5);
+$http = new HttpClient(timeoutSeconds: 8, connectTimeoutSeconds: 3, maxRetries: 0);
 
 $host = strtolower((string) parse_url($url, PHP_URL_HOST));
 $canonicalUrl = $url;

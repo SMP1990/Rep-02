@@ -51,7 +51,7 @@ function toMbasicUrl(string $url): string
     return $rebuilt;
 }
 
-$http = new HttpClient(timeoutSeconds: 15, connectTimeoutSeconds: 5);
+$http = new HttpClient(timeoutSeconds: 8, connectTimeoutSeconds: 3, maxRetries: 0);
 
 $host = strtolower((string) parse_url($url, PHP_URL_HOST));
 $canonicalUrl = $url;
