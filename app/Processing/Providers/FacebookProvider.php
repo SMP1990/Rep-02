@@ -68,6 +68,24 @@ final class FacebookProvider implements ProcessingProvider
     /** JSON keys Facebook uses for the SD/default stream, checked in this order. */
     private const SD_KEYS = ['playable_url', 'browser_native_sd_url'];
 
+    /**
+     * Real browsers send this full, consistent set on every page
+     * navigation, not just a User-Agent. Production testing showed
+     * facebook.com rejecting a request carrying only User-Agent +
+     * cookies with HTTP 400, so both the warm-up and the actual content
+     * request now send the same complete, ordinary set any browser
+     * already sends before a user even interacts with the page.
+     */
+    private const BROWSER_HEADERS = [
+        'Accept-Language' => 'en-US,en;q=0.9',
+        'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+        'Sec-Fetch-Dest' => 'document',
+        'Sec-Fetch-Mode' => 'navigate',
+        'Sec-Fetch-Site' => 'none',
+        'Sec-Fetch-User' => '?1',
+        'Upgrade-Insecure-Requests' => '1',
+    ];
+
     public function __construct(
         private readonly HttpClientInterface $http,
         private readonly CacheStore $cache,
@@ -183,11 +201,7 @@ final class FacebookProvider implements ProcessingProvider
         $cookieJarPath = $this->establishAnonymousVisitorCookies($canonicalUrl);
 
         try {
-            $response = $this->http->get(
-                $canonicalUrl,
-                ['Accept-Language' => 'en-US,en;q=0.9'],
-                $cookieJarPath,
-            );
+            $response = $this->http->get($canonicalUrl, self::BROWSER_HEADERS, $cookieJarPath);
         } catch (HttpRequestException $e) {
             throw new ProviderUnavailableException('Could not reach Facebook right now.', $e);
         } finally {
@@ -329,7 +343,7 @@ final class FacebookProvider implements ProcessingProvider
         }
 
         try {
-            $this->http->get('https://' . $host . '/', ['Accept-Language' => 'en-US,en;q=0.9'], $cookieJarPath);
+            $this->http->get('https://' . $host . '/', self::BROWSER_HEADERS, $cookieJarPath);
         } catch (HttpRequestException) {
             // Best-effort — proceed cookie-less rather than fail the whole
             // resolution over a step that's an enhancement, not a

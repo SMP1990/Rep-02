@@ -116,6 +116,12 @@ final class HttpClient implements HttpClientInterface
             CURLOPT_TIMEOUT => $this->timeoutSeconds,
             CURLOPT_USERAGENT => $this->userAgent,
             CURLOPT_HTTPHEADER => $formattedHeaders,
+            // Empty string = "advertise every encoding this libcurl build
+            // supports (gzip/deflate/br) and transparently decompress the
+            // response" — every real browser does the same; without this,
+            // claiming gzip/br support in an Accept-Encoding header while
+            // not actually decoding it would corrupt the response body.
+            CURLOPT_ENCODING => '',
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,
             CURLOPT_WRITEFUNCTION => function ($handle, string $chunk) use (&$buffer, &$exceeded, $maxBytes): int {
