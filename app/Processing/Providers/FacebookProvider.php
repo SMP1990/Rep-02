@@ -247,22 +247,30 @@ final class FacebookProvider implements ProcessingProvider
     }
 
     /**
-     * fb.watch is a short-link redirector to a canonical facebook.com URL
-     * — resolve it before rewriting to mbasic, since mbasic doesn't proxy
-     * fb.watch links directly.
+     * fb.watch links and /share/... links are both short-link redirectors
+     * to a canonical facebook.com URL — neither has a matching mbasic
+     * route of its own, so rewriting either straight onto mbasic (the
+     * naive path-copy toMbasicUrl() does) fails with mbasic's generic
+     * "Sorry, something went wrong" page instead of the actual content.
+     * Both must be resolved to their real, canonical URL first — by
+     * fetching the *original* (non-mbasic) URL and letting redirects run
+     * their course — before that gets rewritten to mbasic.
      */
     private function resolveCanonicalUrl(string $url): string
     {
         $host = strtolower((string) parse_url($url, PHP_URL_HOST));
+        $path = (string) parse_url($url, PHP_URL_PATH);
 
-        if (!str_contains($host, 'fb.watch')) {
+        $isShortLink = str_contains($host, 'fb.watch') || str_starts_with($path, '/share/');
+
+        if (!$isShortLink) {
             return $url;
         }
 
         try {
             $response = $this->http->get($url);
         } catch (HttpRequestException $e) {
-            throw new ProviderUnavailableException('Could not resolve this fb.watch link.', $e);
+            throw new ProviderUnavailableException('Could not resolve this Facebook link.', $e);
         }
 
         return $response->effectiveUrl !== '' ? $response->effectiveUrl : $url;

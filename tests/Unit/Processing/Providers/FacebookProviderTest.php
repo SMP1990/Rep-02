@@ -252,6 +252,23 @@ final class FacebookProviderTest extends TestCase
         self::assertStringStartsWith('https://mbasic.facebook.com/someone/videos/555/', $http->requestedUrls[1]);
     }
 
+    public function testShareLinksAreResolvedToTheirCanonicalUrlBeforeRewriting(): void
+    {
+        $http = new FakeHttpClient();
+        $http->queue(
+            'web.facebook.com/share/v/',
+            new HttpResponse(200, [], '', effectiveUrl: 'https://www.facebook.com/someone/videos/555/'),
+        );
+        $http->queue('mbasic.facebook.com', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
+
+        $provider = $this->makeProvider($http);
+        $provider->fetchMetadata('https://web.facebook.com/share/v/1HGxDqQqVT/');
+
+        self::assertCount(2, $http->requestedUrls);
+        self::assertStringContainsString('/share/v/', $http->requestedUrls[0]);
+        self::assertStringStartsWith('https://mbasic.facebook.com/someone/videos/555/', $http->requestedUrls[1]);
+    }
+
     public function testWhenAnotherProcessIsAlreadyResolvingTheSameUrlItWaitsThenFallsBackToItsOwnFetchIfStillUncached(): void
     {
         $http = new FakeHttpClient();
