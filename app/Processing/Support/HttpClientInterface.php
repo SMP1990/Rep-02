@@ -13,8 +13,14 @@ namespace App\Processing\Support;
  */
 interface HttpClientInterface
 {
-    /** @param array<string, string> $headers */
-    public function get(string $url, array $headers = []): HttpResponse;
+    /**
+     * @param array<string, string> $headers
+     * @param ?string $cookieJarPath when given, cookies the response sets
+     *     are written to this file and cookies already in it are sent
+     *     with the request — lets two calls sharing a path chain like two
+     *     page loads in the same browser session.
+     */
+    public function get(string $url, array $headers = [], ?string $cookieJarPath = null): HttpResponse;
 
     /** @param array<string, string> $headers */
     public function head(string $url, array $headers = []): HttpResponse;

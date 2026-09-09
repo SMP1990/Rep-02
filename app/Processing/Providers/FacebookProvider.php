@@ -20,9 +20,20 @@ use App\Support\Logger;
  * Public Facebook video/Reel provider — implemented per your explicit
  * approval after the risk was explained (docs/media-platform/phase-7.md,
  * phase-7b-facebook-provider-research.md). Public content only: it never
- * attempts to authenticate, supply cookies, or otherwise access anything
- * behind a login wall — if the page looks login-gated or unavailable, it
- * throws UpstreamRejectedException rather than working around that.
+ * signs in, never supplies any account's credentials or session, and
+ * never attempts to access anything behind a login wall — if the page
+ * looks login-gated or unavailable, it throws UpstreamRejectedException
+ * rather than working around that.
+ *
+ * It does carry ANONYMOUS-VISITOR cookies (see fetchAndCache()'s warm-up
+ * request) — the same baseline cookies Facebook hands any logged-out
+ * browser on its very first page load, before that browser has an
+ * account session or has signed in to anything. Live production testing
+ * showed facebook.com rejecting a completely cookie-less request to a
+ * public Reel URL with HTTP 400; a real logged-out browser never makes a
+ * request that bare, since it always already holds these. This is not
+ * authentication and carries no identity — it's the same footing any
+ * anonymous visitor already has.
  *
  * EXTRACTION TECHNIQUE (revised after live production debugging): fetches
  * the real facebook.com/web.facebook.com page directly — not the old
@@ -169,11 +180,20 @@ final class FacebookProvider implements ProcessingProvider
     private function fetchAndCache(string $url, string $cacheKey): array
     {
         $canonicalUrl = $this->resolveCanonicalUrl($url);
+        $cookieJarPath = $this->establishAnonymousVisitorCookies($canonicalUrl);
 
         try {
-            $response = $this->http->get($canonicalUrl, ['Accept-Language' => 'en-US,en;q=0.9']);
+            $response = $this->http->get(
+                $canonicalUrl,
+                ['Accept-Language' => 'en-US,en;q=0.9'],
+                $cookieJarPath,
+            );
         } catch (HttpRequestException $e) {
             throw new ProviderUnavailableException('Could not reach Facebook right now.', $e);
+        } finally {
+            if ($cookieJarPath !== null) {
+                @unlink($cookieJarPath);
+            }
         }
 
         if ($this->looksLikeLoginWall($response->body)) {
@@ -275,6 +295,48 @@ final class FacebookProvider implements ProcessingProvider
         }
 
         return $response->effectiveUrl !== '' ? $response->effectiveUrl : $url;
+    }
+
+    /**
+     * A real, logged-out browser's very first request to Facebook already
+     * carries the baseline cookies Facebook hands any anonymous visitor —
+     * it never makes a completely cookie-less request. Production testing
+     * showed facebook.com rejecting one with HTTP 400. This makes one
+     * lightweight "warm-up" visit to the site's homepage first, purely to
+     * pick up that same baseline anonymous-visitor cookie set, and hands
+     * back the file path so the real content request can carry them too
+     * — the same footing a first-time visitor's own browser already has,
+     * never an authenticated or account session.
+     *
+     * Best-effort: if the warm-up itself fails, the content request just
+     * proceeds without it rather than failing the whole resolution over
+     * a step that's an enhancement, not a hard requirement.
+     *
+     * @return ?string the cookie jar file path, or null if unavailable
+     */
+    private function establishAnonymousVisitorCookies(string $url): ?string
+    {
+        $host = (string) parse_url($url, PHP_URL_HOST);
+
+        if ($host === '') {
+            return null;
+        }
+
+        $cookieJarPath = tempnam(sys_get_temp_dir(), 'fb-cookies-');
+
+        if ($cookieJarPath === false) {
+            return null;
+        }
+
+        try {
+            $this->http->get('https://' . $host . '/', ['Accept-Language' => 'en-US,en;q=0.9'], $cookieJarPath);
+        } catch (HttpRequestException) {
+            // Best-effort — proceed cookie-less rather than fail the whole
+            // resolution over a step that's an enhancement, not a
+            // requirement.
+        }
+
+        return $cookieJarPath;
     }
 
     private function looksLikeLoginWall(string $html): bool

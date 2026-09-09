@@ -25,6 +25,15 @@ use PHPUnit\Framework\TestCase;
  * real, current markup still matches it. Real-world verification against
  * live public URLs is still required before this is trusted in
  * production.
+ *
+ * Every resolution now makes an extra "warm-up" request to the target
+ * host's homepage first (to pick up baseline anonymous-visitor cookies —
+ * see FacebookProvider::establishAnonymousVisitorCookies()), so most
+ * tests here queue a generic fallback response *after* their specific
+ * one: FakeHttpClient matches in registration order, so the specific,
+ * longer pattern still wins for the actual content URL, and the warm-up
+ * request (which never matches the specific pattern) falls through to
+ * the generic one.
  */
 final class FacebookProviderTest extends TestCase
 {
@@ -64,6 +73,7 @@ final class FacebookProviderTest extends TestCase
     {
         $http = new FakeHttpClient();
         $http->queue('facebook.com/someone/videos/12345', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
+        $this->queueWarmup($http);
 
         $provider = $this->makeProvider($http);
         $result = $provider->fetchMetadata('https://www.facebook.com/someone/videos/12345/');
@@ -80,18 +90,21 @@ final class FacebookProviderTest extends TestCase
     {
         $http = new FakeHttpClient();
         $http->queue('facebook.com/someone/videos/12345', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
+        $this->queueWarmup($http);
 
         $provider = $this->makeProvider($http);
         $provider->fetchMetadata('https://www.facebook.com/someone/videos/12345/');
 
-        self::assertCount(1, $http->requestedUrls);
-        self::assertSame('https://www.facebook.com/someone/videos/12345/', $http->requestedUrls[0]);
+        self::assertCount(2, $http->requestedUrls, 'one warm-up request, then the actual content request');
+        self::assertSame('https://www.facebook.com/', $http->requestedUrls[0]);
+        self::assertSame('https://www.facebook.com/someone/videos/12345/', $http->requestedUrls[1]);
     }
 
     public function testLoginWallIsRejectedNotBypassed(): void
     {
         $http = new FakeHttpClient();
         $http->queue('facebook.com/private/videos/1', new HttpResponse(200, [], self::HTML_LOGIN_WALL));
+        $this->queueWarmup($http);
 
         $provider = $this->makeProvider($http);
 
@@ -108,6 +121,7 @@ final class FacebookProviderTest extends TestCase
 
         $http = new FakeHttpClient();
         $http->queue('facebook.com/private/videos/1', new HttpResponse(200, [], self::HTML_LOGIN_WALL));
+        $this->queueWarmup($http);
 
         $provider = $this->makeProvider($http);
 
@@ -133,6 +147,7 @@ final class FacebookProviderTest extends TestCase
 
         $http = new FakeHttpClient();
         $http->queue('facebook.com/someone/videos/2', new HttpResponse(403, [], '<html>blocked</html>'));
+        $this->queueWarmup($http);
 
         $provider = $this->makeProvider($http);
 
@@ -153,6 +168,7 @@ final class FacebookProviderTest extends TestCase
     {
         $http = new FakeHttpClient();
         $http->queue('facebook.com/someone/posts/999', new HttpResponse(200, [], self::HTML_NO_VIDEO));
+        $this->queueWarmup($http);
 
         $provider = $this->makeProvider($http);
 
@@ -169,6 +185,7 @@ final class FacebookProviderTest extends TestCase
 
         $http = new FakeHttpClient();
         $http->queue('facebook.com/someone/posts/999', new HttpResponse(200, [], self::HTML_NO_VIDEO));
+        $this->queueWarmup($http);
 
         $provider = $this->makeProvider($http);
 
@@ -197,6 +214,7 @@ final class FacebookProviderTest extends TestCase
 
         $http = new FakeHttpClient();
         $http->queue('facebook.com/someone/posts/1000', new HttpResponse(200, [], $html));
+        $this->queueWarmup($http);
 
         $provider = $this->makeProvider($http);
 
@@ -216,6 +234,7 @@ final class FacebookProviderTest extends TestCase
 
         $http = new FakeHttpClient();
         $http->queue('facebook.com/someone/videos/native', new HttpResponse(200, [], $html));
+        $this->queueWarmup($http);
 
         $provider = $this->makeProvider($http);
         $result = $provider->fetchMetadata('https://www.facebook.com/someone/videos/native/');
@@ -233,6 +252,7 @@ final class FacebookProviderTest extends TestCase
     {
         $http = new FakeHttpClient();
         $http->queue('facebook.com/someone/videos/12345', new HttpRequestException('connection reset'));
+        $this->queueWarmup($http);
 
         $provider = $this->makeProvider($http);
 
@@ -244,6 +264,7 @@ final class FacebookProviderTest extends TestCase
     {
         $http = new FakeHttpClient();
         $http->queue('facebook.com/someone/videos/12345', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
+        $this->queueWarmup($http);
 
         $provider = $this->makeProvider($http);
         $result = $provider->process('https://www.facebook.com/someone/videos/12345/', 'sd');
@@ -259,6 +280,7 @@ final class FacebookProviderTest extends TestCase
     {
         $http = new FakeHttpClient();
         $http->queue('facebook.com/someone/videos/12345', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
+        $this->queueWarmup($http);
 
         $provider = $this->makeProvider($http);
 
@@ -270,12 +292,13 @@ final class FacebookProviderTest extends TestCase
     {
         $http = new FakeHttpClient();
         $http->queue('facebook.com/someone/videos/12345', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
+        $this->queueWarmup($http);
 
         $provider = $this->makeProvider($http);
         $provider->fetchMetadata('https://www.facebook.com/someone/videos/12345/');
         $provider->fetchMetadata('https://www.facebook.com/someone/videos/12345/');
 
-        self::assertCount(1, $http->requestedUrls, 'second call should be served from cache, not re-fetched');
+        self::assertCount(2, $http->requestedUrls, 'second call should be served from cache — only the first call\'s warm-up + content requests happen');
     }
 
     public function testFbWatchLinksAreResolvedToTheirCanonicalUrlBeforeFetching(): void
@@ -286,13 +309,15 @@ final class FacebookProviderTest extends TestCase
             new HttpResponse(200, [], '', effectiveUrl: 'https://www.facebook.com/someone/videos/555/'),
         );
         $http->queue('facebook.com/someone/videos/555', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
+        $this->queueWarmup($http);
 
         $provider = $this->makeProvider($http);
         $provider->fetchMetadata('https://fb.watch/abcDEF/');
 
-        self::assertCount(2, $http->requestedUrls);
+        self::assertCount(3, $http->requestedUrls, 'short-link resolve, then warm-up, then the actual content request');
         self::assertStringContainsString('fb.watch', $http->requestedUrls[0]);
-        self::assertSame('https://www.facebook.com/someone/videos/555/', $http->requestedUrls[1]);
+        self::assertSame('https://www.facebook.com/', $http->requestedUrls[1]);
+        self::assertSame('https://www.facebook.com/someone/videos/555/', $http->requestedUrls[2]);
     }
 
     public function testShareLinksAreResolvedToTheirCanonicalUrlBeforeFetching(): void
@@ -303,19 +328,22 @@ final class FacebookProviderTest extends TestCase
             new HttpResponse(200, [], '', effectiveUrl: 'https://www.facebook.com/someone/videos/555/'),
         );
         $http->queue('facebook.com/someone/videos/555', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
+        $this->queueWarmup($http);
 
         $provider = $this->makeProvider($http);
         $provider->fetchMetadata('https://web.facebook.com/share/v/1HGxDqQqVT/');
 
-        self::assertCount(2, $http->requestedUrls);
+        self::assertCount(3, $http->requestedUrls, 'short-link resolve, then warm-up, then the actual content request');
         self::assertStringContainsString('/share/v/', $http->requestedUrls[0]);
-        self::assertSame('https://www.facebook.com/someone/videos/555/', $http->requestedUrls[1]);
+        self::assertSame('https://www.facebook.com/', $http->requestedUrls[1]);
+        self::assertSame('https://www.facebook.com/someone/videos/555/', $http->requestedUrls[2]);
     }
 
     public function testWhenAnotherProcessIsAlreadyResolvingTheSameUrlItWaitsThenFallsBackToItsOwnFetchIfStillUncached(): void
     {
         $http = new FakeHttpClient();
         $http->queue('facebook.com/someone/videos/777', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
+        $this->queueWarmup($http);
 
         $lockDir = sys_get_temp_dir() . '/fetchpoint-fb-lock-test-' . uniqid('', true);
         $url = 'https://www.facebook.com/someone/videos/777/';
@@ -344,7 +372,12 @@ final class FacebookProviderTest extends TestCase
         fclose($externalHandle);
 
         self::assertTrue($result->success, 'should still succeed via its own independent fetch after giving up waiting');
-        self::assertCount(1, $http->requestedUrls, 'gave up waiting and fetched independently since no leader ever populated the cache');
+        self::assertCount(2, $http->requestedUrls, 'gave up waiting and fetched independently (warm-up + content) since no leader ever populated the cache');
+    }
+
+    private function queueWarmup(FakeHttpClient $http): void
+    {
+        $http->queue('facebook.com', new HttpResponse(200, [], ''));
     }
 
     private function makeProvider(?HttpClientInterface $http = null): FacebookProvider
@@ -370,7 +403,7 @@ final class FakeHttpClient implements HttpClientInterface
         $this->queue[] = ['pattern' => $urlPattern, 'result' => $result];
     }
 
-    public function get(string $url, array $headers = []): HttpResponse
+    public function get(string $url, array $headers = [], ?string $cookieJarPath = null): HttpResponse
     {
         $this->requestedUrls[] = $url;
 

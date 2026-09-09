@@ -38,30 +38,40 @@ final class HttpClient implements HttpClientInterface
     ) {
     }
 
-    /** @param array<string, string> $headers */
-    public function get(string $url, array $headers = []): HttpResponse
+    /**
+     * @param array<string, string> $headers
+     * @param ?string $cookieJarPath when given, cookies the response sets
+     *     are written to this file and cookies already in it are sent
+     *     with the request — lets a caller chain a "warm-up" request and
+     *     a follow-up request through the same anonymous-visitor cookie
+     *     jar, the same way a real browser would across two page loads.
+     *     Never shared with any other caller; the file is plain text
+     *     (libcurl's own cookie-jar format), never anything sensitive
+     *     like an authenticated session.
+     */
+    public function get(string $url, array $headers = [], ?string $cookieJarPath = null): HttpResponse
     {
-        return $this->request('GET', $url, $headers);
+        return $this->request('GET', $url, $headers, $cookieJarPath);
     }
 
     /** @param array<string, string> $headers */
     public function head(string $url, array $headers = []): HttpResponse
     {
-        return $this->request('HEAD', $url, $headers);
+        return $this->request('HEAD', $url, $headers, null);
     }
 
     /**
      * @param array<string, string> $headers
      * @throws HttpRequestException
      */
-    private function request(string $method, string $url, array $headers): HttpResponse
+    private function request(string $method, string $url, array $headers, ?string $cookieJarPath): HttpResponse
     {
         $attempt = 0;
         $lastException = null;
 
         while ($attempt <= $this->maxRetries) {
             try {
-                return $this->attempt($method, $url, $headers);
+                return $this->attempt($method, $url, $headers, $cookieJarPath);
             } catch (HttpRequestException $e) {
                 $lastException = $e;
                 $attempt++;
@@ -78,7 +88,7 @@ final class HttpClient implements HttpClientInterface
     }
 
     /** @param array<string, string> $headers */
-    private function attempt(string $method, string $url, array $headers): HttpResponse
+    private function attempt(string $method, string $url, array $headers, ?string $cookieJarPath): HttpResponse
     {
         $ch = curl_init($url);
 
@@ -119,6 +129,16 @@ final class HttpClient implements HttpClientInterface
                 return strlen($chunk);
             },
         ]);
+
+        if ($cookieJarPath !== null) {
+            // Same file for both: libcurl reads whatever cookies are
+            // already there before the request, then writes the
+            // (possibly updated) set back after — letting two calls
+            // sharing a path behave like two page loads in one browser
+            // session, entirely in plain-text cookie-jar format.
+            curl_setopt($ch, CURLOPT_COOKIEFILE, $cookieJarPath);
+            curl_setopt($ch, CURLOPT_COOKIEJAR, $cookieJarPath);
+        }
 
         curl_exec($ch);
         $errorNumber = curl_errno($ch);
