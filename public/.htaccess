@@ -3,6 +3,16 @@ DirectoryIndex index.php
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    # Force HTTPS site-wide (Phase 0 §0.8). Only takes effect once SSL is
+    # issued and active in hPanel — enable SSL first, confirm the site
+    # loads over https:// manually, then this becomes a no-op safety net
+    # for anyone still arriving over http://. Checks both %{HTTPS} (direct
+    # TLS termination) and X-Forwarded-Proto (in case of a proxy in front)
+    # so it works whichever way Hostinger terminates TLS for your plan.
+    RewriteCond %{HTTPS} off
+    RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
     # Serve existing files/directories (assets, robots.txt, ...) directly.
     RewriteCond %{REQUEST_FILENAME} -f [OR]
     RewriteCond %{REQUEST_FILENAME} -d
