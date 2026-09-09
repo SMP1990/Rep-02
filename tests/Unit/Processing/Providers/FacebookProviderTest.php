@@ -100,6 +100,56 @@ final class FacebookProviderTest extends TestCase
         $provider->fetchMetadata('https://www.facebook.com/private/videos/1/');
     }
 
+    public function testLoginWallAlsoSavesTheRawResponseForDiagnosis(): void
+    {
+        $logDirectory = dirname(__DIR__, 4) . '/storage/logs';
+        foreach (glob($logDirectory . '/facebook-raw-*.html') ?: [] as $stale) {
+            unlink($stale);
+        }
+
+        $http = new FakeHttpClient();
+        $http->queue('mbasic.facebook.com', new HttpResponse(200, [], self::HTML_LOGIN_WALL));
+
+        $provider = $this->makeProvider($http);
+
+        try {
+            $provider->fetchMetadata('https://www.facebook.com/private/videos/1/');
+        } catch (UpstreamRejectedException) {
+            // expected — the save happens before this is thrown
+        }
+
+        $saved = glob($logDirectory . '/facebook-raw-*.html') ?: [];
+        self::assertCount(1, $saved);
+        self::assertSame(self::HTML_LOGIN_WALL, file_get_contents($saved[0]));
+
+        unlink($saved[0]);
+    }
+
+    public function testNonSuccessStatusAlsoSavesTheRawResponseForDiagnosis(): void
+    {
+        $logDirectory = dirname(__DIR__, 4) . '/storage/logs';
+        foreach (glob($logDirectory . '/facebook-raw-*.html') ?: [] as $stale) {
+            unlink($stale);
+        }
+
+        $http = new FakeHttpClient();
+        $http->queue('mbasic.facebook.com', new HttpResponse(403, [], '<html>blocked</html>'));
+
+        $provider = $this->makeProvider($http);
+
+        try {
+            $provider->fetchMetadata('https://www.facebook.com/someone/videos/2/');
+        } catch (UpstreamRejectedException) {
+            // expected — the save happens before this is thrown
+        }
+
+        $saved = glob($logDirectory . '/facebook-raw-*.html') ?: [];
+        self::assertCount(1, $saved);
+        self::assertSame('<html>blocked</html>', file_get_contents($saved[0]));
+
+        unlink($saved[0]);
+    }
+
     public function testNoVideoFoundIsRejected(): void
     {
         $http = new FakeHttpClient();

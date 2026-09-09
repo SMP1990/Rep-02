@@ -174,12 +174,28 @@ final class FacebookProvider implements ProcessingProvider
         }
 
         if ($this->looksLikeLoginWall($response->body)) {
+            $savedAs = $this->saveRawResponseForDiagnosis($response->body);
+
+            Logger::channel('processing')->warning('Facebook provider detected a login wall', [
+                'url_hash' => hash('sha256', $url),
+                'http_status' => $response->status,
+                'raw_response_saved_as' => $savedAs,
+            ]);
+
             throw new UpstreamRejectedException(
                 'This video is private, restricted, or requires logging in, so it cannot be processed.',
             );
         }
 
         if (!$response->isSuccessful()) {
+            $savedAs = $this->saveRawResponseForDiagnosis($response->body);
+
+            Logger::channel('processing')->warning('Facebook provider received a non-success HTTP status', [
+                'url_hash' => hash('sha256', $url),
+                'http_status' => $response->status,
+                'raw_response_saved_as' => $savedAs,
+            ]);
+
             throw new UpstreamRejectedException('This content is unavailable, private, or has been removed.');
         }
 
