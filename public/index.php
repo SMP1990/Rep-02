@@ -57,7 +57,17 @@ $rateLimiter = new RateLimiter($cache);
 // through, which would have fatal-errored the moment a provider was
 // actually listed there — caught while wiring the first real provider).
 $facebookProvider = new FacebookProvider(
-    http: new HttpClient(timeoutSeconds: 12, connectTimeoutSeconds: 4),
+    // A standard mobile-browser User-Agent, not HttpClient's default
+    // "FetchpointBot" one — Facebook's mbasic interface (Phase 8b/live
+    // debugging) rejects the default with a browser-compatibility
+    // interstitial before ever reaching login/content checks. This is
+    // still an unauthenticated request for public content only; it just
+    // stops volunteering "this is an automated bot" in the process.
+    http: new HttpClient(
+        timeoutSeconds: 12,
+        connectTimeoutSeconds: 4,
+        userAgent: 'Mozilla/5.0 (Linux; Android 13; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+    ),
     cache: $cache,
     // Coalesces concurrent requests for the same URL (Phase 8 finding) —
     // lives alongside the file cache, not inside it, since a lock's
