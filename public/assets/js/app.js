@@ -36,25 +36,38 @@
 
     var currentUrl = '';
 
-    urlInput.addEventListener('input', function () {
-        urlClearBtn.classList.toggle('d-none', urlInput.value.trim() === '');
-    });
+    // Guards every element this script looks up: if the HTML template on
+    // the server is out of sync with this file (an old page cached, or a
+    // deploy that updated one but not the other), a missing element
+    // silently no-ops here instead of throwing and taking down the whole
+    // fetch/download flow with a cryptic "Cannot read properties of null".
+    function setHidden(el, hidden) {
+        if (el) {
+            el.classList.toggle('d-none', hidden);
+        }
+    }
 
-    urlClearBtn.addEventListener('click', function () {
-        urlInput.value = '';
-        urlClearBtn.classList.add('d-none');
-        urlInput.focus();
-    });
+    if (urlInput && urlClearBtn) {
+        urlInput.addEventListener('input', function () {
+            setHidden(urlClearBtn, urlInput.value.trim() === '');
+        });
+
+        urlClearBtn.addEventListener('click', function () {
+            urlInput.value = '';
+            setHidden(urlClearBtn, true);
+            urlInput.focus();
+        });
+    }
 
     function showState(name) {
         Object.keys(states).forEach(function (key) {
-            states[key].classList.toggle('d-none', key !== name);
+            setHidden(states[key], key !== name);
         });
     }
 
     function hideAllStates() {
         Object.keys(states).forEach(function (key) {
-            states[key].classList.add('d-none');
+            setHidden(states[key], true);
         });
     }
 
@@ -109,6 +122,10 @@
      * fabricates numbers for those; it shows only what's genuinely known.
      */
     function renderOptions(options) {
+        if (!resultOptionsEl) {
+            return;
+        }
+
         resultOptionsEl.innerHTML = '';
 
         if (!options || options.length === 0) {
@@ -160,24 +177,34 @@
 
         callApi('/api/v1/metadata', { url: url })
             .then(function (data) {
-                resultTitleEl.textContent = data.title || 'Untitled';
-                resultMetaEl.textContent = [data.source_platform, formatDuration(data.duration_seconds)]
-                    .filter(Boolean)
-                    .join(' · ');
-
-                if (data.thumbnail_url) {
-                    resultThumbEl.src = data.thumbnail_url;
-                    resultThumbEl.alt = data.title || '';
-                    resultThumbWrapEl.classList.remove('d-none');
-                } else {
-                    resultThumbWrapEl.classList.add('d-none');
+                if (resultTitleEl) {
+                    resultTitleEl.textContent = data.title || 'Untitled';
+                }
+                if (resultMetaEl) {
+                    resultMetaEl.textContent = [data.source_platform, formatDuration(data.duration_seconds)]
+                        .filter(Boolean)
+                        .join(' · ');
                 }
 
-                resultBadgeTypeEl.textContent = /\/reel\//i.test(url) ? 'Reel' : 'Video';
-                resultBadgeTypeEl.classList.remove('d-none');
+                if (resultThumbEl && resultThumbWrapEl) {
+                    if (data.thumbnail_url) {
+                        resultThumbEl.src = data.thumbnail_url;
+                        resultThumbEl.alt = data.title || '';
+                        setHidden(resultThumbWrapEl, false);
+                    } else {
+                        setHidden(resultThumbWrapEl, true);
+                    }
+                }
 
-                resultSourceLinkEl.href = url;
-                resultSourceLinkEl.classList.remove('d-none');
+                if (resultBadgeTypeEl) {
+                    resultBadgeTypeEl.textContent = /\/reel\//i.test(url) ? 'Reel' : 'Video';
+                    setHidden(resultBadgeTypeEl, false);
+                }
+
+                if (resultSourceLinkEl) {
+                    resultSourceLinkEl.href = url;
+                    setHidden(resultSourceLinkEl, false);
+                }
 
                 renderOptions(data.options);
                 showState('result');
@@ -197,7 +224,7 @@
      * step, matching how each quality row is meant to behave.
      */
     function handleProcess(optionId, triggerButton) {
-        var buttons = resultOptionsEl.querySelectorAll('button');
+        var buttons = resultOptionsEl ? resultOptionsEl.querySelectorAll('button') : [];
         buttons.forEach(function (btn) {
             btn.disabled = true;
         });
