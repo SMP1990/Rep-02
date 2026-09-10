@@ -370,6 +370,42 @@ final class FacebookProviderTest extends TestCase
         self::assertCount(3, $http->requestedUrls, 'warm-up, canonical (no video), then mobile-host fallback (found it)');
     }
 
+    public function testFindsVideoUrlFromDataVideoUrlAttributeOnTheWeblitePipeline(): void
+    {
+        // Mirrors a real fetched www.facebook.com Reel page from
+        // production testing that used Facebook's "weblite" rendering
+        // pipeline: no playable_url/browser_native/*_src key anywhere —
+        // the stream is a plain HTML data-video-url="..." attribute on
+        // the player component, with &amp;-encoded query string. A
+        // second, unrelated data-video-url further down the page (a
+        // "more to explore" suggested video) must NOT be picked instead.
+        $html = <<<'HTML'
+            <!DOCTYPE html>
+            <html><head><title>A Reel</title></head>
+            <body>
+            <div data-video-id="1375160947610126" data-video-url="https://video-cgk1-2.xx.fbcdn.net/o1/v/t2/f2/m412/primary.mp4?_nc_cat=108&amp;bitrate=207304&amp;tag=sve_sd" data-mcomponent="ServerMVideo"></div>
+            <div data-video-id="1140017645022948" data-video-url="https://video-cgk1-2.xx.fbcdn.net/o1/v/t2/f2/m412/unrelated-suggested.mp4?bitrate=246826&amp;tag=sve_sd" data-mcomponent="ServerMVideo"></div>
+            </body></html>
+            HTML;
+
+        $http = new FakeHttpClient();
+        $http->queue('facebook.com/reel/998877', new HttpResponse(200, [], $html));
+        $this->queueWarmup($http);
+
+        $provider = $this->makeProvider($http);
+        $metadata = $provider->fetchMetadata('https://www.facebook.com/reel/998877/');
+
+        self::assertTrue($metadata->success);
+        self::assertCount(1, $metadata->options);
+        self::assertSame('sd', $metadata->options[0]->id);
+
+        $result = $provider->process('https://www.facebook.com/reel/998877/', 'sd');
+        self::assertSame(
+            'https://video-cgk1-2.xx.fbcdn.net/o1/v/t2/f2/m412/primary.mp4?_nc_cat=108&bitrate=207304&tag=sve_sd',
+            $result->output->url,
+        );
+    }
+
     public function testFallsBackToLegacyUnquotedKeysWhenModernKeysAreAbsent(): void
     {
         // Older Facebook markup generations have used hd_src/sd_src as

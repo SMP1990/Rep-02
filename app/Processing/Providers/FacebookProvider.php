@@ -505,6 +505,10 @@ final class FacebookProvider implements ProcessingProvider
      * unescaped via json_decode() of the quoted fragment rather than used
      * raw.
      *
+     * A third rendering pipeline (the "weblite" one — see
+     * extractHtmlAttributeValue()'s call site below) doesn't use this
+     * JSON-key embedding at all; that's handled as a separate fallback.
+     *
      * @return array<string, string> quality label ('hd'|'sd') => direct URL
      */
     private function extractVideoCandidates(string $html): array
@@ -529,7 +533,41 @@ final class FacebookProvider implements ProcessingProvider
             }
         }
 
+        // A third rendering pipeline Facebook uses for some reel/video
+        // permalinks (production testing showed it appearing even on
+        // ordinary www.facebook.com URLs, not just m./mbasic.) doesn't
+        // embed the stream as a JSON string at all — it's a plain HTML
+        // `data-video-url="..."` attribute on the video player component,
+        // HTML-entity-encoded (`&amp;`) rather than JSON-escaped. Only
+        // used as a last resort when nothing above found an SD stream,
+        // and only the first occurrence — later ones on the same page are
+        // unrelated "more to explore" suggested videos, not this one.
+        if (!isset($candidates['sd'])) {
+            $videoUrl = $this->extractHtmlAttributeValue($html, 'data-video-url');
+
+            if ($videoUrl !== null) {
+                $candidates['sd'] = $videoUrl;
+            }
+        }
+
         return $candidates;
+    }
+
+    /**
+     * Finds the first occurrence of a plain HTML `$attribute="..."` value
+     * and returns it HTML-entity-decoded, or null if absent/empty.
+     */
+    private function extractHtmlAttributeValue(string $html, string $attribute): ?string
+    {
+        $pattern = '/' . preg_quote($attribute, '/') . '="([^"]+)"/';
+
+        if (preg_match($pattern, $html, $matches) !== 1) {
+            return null;
+        }
+
+        $value = html_entity_decode($matches[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        return $value !== '' ? $value : null;
     }
 
     /**
