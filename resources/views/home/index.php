@@ -8,18 +8,25 @@
                 </p>
 
                 <form id="fetch-form" class="fetch-form" novalidate>
-                    <div class="input-group input-group-lg">
+                    <div class="url-input-group">
                         <label for="media-url" class="visually-hidden">Media link</label>
+                        <span class="url-input-icon" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                        </span>
                         <input
                             type="url"
-                            class="form-control"
+                            class="form-control url-input"
                             id="media-url"
                             name="url"
-                            placeholder="Paste a link here…"
+                            placeholder="Paste a Facebook video or Reel link here…"
                             autocomplete="off"
                             required
                         >
-                        <button class="btn btn-primary px-4" type="submit" id="fetch-submit">Fetch</button>
+                        <button type="button" class="url-clear-btn d-none" id="url-clear" aria-label="Clear link">&times;</button>
+                        <button class="btn btn-primary url-submit-btn" type="submit" id="fetch-submit">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+                            Get Video
+                        </button>
                     </div>
                     <div class="form-text text-start mt-2">
                         We don't store the links you submit any longer than it takes to process them.
@@ -43,26 +50,36 @@
                     </div>
 
                     <div id="state-result" class="fetch-state d-none text-start">
+                        <div class="alert result-success-banner" role="status">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m22 4-10 10-3-3"/></svg>
+                            Video found — ready for download.
+                        </div>
+
                         <div class="card result-card">
                             <div class="card-body">
                                 <div class="d-flex gap-3">
-                                    <img id="result-thumbnail" src="" alt="" class="result-thumbnail d-none">
-                                    <div>
-                                        <p class="fw-semibold mb-1" id="result-title"></p>
-                                        <p class="text-body-secondary small mb-0" id="result-meta"></p>
+                                    <div class="result-thumb-wrap d-none" id="result-thumb-wrap">
+                                        <img id="result-thumbnail" src="" alt="" class="result-thumbnail">
+                                        <span class="result-badge result-badge-type d-none" id="result-badge-type"></span>
+                                    </div>
+                                    <div class="flex-grow-1 min-w-0">
+                                        <p class="fw-semibold mb-1 result-title" id="result-title"></p>
+                                        <p class="text-body-secondary small mb-0 d-flex align-items-center gap-2 flex-wrap" id="result-meta-row">
+                                            <span id="result-meta"></span>
+                                            <a href="#" id="result-source-link" target="_blank" rel="noopener" class="d-none">Open on Facebook &#8599;</a>
+                                        </p>
                                     </div>
                                 </div>
 
-                                <div class="mt-3" id="result-options"></div>
-
-                                <div class="mt-3 d-none" id="result-output">
-                                    <a href="#" id="result-download-link" class="btn btn-success">
-                                        Download
-                                    </a>
-                                </div>
+                                <p class="text-uppercase text-body-secondary small fw-semibold mt-4 mb-2 result-options-heading">
+                                    Available download options
+                                </p>
+                                <div id="result-options"></div>
                             </div>
                         </div>
-                        <button type="button" class="btn btn-outline-secondary btn-sm mt-3" id="result-reset">Fetch another link</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm mt-3" id="result-reset">
+                            &#8635; Fetch another link
+                        </button>
                     </div>
                 </div>
             </div>

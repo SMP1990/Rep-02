@@ -13,6 +13,7 @@
     }
 
     var urlInput = document.getElementById('media-url');
+    var urlClearBtn = document.getElementById('url-clear');
     var submitButton = document.getElementById('fetch-submit');
 
     var states = {
@@ -27,12 +28,23 @@
 
     var resultTitleEl = document.getElementById('result-title');
     var resultMetaEl = document.getElementById('result-meta');
+    var resultThumbWrapEl = document.getElementById('result-thumb-wrap');
     var resultThumbEl = document.getElementById('result-thumbnail');
+    var resultBadgeTypeEl = document.getElementById('result-badge-type');
+    var resultSourceLinkEl = document.getElementById('result-source-link');
     var resultOptionsEl = document.getElementById('result-options');
-    var resultOutputEl = document.getElementById('result-output');
-    var resultDownloadLink = document.getElementById('result-download-link');
 
     var currentUrl = '';
+
+    urlInput.addEventListener('input', function () {
+        urlClearBtn.classList.toggle('d-none', urlInput.value.trim() === '');
+    });
+
+    urlClearBtn.addEventListener('click', function () {
+        urlInput.value = '';
+        urlClearBtn.classList.add('d-none');
+        urlInput.focus();
+    });
 
     function showState(name) {
         Object.keys(states).forEach(function (key) {
@@ -84,9 +96,20 @@
         return minutes + ':' + String(remaining).padStart(2, '0');
     }
 
+    var DOWNLOAD_ICON_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+        'stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+        '<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>';
+
+    /**
+     * One row per option, styled to match the reference layout (a badge
+     * for the format, the label, and a single Download button per row) —
+     * but only ever from real data /api/v1/metadata actually returned.
+     * There's no resolution, file-size, or view-count data available from
+     * the provider, so unlike a mocked design reference this never
+     * fabricates numbers for those; it shows only what's genuinely known.
+     */
     function renderOptions(options) {
         resultOptionsEl.innerHTML = '';
-        resultOutputEl.classList.add('d-none');
 
         if (!options || options.length === 0) {
             var note = document.createElement('p');
@@ -97,14 +120,38 @@
         }
 
         options.forEach(function (option) {
+            var row = document.createElement('div');
+            row.className = 'option-row';
+
+            var badge = document.createElement('span');
+            badge.className = 'option-badge' + (option.id === 'hd' ? ' option-badge-hd' : '');
+            badge.textContent = option.id === 'hd' ? 'HD' : 'SD';
+            row.appendChild(badge);
+
+            var info = document.createElement('div');
+            info.className = 'option-info';
+            var labelEl = document.createElement('span');
+            labelEl.className = 'option-label';
+            labelEl.textContent = option.label;
+            info.appendChild(labelEl);
+            if (option.format) {
+                var formatEl = document.createElement('span');
+                formatEl.className = 'option-format';
+                formatEl.textContent = 'Format: ' + option.format.toUpperCase();
+                info.appendChild(formatEl);
+            }
+            row.appendChild(info);
+
             var btn = document.createElement('button');
             btn.type = 'button';
-            btn.className = 'btn btn-outline-primary option-btn mb-2';
-            btn.textContent = option.label + (option.format ? ' (' + option.format + ')' : '');
+            btn.className = 'btn btn-primary option-download-btn';
+            btn.innerHTML = DOWNLOAD_ICON_SVG + '<span>Download</span>';
             btn.addEventListener('click', function () {
                 handleProcess(option.id, btn);
             });
-            resultOptionsEl.appendChild(btn);
+            row.appendChild(btn);
+
+            resultOptionsEl.appendChild(row);
         });
     }
 
@@ -121,10 +168,16 @@
                 if (data.thumbnail_url) {
                     resultThumbEl.src = data.thumbnail_url;
                     resultThumbEl.alt = data.title || '';
-                    resultThumbEl.classList.remove('d-none');
+                    resultThumbWrapEl.classList.remove('d-none');
                 } else {
-                    resultThumbEl.classList.add('d-none');
+                    resultThumbWrapEl.classList.add('d-none');
                 }
+
+                resultBadgeTypeEl.textContent = /\/reel\//i.test(url) ? 'Reel' : 'Video';
+                resultBadgeTypeEl.classList.remove('d-none');
+
+                resultSourceLinkEl.href = url;
+                resultSourceLinkEl.classList.remove('d-none');
 
                 renderOptions(data.options);
                 showState('result');
@@ -138,14 +191,18 @@
             });
     }
 
+    /**
+     * A single click both resolves the direct stream (/api/v1/process)
+     * and starts the download — no separate "now click Download" second
+     * step, matching how each quality row is meant to behave.
+     */
     function handleProcess(optionId, triggerButton) {
         var buttons = resultOptionsEl.querySelectorAll('button');
         buttons.forEach(function (btn) {
             btn.disabled = true;
         });
-        if (triggerButton) {
-            triggerButton.textContent = 'Preparing…';
-        }
+        var originalHtml = triggerButton.innerHTML;
+        triggerButton.innerHTML = '<span>Preparing…</span>';
 
         callApi('/api/v1/process', { url: currentUrl, option_id: optionId })
             .then(function (data) {
@@ -157,9 +214,9 @@
                     // origins) — it just opens the video. The proxy
                     // re-serves the same bytes with that header set.
                     var filename = data.output.filename || 'video.mp4';
-                    resultDownloadLink.href = '/api/v1/download?url=' + encodeURIComponent(data.output.url) +
+                    var downloadUrl = '/api/v1/download?url=' + encodeURIComponent(data.output.url) +
                         '&filename=' + encodeURIComponent(filename);
-                    resultOutputEl.classList.remove('d-none');
+                    window.location.href = downloadUrl;
                 }
             })
             .catch(function (error) {
@@ -170,6 +227,7 @@
                 buttons.forEach(function (btn) {
                     btn.disabled = false;
                 });
+                triggerButton.innerHTML = originalHtml;
             });
     }
 
