@@ -40,22 +40,43 @@ final class DownloadController
 
     public function __invoke(Request $request): Response
     {
-        $url = (string) $request->input('url', '');
+        // Defensive: this app's global handler turns even a PHP warning
+        // into a thrown exception, which would otherwise crash the whole
+        // request with the generic 500 page. A problem specific to this
+        // one route (an unusual upstream response, a hosting quirk with
+        // cURL or output buffering) should fail as a download error, not
+        // take the page down — so nothing above the actual byte-streaming
+        // is allowed to propagate uncaught.
+        try {
+            $url = (string) $request->input('url', '');
 
-        if (!$this->isAllowedUpstreamUrl($url)) {
-            return Response::error('INVALID_URL', 'This download link is not valid.', 422);
+            if (!$this->isAllowedUpstreamUrl($url)) {
+                return Response::error('INVALID_URL', 'This download link is not valid.', 422);
+            }
+
+            $filename = $this->sanitizeFilename((string) $request->input('filename', self::DEFAULT_FILENAME));
+
+            return Response::stream(
+                function () use ($url): void {
+                    try {
+                        $this->streamUpstream($url);
+                    } catch (\Throwable) {
+                        // Headers/some bytes may already be on the wire at
+                        // this point, so there's no clean response left to
+                        // return — best we can do is stop without a fatal
+                        // error. The browser sees a truncated download,
+                        // not a crashed page.
+                    }
+                },
+                [
+                    'Content-Type' => 'video/mp4',
+                    'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                    'X-Robots-Tag' => 'noindex',
+                ],
+            );
+        } catch (\Throwable) {
+            return Response::error('DOWNLOAD_FAILED', 'Could not start the download. Please try again.', 500);
         }
-
-        $filename = $this->sanitizeFilename((string) $request->input('filename', self::DEFAULT_FILENAME));
-
-        return Response::stream(
-            fn () => $this->streamUpstream($url),
-            [
-                'Content-Type' => 'video/mp4',
-                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-                'X-Robots-Tag' => 'noindex',
-            ],
-        );
     }
 
     private function isAllowedUpstreamUrl(string $url): bool
@@ -110,6 +131,14 @@ final class DownloadController
      */
     private function streamUpstream(string $url): void
     {
+        // Shared hosting's default max_execution_time (often 30-60s) is
+        // sized for ordinary requests, not a large video re-streamed
+        // through this server — without this, a slow/large download
+        // would be killed mid-transfer regardless of cURL's own timeout.
+        // Suppressed: some hosts disable set_time_limit() entirely, and
+        // that's not fatal to this feature, just a smaller safety margin.
+        @set_time_limit(0);
+
         $ch = curl_init($url);
 
         if ($ch === false) {
