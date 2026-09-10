@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\LogController;
 use App\Http\Controllers\Admin\PageController as AdminPageController;
 use App\Http\Controllers\Admin\SeoController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Api\DownloadController;
 use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\Api\MetadataController;
 use App\Http\Controllers\Api\ProcessController;
@@ -131,6 +132,7 @@ $router->get('/copyright', [$pages, 'copyright']);
 $router->get('/api/v1/health', new HealthController());
 $router->post('/api/v1/metadata', new MetadataController($providerManager, $recorder), [$processingThrottle]);
 $router->post('/api/v1/process', new ProcessController($providerManager, $recorder), [$processingThrottle]);
+$router->get('/api/v1/download', new DownloadController(), [$processingThrottle]);
 
 // Admin API (JSON — Phase 4, kept for any future JS/SPA/mobile consumer)
 $router->get('/admin/api/csrf-token', [$authController, 'csrfToken']);

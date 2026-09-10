@@ -150,7 +150,15 @@
         callApi('/api/v1/process', { url: currentUrl, option_id: optionId })
             .then(function (data) {
                 if (data.output && data.output.url) {
-                    resultDownloadLink.href = data.output.url;
+                    // Point at our own download proxy, not the raw CDN
+                    // URL directly: a cross-origin link never triggers a
+                    // real download (no Content-Disposition from the CDN,
+                    // and browsers ignore the `download` attribute across
+                    // origins) — it just opens the video. The proxy
+                    // re-serves the same bytes with that header set.
+                    var filename = data.output.filename || 'video.mp4';
+                    resultDownloadLink.href = '/api/v1/download?url=' + encodeURIComponent(data.output.url) +
+                        '&filename=' + encodeURIComponent(filename);
                     resultOutputEl.classList.remove('d-none');
                 }
             })

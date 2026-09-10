@@ -16,6 +16,7 @@ final class Response
         private readonly int $status,
         private readonly array $headers,
         private readonly string $body,
+        private readonly ?\Closure $streamBody = null,
     ) {
     }
 
@@ -51,6 +52,19 @@ final class Response
     }
 
     /**
+     * For a response body too large to buffer as a PHP string (a proxied
+     * video download can be tens/hundreds of MB — shared hosting's
+     * memory_limit can't absorb that per-request). $emitter is called
+     * during send(), after headers are set, and is responsible for
+     * echo-ing its own output in chunks (e.g. a cURL write callback) —
+     * nothing here buffers what it writes.
+     */
+    public static function stream(callable $emitter, array $headers = [], int $status = 200): self
+    {
+        return new self($status, $headers, '', \Closure::fromCallable($emitter));
+    }
+
+    /**
      * 303 (not 302) so a redirect after a POST always becomes a GET on the
      * client — the standard Post/Redirect/Get pattern the admin dashboard's
      * plain HTML forms rely on to avoid a resubmission prompt on refresh.
@@ -77,6 +91,12 @@ final class Response
             foreach ($this->headers as $name => $value) {
                 header("{$name}: {$value}");
             }
+        }
+
+        if ($this->streamBody !== null) {
+            ($this->streamBody)();
+
+            return;
         }
 
         echo $this->body;

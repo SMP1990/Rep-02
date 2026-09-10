@@ -56,7 +56,7 @@
                                 <div class="mt-3" id="result-options"></div>
 
                                 <div class="mt-3 d-none" id="result-output">
-                                    <a href="#" id="result-download-link" class="btn btn-success" target="_blank" rel="noopener">
+                                    <a href="#" id="result-download-link" class="btn btn-success">
                                         Download
                                     </a>
                                 </div>
