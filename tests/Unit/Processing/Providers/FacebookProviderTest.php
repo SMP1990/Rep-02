@@ -287,6 +287,35 @@ final class FacebookProviderTest extends TestCase
         self::assertSame('https://video-cgk1-2.xx.fbcdn.net/reel-sd.mp4?oh=abc&oe=def', $sdResult->output->url);
     }
 
+    public function testFallsBackToLegacyUnquotedKeysWhenModernKeysAreAbsent(): void
+    {
+        // Older Facebook markup generations have used hd_src/sd_src as
+        // unquoted keys inside a JS object literal, rather than the
+        // modern quoted playable_url/browser_native_* names.
+        $html = <<<'HTML'
+            <!DOCTYPE html>
+            <html><head><title>Legacy key video</title></head>
+            <body>
+            <script>window.__data = {video: {hd_src:"https:\/\/video.example.fbcdn.net\/legacy-hd.mp4",sd_src:"https:\/\/video.example.fbcdn.net\/legacy-sd.mp4"}};</script>
+            </body></html>
+            HTML;
+
+        $http = new FakeHttpClient();
+        $http->queue('facebook.com/someone/videos/legacy', new HttpResponse(200, [], $html));
+        $this->queueWarmup($http);
+
+        $provider = $this->makeProvider($http);
+        $result = $provider->fetchMetadata('https://www.facebook.com/someone/videos/legacy/');
+
+        self::assertCount(2, $result->options);
+
+        $hdResult = $provider->process('https://www.facebook.com/someone/videos/legacy/', 'hd');
+        self::assertSame('https://video.example.fbcdn.net/legacy-hd.mp4', $hdResult->output->url);
+
+        $sdResult = $provider->process('https://www.facebook.com/someone/videos/legacy/', 'sd');
+        self::assertSame('https://video.example.fbcdn.net/legacy-sd.mp4', $sdResult->output->url);
+    }
+
     public function testTransientHttpFailureBecomesProviderUnavailable(): void
     {
         $http = new FakeHttpClient();

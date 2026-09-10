@@ -62,11 +62,16 @@ final class FacebookProvider implements ProcessingProvider
 {
     private const CACHE_TTL_SECONDS = 300;
 
-    /** JSON keys Facebook uses for the HD stream, checked in this order. */
-    private const HD_KEYS = ['playable_url_quality_hd', 'browser_native_hd_url'];
+    /**
+     * Key names Facebook uses for the HD stream, checked in this order.
+     * The last two (`hd_src`/`hd_src_no_ratelimit`) are older key names
+     * from earlier Facebook markup generations — kept as a fallback in
+     * case a given page render uses them instead of the modern ones.
+     */
+    private const HD_KEYS = ['playable_url_quality_hd', 'browser_native_hd_url', 'hd_src_no_ratelimit', 'hd_src'];
 
-    /** JSON keys Facebook uses for the SD/default stream, checked in this order. */
-    private const SD_KEYS = ['playable_url', 'browser_native_sd_url'];
+    /** SD/default-stream equivalent of self::HD_KEYS, same fallback reasoning. */
+    private const SD_KEYS = ['playable_url', 'browser_native_sd_url', 'sd_src_no_ratelimit', 'sd_src'];
 
     /**
      * Real browsers send this full, consistent set on every page
@@ -421,13 +426,18 @@ final class FacebookProvider implements ProcessingProvider
     }
 
     /**
-     * Finds the first `"$key":"..."` occurrence in $html and returns its
+     * Finds the first `"$key":"..."` OR unquoted `$key:"..."` occurrence
+     * in $html (some older Facebook markup omits the quotes around the
+     * key in what's otherwise a JS object literal) and returns its
      * decoded (unescaped) string value, or null if the key isn't present
-     * or its value is empty/not a string once decoded.
+     * or its value is empty/not a string once decoded. The unquoted form
+     * requires a non-identifier character (or string end) right after the
+     * key so it can't match as a prefix of some longer, unrelated key.
      */
     private function extractJsonStringValue(string $html, string $key): ?string
     {
-        $pattern = '/"' . preg_quote($key, '/') . '"\s*:\s*"((?:\\\\.|[^"\\\\])*)"/';
+        $quotedKey = preg_quote($key, '/');
+        $pattern = '/(?:"' . $quotedKey . '"|' . $quotedKey . '(?![A-Za-z0-9_]))\s*:\s*"((?:\\\\.|[^"\\\\])*)"/';
 
         if (preg_match($pattern, $html, $matches) !== 1) {
             return null;
@@ -435,7 +445,15 @@ final class FacebookProvider implements ProcessingProvider
 
         $decoded = json_decode('"' . $matches[1] . '"');
 
-        return (is_string($decoded) && $decoded !== '') ? $decoded : null;
+        if (!is_string($decoded) || $decoded === '') {
+            return null;
+        }
+
+        // Some embed contexts leave stray HTML-entity-encoded ampersands
+        // in an otherwise-JSON string value rather than a bare `&`.
+        $decoded = str_replace('&amp;', '&', $decoded);
+
+        return $decoded;
     }
 
     /**
