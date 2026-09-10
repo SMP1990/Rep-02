@@ -287,6 +287,89 @@ final class FacebookProviderTest extends TestCase
         self::assertSame('https://video-cgk1-2.xx.fbcdn.net/reel-sd.mp4?oh=abc&oe=def', $sdResult->output->url);
     }
 
+    public function testThumbnailIsExtractedFromOpenGraphMetaTag(): void
+    {
+        $html = <<<'HTML'
+            <!DOCTYPE html>
+            <html><head><title>Sample Cat Video</title>
+            <meta property="og:image" content="https://scontent.example.fbcdn.net/thumb.jpg">
+            </head>
+            <body>
+            <script type="application/json" data-sjs>{"playable_url_quality_hd":"https:\/\/video.example.fbcdn.net\/hd.mp4","playable_url":"https:\/\/video.example.fbcdn.net\/sd.mp4"}</script>
+            </body></html>
+            HTML;
+
+        $http = new FakeHttpClient();
+        $http->queue('facebook.com/someone/videos/thumb', new HttpResponse(200, [], $html));
+        $this->queueWarmup($http);
+
+        $provider = $this->makeProvider($http);
+        $result = $provider->fetchMetadata('https://www.facebook.com/someone/videos/thumb/');
+
+        self::assertSame('https://scontent.example.fbcdn.net/thumb.jpg', $result->thumbnailUrl);
+    }
+
+    public function testTitleStripsTrailingFacebookSuffix(): void
+    {
+        $html = <<<'HTML'
+            <!DOCTYPE html>
+            <html><head><title>Sample Cat Video | Facebook</title></head>
+            <body>
+            <script type="application/json" data-sjs>{"playable_url_quality_hd":"https:\/\/video.example.fbcdn.net\/hd.mp4","playable_url":"https:\/\/video.example.fbcdn.net\/sd.mp4"}</script>
+            </body></html>
+            HTML;
+
+        $http = new FakeHttpClient();
+        $http->queue('facebook.com/someone/videos/suffix', new HttpResponse(200, [], $html));
+        $this->queueWarmup($http);
+
+        $provider = $this->makeProvider($http);
+        $result = $provider->fetchMetadata('https://www.facebook.com/someone/videos/suffix/');
+
+        self::assertSame('Sample Cat Video', $result->title);
+    }
+
+    public function testLoginFormWidgetDoesNotBlockAPageThatAlsoCarriesVideoData(): void
+    {
+        $html = <<<'HTML'
+            <!DOCTYPE html>
+            <html><head><title>Sample Cat Video</title></head>
+            <body>
+            <form id="login_form" action="/login/"><input name="email"></form>
+            <script type="application/json" data-sjs>{"playable_url_quality_hd":"https:\/\/video.example.fbcdn.net\/hd.mp4","playable_url":"https:\/\/video.example.fbcdn.net\/sd.mp4"}</script>
+            </body></html>
+            HTML;
+
+        $http = new FakeHttpClient();
+        $http->queue('facebook.com/someone/videos/nagbanner', new HttpResponse(200, [], $html));
+        $this->queueWarmup($http);
+
+        $provider = $this->makeProvider($http);
+        $result = $provider->fetchMetadata('https://www.facebook.com/someone/videos/nagbanner/');
+
+        self::assertTrue($result->success);
+        self::assertCount(2, $result->options);
+    }
+
+    public function testFallsBackToTheMobileHostWhenTheCanonicalPageHasNoVideoData(): void
+    {
+        $http = new FakeHttpClient();
+        // Registration order matters for FakeHttpClient's first-match scan
+        // — these two specific patterns don't overlap ("www.facebook.com"
+        // never contains the substring "m.facebook.com"), so either order
+        // is safe, but both must come before the generic warm-up pattern.
+        $http->queue('m.facebook.com/someone/videos/mobile-fallback', new HttpResponse(200, [], self::HTML_TWO_QUALITIES));
+        $http->queue('facebook.com/someone/videos/mobile-fallback', new HttpResponse(200, [], self::HTML_NO_VIDEO));
+        $this->queueWarmup($http);
+
+        $provider = $this->makeProvider($http);
+        $result = $provider->fetchMetadata('https://www.facebook.com/someone/videos/mobile-fallback/');
+
+        self::assertTrue($result->success);
+        self::assertCount(2, $result->options);
+        self::assertCount(3, $http->requestedUrls, 'warm-up, canonical (no video), then mobile-host fallback (found it)');
+    }
+
     public function testFallsBackToLegacyUnquotedKeysWhenModernKeysAreAbsent(): void
     {
         // Older Facebook markup generations have used hd_src/sd_src as

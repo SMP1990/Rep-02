@@ -68,10 +68,10 @@ final class FacebookProvider implements ProcessingProvider
      * from earlier Facebook markup generations — kept as a fallback in
      * case a given page render uses them instead of the modern ones.
      */
-    private const HD_KEYS = ['playable_url_quality_hd', 'browser_native_hd_url', 'hd_src_no_ratelimit', 'hd_src'];
+    private const HD_KEYS = ['playable_url_quality_hd', 'browser_native_hd_url', 'hd_src_no_ratelimit', 'hd_src', 'video_url_hd'];
 
     /** SD/default-stream equivalent of self::HD_KEYS, same fallback reasoning. */
-    private const SD_KEYS = ['playable_url', 'browser_native_sd_url', 'sd_src_no_ratelimit', 'sd_src'];
+    private const SD_KEYS = ['playable_url', 'browser_native_sd_url', 'sd_src_no_ratelimit', 'sd_src', 'video_url'];
 
     /**
      * Real browsers send this full, consistent set on every page
@@ -149,7 +149,7 @@ final class FacebookProvider implements ProcessingProvider
     }
 
     /**
-     * @return array{title: ?string, options: array<int, array{id: string, label: string, url: string}>}
+     * @return array{title: ?string, thumbnail: ?string, options: array<int, array{id: string, label: string, url: string}>}
      */
     private function resolve(string $url): array
     {
@@ -179,12 +179,12 @@ final class FacebookProvider implements ProcessingProvider
         }
     }
 
-    /** @return array{title: ?string, options: array<int, array{id: string, label: string, url: string}>}|null */
+    /** @return array{title: ?string, thumbnail: ?string, options: array<int, array{id: string, label: string, url: string}>}|null */
     private function readCache(string $cacheKey): ?array
     {
         $cached = $this->cache->get($cacheKey);
 
-        /** @var array{title: ?string, options: array<int, array{id: string, label: string, url: string}>}|null */
+        /** @var array{title: ?string, thumbnail: ?string, options: array<int, array{id: string, label: string, url: string}>}|null */
         return (is_array($cached) && isset($cached['options'])) ? $cached : null;
     }
 
@@ -198,7 +198,7 @@ final class FacebookProvider implements ProcessingProvider
      * time thanks to InFlightLock, whether it's called as the lock
      * "leader" or as a fallback when coalescing wasn't possible.
      *
-     * @return array{title: ?string, options: array<int, array{id: string, label: string, url: string}>}
+     * @return array{title: ?string, thumbnail: ?string, options: array<int, array{id: string, label: string, url: string}>}
      */
     private function fetchAndCache(string $url, string $cacheKey): array
     {
@@ -208,14 +208,18 @@ final class FacebookProvider implements ProcessingProvider
         try {
             $response = $this->http->get($canonicalUrl, self::BROWSER_HEADERS, $cookieJarPath);
         } catch (HttpRequestException $e) {
-            throw new ProviderUnavailableException('Could not reach Facebook right now.', $e);
-        } finally {
             if ($cookieJarPath !== null) {
                 @unlink($cookieJarPath);
             }
+
+            throw new ProviderUnavailableException('Could not reach Facebook right now.', $e);
         }
 
         if ($this->looksLikeLoginWall($response->body)) {
+            if ($cookieJarPath !== null) {
+                @unlink($cookieJarPath);
+            }
+
             $savedAs = $this->saveRawResponseForDiagnosis($response->body);
 
             Logger::channel('processing')->warning('Facebook provider detected a login wall', [
@@ -231,6 +235,10 @@ final class FacebookProvider implements ProcessingProvider
         }
 
         if (!$response->isSuccessful()) {
+            if ($cookieJarPath !== null) {
+                @unlink($cookieJarPath);
+            }
+
             $savedAs = $this->saveRawResponseForDiagnosis($response->body);
 
             Logger::channel('processing')->warning('Facebook provider received a non-success HTTP status', [
@@ -244,10 +252,35 @@ final class FacebookProvider implements ProcessingProvider
         }
 
         $title = $this->extractTitle($response->body);
+        $thumbnail = $this->extractThumbnail($response->body);
         $candidates = $this->extractVideoCandidates($response->body);
+        $usedBody = $response->body;
+
+        // The canonical page sometimes doesn't carry the video data at all
+        // (Facebook varies which host renders it) — one best-effort retry
+        // against the m.facebook.com variant of the same URL, sharing the
+        // same anonymous-visitor cookies, before giving up entirely.
+        if ($candidates === []) {
+            $mobileBody = $this->fetchMobileFallback($canonicalUrl, $cookieJarPath);
+
+            if ($mobileBody !== null) {
+                $mobileCandidates = $this->extractVideoCandidates($mobileBody);
+
+                if ($mobileCandidates !== []) {
+                    $candidates = $mobileCandidates;
+                    $usedBody = $mobileBody;
+                    $title ??= $this->extractTitle($mobileBody);
+                    $thumbnail ??= $this->extractThumbnail($mobileBody);
+                }
+            }
+        }
+
+        if ($cookieJarPath !== null) {
+            @unlink($cookieJarPath);
+        }
 
         if ($candidates === []) {
-            $savedAs = $this->saveRawResponseForDiagnosis($response->body);
+            $savedAs = $this->saveRawResponseForDiagnosis($usedBody);
 
             Logger::channel('processing')->warning('Facebook provider found no video candidates', [
                 'url_hash' => hash('sha256', $url),
@@ -267,10 +300,41 @@ final class FacebookProvider implements ProcessingProvider
             ];
         }
 
-        $extraction = ['title' => $title, 'options' => $options];
+        $extraction = ['title' => $title, 'thumbnail' => $thumbnail, 'options' => $options];
         $this->cache->set($cacheKey, $extraction, self::CACHE_TTL_SECONDS);
 
         return $extraction;
+    }
+
+    /**
+     * Best-effort retry of the same URL against m.facebook.com when the
+     * canonical host's response carried no video data — a different host
+     * can render different markup for the same content. Never throws:
+     * any failure here (including a raw HttpRequestException) just means
+     * the caller falls back to its original "no video found" outcome
+     * rather than this optional retry crashing the whole resolution.
+     */
+    private function fetchMobileFallback(string $canonicalUrl, ?string $cookieJarPath): ?string
+    {
+        $host = strtolower((string) parse_url($canonicalUrl, PHP_URL_HOST));
+
+        if ($host === '' || str_starts_with($host, 'm.') || str_starts_with($host, 'mbasic.')) {
+            return null;
+        }
+
+        $mobileUrl = preg_replace('/^https?:\/\/[^\/]+/', 'https://m.facebook.com', $canonicalUrl, 1);
+
+        if ($mobileUrl === null) {
+            return null;
+        }
+
+        try {
+            $response = $this->http->get($mobileUrl, self::BROWSER_HEADERS, $cookieJarPath);
+        } catch (\Throwable) {
+            return null;
+        }
+
+        return $response->isSuccessful() ? $response->body : null;
     }
 
     private function toResult(string $url, array $extraction, ?ProcessingOutput $output): ProcessingResult
@@ -280,7 +344,7 @@ final class FacebookProvider implements ProcessingProvider
             sourceUrl: $url,
             sourcePlatform: 'facebook',
             title: $extraction['title'],
-            thumbnailUrl: null,
+            thumbnailUrl: $extraction['thumbnail'] ?? null,
             durationSeconds: null,
             options: array_map(
                 static fn (array $o) => new ProcessingOption($o['id'], $o['label'], 'mp4', null),
@@ -360,10 +424,19 @@ final class FacebookProvider implements ProcessingProvider
 
     private function looksLikeLoginWall(string $html): bool
     {
-        foreach (['You must log in to continue', 'log_in_to_continue', 'id="login_form"'] as $signal) {
+        foreach (['You must log in to continue', 'log_in_to_continue'] as $signal) {
             if (stripos($html, $signal) !== false) {
                 return true;
             }
+        }
+
+        // A bare login-form widget can appear as a nag banner alongside
+        // genuinely public, playable video content — production testing
+        // showed a real Reel page's markup can carry both at once. Only
+        // treat it as a hard wall when the page carries no video-stream
+        // data at all; otherwise this weaker signal is ignored.
+        if (stripos($html, 'id="login_form"') !== false) {
+            return !str_contains($html, 'playable_url') && !str_contains($html, 'browser_native');
         }
 
         return false;
@@ -376,9 +449,43 @@ final class FacebookProvider implements ProcessingProvider
         }
 
         $title = html_entity_decode(trim($matches[1]), ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        $title = preg_replace('/\s+/', ' ', $title) ?? $title;
+        $title = preg_replace('/\s*[|\-]\s*Facebook\s*$/i', '', $title) ?? $title;
+        $title = preg_replace('/^Watch\s*\|\s*/i', '', $title) ?? $title;
+        $title = preg_replace('/\s+/', ' ', trim($title)) ?? $title;
 
         return $title !== '' ? $title : null;
+    }
+
+    /**
+     * Looks for a thumbnail image via the standard Open Graph meta tags
+     * pages set for link-preview purposes, falling back to Facebook's own
+     * internal `preferred_thumbnail` JSON key if neither is present.
+     */
+    private function extractThumbnail(string $html): ?string
+    {
+        foreach (['og:image:secure_url', 'og:image'] as $property) {
+            $quotedProperty = preg_quote($property, '/');
+            $patterns = [
+                '/<meta\s+property="' . $quotedProperty . '"\s+content="([^"]*)"/i',
+                '/<meta\s+content="([^"]*)"\s+property="' . $quotedProperty . '"/i',
+            ];
+
+            foreach ($patterns as $pattern) {
+                if (preg_match($pattern, $html, $matches) === 1 && $matches[1] !== '') {
+                    return html_entity_decode($matches[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                }
+            }
+        }
+
+        if (preg_match('/"preferred_thumbnail"\s*:\s*\{\s*"image"\s*:\s*\{\s*"uri"\s*:\s*"((?:\\\\.|[^"\\\\])*)"/', $html, $matches) === 1) {
+            $decoded = json_decode('"' . $matches[1] . '"');
+
+            if (is_string($decoded) && $decoded !== '') {
+                return $decoded;
+            }
+        }
+
+        return null;
     }
 
     /**
