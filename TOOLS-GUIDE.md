@@ -1,0 +1,60 @@
+# ASK Downloader — tools: where everything is
+
+A map of the work on the site's online tools, so any part can be found and
+restored later. Everything below is in this GitHub repository
+(`SMP1990/Rep-02`).
+
+## Permanent markers (git tags)
+
+Tags never move and keep every file in their history reachable, even if a
+branch is deleted.
+
+| Tag | What it holds |
+|---|---|
+| `tools-v1` | The complete state when the tools section and the Background Remover went live: site source, tool source, models, deploy ZIP. |
+| `bg-remover-model-isnet-v1` | Commit `f971bc3`: the fast AI model (ISNet) that the live site downloads. |
+| `bg-remover-model-u2net-v1` | Commit `bfcf318`: the "Need better results?" AI model (U2Net) that the live site downloads. |
+
+**Do not delete these tags.** The live site loads its AI models from GitHub
+through jsDelivr using the two model commits above.
+
+## Folders
+
+| Folder | Contents |
+|---|---|
+| `ask-downloader/` | The website (React + Express) with the tools added. Deploy from here. |
+| `ask-downloader/src/tools/background-remover/` | Background Remover code inside the site (UI, AI worker, 11 languages). |
+| `ask-downloader/src/components/ToolsSection.tsx` | The "Free Online Tools" tiles on the home page. |
+| `ask-downloader/src/config/tools.ts` | List of tool tiles. To launch a new tool, give its tile a `path`. |
+| `ask-downloader/src/pages/BackgroundRemoverPage.tsx` | The `/background-remover` page. |
+| `bg-remover-tool/` | The Background Remover as a standalone project (where it was built and tested), plus `model/` (ISNet) and `model-hd/` (U2Net) parts and the scripts that made them. |
+| `releases/` | Ready-to-upload deploy ZIPs for Hostinger. |
+
+## Getting something back
+
+- **The deploy ZIP:** download it from `releases/` on GitHub (open the file,
+  then "Download raw file"). Upload it on Hostinger as usual.
+- **The whole project at the "tools-v1" moment:** on GitHub, open the
+  branch/tag menu, choose the tag `tools-v1`, then "Code" → "Download ZIP".
+- **The site exactly as it was before the tools were added:** commit
+  `b53b38c` ("Add the ASK Downloader site source, unchanged").
+
+## Rebuilding the deploy ZIP (for a developer)
+
+```bash
+cd ask-downloader
+npm install
+npm run lint && npm run build
+rm -f dist/server.cjs.map
+zip -qr ../releases/ask-downloader-<name>.zip . -x "node_modules/*" -x ".git/*"
+```
+
+## Adding the next tool
+
+1. Build it as its own folder under `ask-downloader/src/tools/<tool-name>/`.
+2. Give it its own lazy-loaded page and route (see the Background Remover:
+   `App.tsx`, `AdminContext.tsx`, `types/admin.ts`, `PageLink.tsx`).
+3. Add its server title/description and sitemap entry in `server.ts`; only
+   if it needs a CDN or extra speed, add its path to `TOOL_PAGES`.
+4. Turn one "Coming soon" tile into it in `src/config/tools.ts`.
+5. Words in all 11 languages; run the full site check before deploying.
