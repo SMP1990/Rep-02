@@ -5,13 +5,29 @@ import type * as Ort from 'onnxruntime-web';
 import { MODELS, type ModelId, type ModelSpec } from './models';
 
 const ORT_VERSION = '1.30.0'; // keep equal to package.json
-const ORT_CDN = `https://cdn.jsdelivr.net/npm/onnxruntime-web@${ORT_VERSION}/dist/`;
+// Same files on two npm CDNs: jsDelivr first, unpkg if it is unreachable.
+const ORT_CDNS = [
+  `https://cdn.jsdelivr.net/npm/onnxruntime-web@${ORT_VERSION}/dist/`,
+  `https://unpkg.com/onnxruntime-web@${ORT_VERSION}/dist/`,
+];
 
 const env = import.meta.env;
 // WASM-only build (~3.5MB) for most devices; the WebGPU build (~7MB) only
 // for devices with a real graphics chip.
-const ORT_WASM_URL: string = env.VITE_ORT_URL || ORT_CDN + 'ort.wasm.min.mjs';
-const ORT_GPU_URL: string = env.VITE_ORT_GPU_URL || ORT_CDN + 'ort.webgpu.min.mjs';
+const ORT_WASM_URLS: string[] = env.VITE_ORT_URL ? [env.VITE_ORT_URL] : ORT_CDNS.map((c) => c + 'ort.wasm.min.mjs');
+const ORT_GPU_URLS: string[] = env.VITE_ORT_GPU_URL ? [env.VITE_ORT_GPU_URL] : ORT_CDNS.map((c) => c + 'ort.webgpu.min.mjs');
+
+/** The runtime from the first CDN that answers. */
+async function importRuntime(urls: string[]): Promise<typeof Ort> {
+  for (const url of urls) {
+    try {
+      return (await import(/* @vite-ignore */ url)) as typeof Ort;
+    } catch {
+      // unreachable or blocked: try the next CDN
+    }
+  }
+  throw new Error('model-download-failed');
+}
 
 /** Same files from two hosts: jsDelivr first, GitHub raw if it fails. */
 function hosts(m: ModelSpec): string[] {
@@ -53,7 +69,7 @@ async function realGpu(): Promise<boolean> {
 function loadRuntime() {
   runtime ??= (async () => {
     const gpu = await realGpu();
-    const ort = (await import(/* @vite-ignore */ gpu ? ORT_GPU_URL : ORT_WASM_URL)) as typeof Ort;
+    const ort = await importRuntime(gpu ? ORT_GPU_URLS : ORT_WASM_URLS);
     // Threads only work when the page is cross-origin isolated.
     ort.env.wasm.numThreads = self.crossOriginIsolated
       ? Math.min(4, navigator.hardwareConcurrency || 1)

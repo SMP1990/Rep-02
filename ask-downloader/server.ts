@@ -65,7 +65,8 @@ app.use(express.urlencoded({ extended: true }));
  */
 const TOOL_PAGES = new Set(['/background-remover']);
 const TOOL_ASSET_HOSTS =
-  String(process.env.TOOL_ASSET_HOSTS || '').trim() || 'https://cdn.jsdelivr.net https://raw.githubusercontent.com';
+  String(process.env.TOOL_ASSET_HOSTS || '').trim() ||
+  'https://cdn.jsdelivr.net https://unpkg.com https://raw.githubusercontent.com';
 
 /**
  * Security HTTP Headers Middleware
