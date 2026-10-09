@@ -1,7 +1,7 @@
 // Image -> alpha mask, all inside the browser.
 import type * as Ort from 'onnxruntime-web';
 import { fallBackToWasm, loadModel, type Loaded } from './model';
-import { MODELS, type ModelId, type ModelSpec } from './models';
+import { MODELS, inputSize, type ModelId, type ModelSpec } from './models';
 
 /** Grayscale mask (0..255), same size as the source image. */
 export interface Mask {
@@ -10,8 +10,7 @@ export interface Mask {
   data: Uint8ClampedArray;
 }
 
-function toTensor(ort: typeof Ort, img: CanvasImageSource, m: ModelSpec): Ort.Tensor {
-  const S = m.size;
+function toTensor(ort: typeof Ort, img: CanvasImageSource, m: ModelSpec, S: number): Ort.Tensor {
   const canvas = new OffscreenCanvas(S, S);
   const ctx = canvas.getContext('2d')!;
   ctx.imageSmoothingQuality = 'high';
@@ -33,8 +32,7 @@ function toTensor(ort: typeof Ort, img: CanvasImageSource, m: ModelSpec): Ort.Te
   return new ort.Tensor('float32', input, [1, 3, S, S]);
 }
 
-function toMask(out: Float32Array, m: ModelSpec, width: number, height: number): Mask {
-  const S = m.size;
+function toMask(out: Float32Array, m: ModelSpec, S: number, width: number, height: number): Mask {
   const v = m.sigmoid ? out.map((x) => 1 / (1 + Math.exp(-x))) : out;
   let min = Infinity;
   let max = -Infinity;
@@ -83,7 +81,8 @@ function looksBroken(out: Float32Array): boolean {
 export async function computeMask(img: ImageBitmap, id: ModelId): Promise<Mask> {
   const m = MODELS[id];
   const loaded = await loadModel(id);
-  const input = toTensor(loaded.ort, img, m);
+  const size = inputSize(m);
+  const input = toTensor(loaded.ort, img, m, size);
   let data = await run(loaded, input).catch((err) => {
     if (loaded.backend !== 'webgpu') throw err;
     return null;
@@ -93,5 +92,5 @@ export async function computeMask(img: ImageBitmap, id: ModelId): Promise<Mask> 
     // go through WASM, which matches the reference model.
     data = await run(await fallBackToWasm(id), input);
   }
-  return toMask(data, m, img.width, img.height);
+  return toMask(data, m, size, img.width, img.height);
 }

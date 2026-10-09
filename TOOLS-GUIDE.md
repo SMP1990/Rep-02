@@ -12,11 +12,20 @@ branch is deleted.
 | Tag | What it holds |
 |---|---|
 | `tools-v1` | The complete state when the tools section and the Background Remover went live: site source, tool source, models, deploy ZIP. |
-| `bg-remover-model-isnet-v1` | Commit `f971bc3`: the fast AI model (ISNet) that the live site downloads. |
+| `bg-remover-model-isnet-v1` | Commit `f971bc3`: the first fast model (ISNet, 1024 only), used by `tools-v1`. |
 | `bg-remover-model-u2net-v1` | Commit `bfcf318`: the "Need better results?" AI model (U2Net) that the live site downloads. |
 
 **Do not delete these tags.** The live site loads its AI models from GitHub
 through jsDelivr using the two model commits above.
+
+## Model versions the site loads
+
+| Commit | What it is |
+|---|---|
+| `d472b3d` | Fast model (ISNet) that works at any size: phones use 768, computers 1024. Loaded by the site from the "fast on mobile" release on. |
+| `bfcf318` | "Need better results?" model (U2Net). |
+
+These commits are in the history of the protected branches, so they stay.
 
 ## Backup branch
 
@@ -38,8 +47,9 @@ or delete it; it only exists so the code can always be found.
 
 ## Getting something back
 
-- **The deploy ZIP:** download it from `releases/` on GitHub (open the file,
-  then "Download raw file"). Upload it on Hostinger as usual.
+- **The deploy ZIP:** download the newest one from `releases/` on GitHub
+  (open the file, then "Download raw file"). Upload it on Hostinger as usual.
+  Older ZIPs are inside their release tag (for example `tools-v1`).
 - **The whole project at the "tools-v1" moment:** on GitHub, open the
   branch/tag menu, choose the tag `tools-v1`, then "Code" → "Download ZIP".
 - **The site exactly as it was before the tools were added:** commit
