@@ -1,0 +1,6 @@
+{
+  "name": "FDownloader - Social Video Downloader & Admin Suite",
+  "description": "Comprehensive full-stack social media video downloader with back-office control panel, real-time analytics, subscriber management, and SEO-optimized blog publishing.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

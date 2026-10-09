@@ -1,0 +1,456 @@
+@import "tailwindcss";
+
+/* Dark mode is toggled by adding .dark to <html>, not by the OS setting.
+   Tailwind v4 defaults the `dark:` variant to prefers-color-scheme, which
+   made every `dark:` utility dead on this site. This rebinds it to the class. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', 'Noto Sans Arabic', 'Noto Sans Devanagari', 'Hiragino Kaku Gothic ProN', 'Yu Gothic UI', ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  :root {
+    --font-heading: 'Fraunces', 'Noto Naskh Arabic', 'Noto Sans Devanagari', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+    --font-body: 'Plus Jakarta Sans', 'Noto Sans Arabic', 'Noto Sans Devanagari', 'Hiragino Kaku Gothic ProN', 'Yu Gothic UI', sans-serif;
+    --bg-lavender: #f6f0f4;
+    --ink-900: #2e2440;
+  }
+
+  /* Deep Night Dark Mode Variables & Colors */
+  html.dark, :root.dark, [data-theme="dark"] {
+    --bg-lavender: #0e0a17;
+    --ink-900: #f4eefb;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background-color: var(--bg-lavender);
+    color: var(--ink-900);
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  h1, h2, h3, .font-heading {
+    font-family: var(--font-heading);
+  }
+
+  /* Visible focus ring for keyboard navigation only — :focus-visible never
+     triggers on a mouse click, so this has zero effect on normal use and
+     only helps people tabbing through the site with a keyboard. */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid #6d46b8;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  html.dark a:focus-visible,
+  html.dark button:focus-visible,
+  html.dark input:focus-visible,
+  html.dark textarea:focus-visible,
+  html.dark select:focus-visible,
+  html.dark [tabindex]:focus-visible {
+    outline-color: #d1b9f7;
+  }
+}
+
+/* ==========================================================================
+   DEEP NIGHT DARK MODE SYSTEM OVERRIDES
+   Engineered for maximum eye comfort, low blue-light glare, and crisp contrast
+   ========================================================================== */
+
+html.dark {
+  color-scheme: dark;
+}
+
+html.dark body {
+  background-color: #0e0a17 !important;
+  color: #f4eefb !important;
+}
+
+/* Page canvas backgrounds */
+html.dark .bg-\[\#f6f0f4\],
+html.dark main.bg-\[\#f6f0f4\] {
+  background-color: #0e0a17 !important;
+}
+
+/* Elevated Cards & Modals */
+html.dark .bg-white {
+  background-color: #181224 !important;
+  color: #f4eefb;
+}
+
+html.dark .bg-white\/90 {
+  background-color: rgba(24, 18, 36, 0.92) !important;
+}
+
+html.dark .bg-white\/95 {
+  background-color: rgba(24, 18, 36, 0.95) !important;
+}
+
+/* Soft accent containers */
+html.dark .bg-\[\#f1e9fb\] {
+  background-color: #261b3b !important;
+}
+
+html.dark .bg-\[\#fdedf1\] {
+  background-color: #311627 !important;
+}
+
+/* Borders & Dividers */
+html.dark .border-\[\#eae3ee\],
+html.dark .border-\[\#f1e9fb\],
+html.dark .border-\[\#e6799f\]\/10,
+html.dark .border-\[\#e6799f\]\/15,
+html.dark .border-white {
+  border-color: #2e2342 !important;
+}
+
+/* Typography & Heading Contrasts */
+html.dark .text-\[\#2e2440\] {
+  color: #f4eefb !important;
+}
+
+html.dark .text-\[\#4b2e83\] {
+  color: #cbb5f8 !important;
+}
+
+html.dark .text-\[\#6d46b8\] {
+  color: #ba9cf5 !important;
+}
+
+html.dark .text-\[\#726c85\] {
+  color: #b5a9cd !important;
+}
+
+html.dark .text-\[\#a29cb2\] {
+  color: #887c9f !important;
+}
+
+html.dark .text-\[\#d9628c\],
+html.dark .text-\[\#c84d78\] {
+  color: #f28aae !important;
+}
+
+/* Form Inputs, Selects, and Textareas */
+html.dark input:not([type="checkbox"]):not([type="radio"]),
+html.dark textarea,
+html.dark select {
+  background-color: #120d1e !important;
+  color: #f4eefb !important;
+  border-color: #382c4f !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #796b92 !important;
+}
+
+html.dark input:focus,
+html.dark textarea:focus,
+html.dark select:focus {
+  border-color: #9d6ef0 !important;
+  background-color: #150f24 !important;
+}
+
+/* Tables in Deep Night */
+html.dark table thead,
+html.dark table th {
+  background-color: #120d1e !important;
+  color: #d1c3ea !important;
+  border-color: #2e2342 !important;
+}
+
+html.dark table td {
+  border-color: #261c39 !important;
+}
+
+html.dark table tbody tr:hover td {
+  background-color: #201732 !important;
+}
+
+/* Interactive Hover States */
+html.dark .hover\:bg-\[\#f6f0f4\]:hover {
+  background-color: #221836 !important;
+}
+
+html.dark .hover\:bg-\[\#f1e9fb\]:hover {
+  background-color: #291d40 !important;
+}
+
+html.dark .hover\:bg-white:hover {
+  background-color: #201732 !important;
+}
+
+/* Stat Cards & Shadows */
+html.dark .shadow-\[0_10px_30px_rgba\(140\,80\,120\,0\.08\)\],
+html.dark .shadow-\[0_10px_30px_rgba\(140\,80\,120\,0\.06\)\] {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Code block & monospace badges */
+html.dark code,
+html.dark pre {
+  background-color: #120d1e !important;
+  color: #e5d9f8 !important;
+}
+
+/* Deep Night Scrollbar */
+html.dark ::-webkit-scrollbar-thumb {
+  background: #3c2d53;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #5b427b;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.animate-shake {
+  animation: shake 0.45s ease-in-out;
+}
+
+@keyframes pulseRing {
+  0% { box-shadow: 0 0 0 0 rgba(230, 121, 159, 0.45); }
+  70% { box-shadow: 0 0 0 12px rgba(230, 121, 159, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(230, 121, 159, 0); }
+}
+
+.animate-pulse-ring {
+  animation: pulseRing 2.6s ease-out infinite;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+/* Floating Ambient Orbs & Blobs */
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translateY(-16px) rotate(4deg) scale(1.04);
+  }
+}
+
+.animate-float-slow {
+  animation: floatSlow 7s ease-in-out infinite;
+}
+
+@keyframes floatReverse {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translateY(14px) rotate(-3deg) scale(0.96);
+  }
+}
+
+.animate-float-reverse {
+  animation: floatReverse 8.5s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradientShift 6s ease infinite;
+}
+
+@keyframes shimmerTranslate {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.animate-shimmer {
+  animation: shimmerTranslate 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes bounceShort {
+  0%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-6px); }
+  50% { transform: translateY(0); }
+  70% { transform: translateY(-2px); }
+}
+.animate-bounce-short {
+  animation: bounceShort 0.8s ease-out 1;
+}
+
+@keyframes swing {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(12deg); }
+  40% { transform: rotate(-10deg); }
+  60% { transform: rotate(6deg); }
+  80% { transform: rotate(-4deg); }
+}
+.animate-swing {
+  animation: swing 0.7s ease-in-out;
+  transform-origin: top center;
+}
+
+/* Custom scrollbar for clean dashboard feel */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d8cde3;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #bda8cf;
+}
+
+/* Infinite Marquee Animation for Blog Articles & Social Tickers */
+@keyframes marqueeLeft {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee-slow {
+  display: flex;
+  width: max-content;
+  animation: marqueeLeft 42s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-slow:hover {
+  animation-play-state: paused !important;
+}
+
+
+/* ============================================================
+   NON-LATIN SCRIPT TYPOGRAPHY
+   ------------------------------------------------------------
+   Plus Jakarta Sans and Fraunces carry no Arabic, Devanagari or
+   CJK glyphs, so before this every Urdu, Arabic, Hindi and
+   Japanese character fell back to whatever the operating system
+   happened to provide — Segoe UI on Windows, Geeza Pro on macOS,
+   Noto on Android. Same post, three different faces.
+
+   Google Fonts serves these with `unicode-range`, so a visitor
+   reading English never downloads a single byte of them.
+
+   Two faces per script, on purpose:
+     - interface chrome (buttons, menus, labels) wants a compact,
+       upright face that fits a 32px-tall button;
+     - editorial copy wants the face readers actually expect for
+       long-form text.
+   For Urdu that difference matters most: Nastaliq is the correct
+   script for prose, but it slopes steeply and needs roughly twice
+   the leading, which would wreck a navigation bar.
+   ============================================================ */
+
+/* --- Interface chrome ------------------------------------
+   Handled by the font stacks on :root rather than :lang() rules.
+   A :lang(ur) selector matches every descendant, so reading an Urdu
+   article with an English interface would drag the whole navigation
+   into an Arabic face. Listing the Noto fonts as fallbacks instead
+   lets the browser pick per GLYPH: Latin keeps Plus Jakarta Sans,
+   Arabic and Devanagari characters fall through to their own font,
+   in the same line if need be.
+   ------------------------------------------------------------ */
+
+/* --- Editorial copy ---------------------------------------
+   Selectors deliberately never match <html>. The document root
+   carries the content language for SEO, so a bare `[lang='ur'] h3`
+   would repaint every heading on the page — including the English
+   "Recent Articles" in the sidebar. Listing the element names keeps
+   these rules on the content that actually is in that script.
+   ------------------------------------------------------------ */
+
+/* Urdu reads in Nastaliq: descenders sweep far below the baseline,
+   so running text needs nearly double leading and a small size bump —
+   at the same nominal size Nastaliq looks smaller than Latin. */
+:is(p, li, blockquote, div, section, article, span)[lang='ur'] {
+  font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', 'Noto Sans Arabic', serif;
+  line-height: 2.15;
+  font-size: 1.06em;
+  font-feature-settings: 'liga' 1, 'calt' 1, 'kern' 1;
+}
+
+/* Headings get the face and tighter leading, never a font-size: `em`
+   here is measured against the PARENT and would collapse a 36px h1. */
+:is(h1, h2, h3, h4)[lang='ur'],
+:is(div, section, article)[lang='ur'] :is(h1, h2, h3, h4) {
+  font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', 'Noto Sans Arabic', serif;
+  line-height: 1.75;
+  font-feature-settings: 'liga' 1, 'calt' 1, 'kern' 1;
+}
+
+/* Arabic readers expect Naskh for running text — Nastaliq would be
+   wrong here, not merely unusual. */
+:is(p, li, blockquote, div, section, article, span)[lang='ar'] {
+  font-family: 'Noto Naskh Arabic', 'Noto Sans Arabic', 'Segoe UI', serif;
+  line-height: 1.95;
+  font-size: 1.04em;
+}
+
+:is(h1, h2, h3, h4)[lang='ar'],
+:is(div, section, article)[lang='ar'] :is(h1, h2, h3, h4) {
+  font-family: 'Noto Naskh Arabic', 'Noto Sans Arabic', 'Segoe UI', serif;
+  line-height: 1.6;
+}
+
+/* Devanagari hangs from a headline stroke: a little more leading than
+   Latin, nothing like Nastaliq. */
+:is(p, li, blockquote, div, section, article, span)[lang='hi'] {
+  font-family: 'Noto Sans Devanagari', 'Nirmala UI', sans-serif;
+  line-height: 1.8;
+}
+
+:is(h1, h2, h3, h4)[lang='hi'],
+:is(div, section, article)[lang='hi'] :is(h1, h2, h3, h4) {
+  font-family: 'Noto Sans Devanagari', 'Nirmala UI', sans-serif;
+  line-height: 1.45;
+}
+
+/* A clamped Nastaliq line clips its descenders, so give truncated card
+   titles room to breathe. */
+[lang='ur'] .line-clamp-2,
+[lang='ur'].line-clamp-2,
+[lang='ur'] .line-clamp-3,
+[lang='ur'].line-clamp-3 {
+  line-height: 1.95;
+}
