@@ -42,14 +42,17 @@ async function openCache(): Promise<Cache | null> {
 /** One model part, from the browser cache or the first host that answers. */
 async function fetchPart(n: number, onBytes: (n: number) => void): Promise<Uint8Array> {
   const file = `isnet.part${n}`;
+  // Cache keys must be full URLs (a relative name fails in a blob: worker).
+  const key = MODEL_HOSTS[0] + file;
   const cache = await openCache();
-  const hit = await cache?.match(file);
+  const hit = await cache?.match(key).catch(() => undefined);
   if (hit) {
     const buf = new Uint8Array(await hit.arrayBuffer());
     onBytes(buf.length);
     return buf;
   }
   for (const host of MODEL_HOSTS) {
+    let got = 0;
     try {
       const res = await fetch(host + file);
       if (!res.ok || !res.body) continue;
@@ -59,13 +62,14 @@ async function fetchPart(n: number, onBytes: (n: number) => void): Promise<Uint8
         const { done, value } = await reader.read();
         if (done) break;
         chunks.push(value);
+        got += value.length;
         onBytes(value.length);
       }
       const buf = join(chunks);
-      cache?.put(file, new Response(buf)).catch(() => {});
+      cache?.put(key, new Response(buf)).catch(() => {});
       return buf;
     } catch {
-      // network error: try the next host
+      onBytes(-got); // broke half-way: the next host starts this part again
     }
   }
   throw new Error('model-download-failed');

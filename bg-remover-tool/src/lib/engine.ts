@@ -1,4 +1,5 @@
 // Main-thread side of the worker: one shared worker, promise-based calls.
+import createWorker from './createWorker';
 import type { WorkerRequest, WorkerResponse } from './worker';
 
 export interface Result {
@@ -16,10 +17,23 @@ let ready: Promise<void> | null = null;
 let nextId = 1;
 const pending = new Map<number, { resolve: (r: Result) => void; reject: (e: Error) => void }>();
 const progressListeners = new Set<(p: number) => void>();
+let failLoad: ((e: Error) => void) | null = null;
+
+/** The worker itself broke (script failed to load or crashed): fail
+ *  everything waiting on it and start a fresh worker on the next try. */
+function crash(ev: Event) {
+  console.error('background remover worker failed', (ev as ErrorEvent).message ?? ev);
+  worker?.terminate();
+  worker = null;
+  const err = new ToolError('processing-failed');
+  failLoad?.(err);
+  pending.forEach((p) => p.reject(err));
+  pending.clear();
+}
 
 function getWorker(): Worker {
   if (worker) return worker;
-  worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
+  worker = createWorker();
   worker.onmessage = (e: MessageEvent<WorkerResponse>) => {
     const msg = e.data;
     if (msg.type === 'progress') progressListeners.forEach((f) => f(msg.p));
@@ -32,6 +46,8 @@ function getWorker(): Worker {
       pending.delete(msg.id);
     }
   };
+  worker.onerror = crash;
+  worker.onmessageerror = crash;
   return worker;
 }
 
@@ -42,6 +58,7 @@ const send = (msg: WorkerRequest, transfer: Transferable[] = []) =>
 export function prepare(onProgress?: (p: number) => void): Promise<void> {
   if (onProgress) progressListeners.add(onProgress);
   ready ??= new Promise<void>((resolve, reject) => {
+    failLoad = reject;
     const w = getWorker();
     const onMsg = (e: MessageEvent<WorkerResponse>) => {
       if (e.data.type === 'ready') resolve();
