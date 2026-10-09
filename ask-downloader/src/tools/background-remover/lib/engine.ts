@@ -1,6 +1,7 @@
 // Main-thread side of the worker: one shared worker, promise-based calls.
 import createWorker from './createWorker';
 import type { ModelId } from './models';
+import { testLog } from './testMode';
 import type { WorkerRequest, WorkerResponse } from './worker';
 
 export interface Result {
@@ -42,6 +43,7 @@ function getWorker(): Worker {
   worker = createWorker();
   worker.onmessage = (e: MessageEvent<WorkerResponse>) => {
     const msg = e.data;
+    if (msg.type === 'info' && msg.text) testLog(msg.text);
     if (msg.type === 'progress') loads.get(msg.model)?.listeners.forEach((f) => f(msg.p));
     if (msg.type === 'result') {
       pending.get(msg.id)?.resolve(msg);

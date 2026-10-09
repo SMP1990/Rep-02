@@ -1,7 +1,7 @@
 // Runs the models off the main thread so the page stays smooth while they work.
-import { loadModel } from './model';
+import { loadInfo, loadModel } from './model';
 import type { ModelId } from './models';
-import { computeMask } from './removeBackground';
+import { computeMask, lastRun } from './removeBackground';
 
 export type WorkerRequest =
   | { type: 'load'; model: ModelId }
@@ -11,7 +11,8 @@ export type WorkerResponse =
   | { type: 'progress'; model: ModelId; p: number }
   | { type: 'ready'; model: ModelId }
   | { type: 'result'; id: number; mask: Uint8ClampedArray; width: number; height: number }
-  | { type: 'error'; id?: number; model?: ModelId; code: string };
+  | { type: 'error'; id?: number; model?: ModelId; code: string }
+  | { type: 'info'; text: string };
 
 const post = (msg: WorkerResponse, transfer: Transferable[] = []) =>
   (self as unknown as Worker).postMessage(msg, transfer);
@@ -29,6 +30,7 @@ self.onmessage = async (e: MessageEvent<WorkerRequest>) => {
   if (msg.type === 'load') {
     try {
       await loadModel(msg.model, (p) => post({ type: 'progress', model: msg.model, p }));
+      post({ type: 'info', text: loadInfo.get(msg.model) ?? '' });
       post({ type: 'ready', model: msg.model });
     } catch (err) {
       post({ type: 'error', model: msg.model, code: errorCode(err) });
@@ -38,6 +40,7 @@ self.onmessage = async (e: MessageEvent<WorkerRequest>) => {
   try {
     const mask = await computeMask(msg.image, msg.model);
     msg.image.close();
+    post({ type: 'info', text: lastRun });
     post(
       { type: 'result', id: msg.id, mask: mask.data, width: mask.width, height: mask.height },
       [mask.data.buffer],

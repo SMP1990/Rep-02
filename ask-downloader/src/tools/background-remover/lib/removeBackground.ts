@@ -78,11 +78,16 @@ function looksBroken(out: Float32Array): boolean {
   return max - min < 1e-3;
 }
 
+/** Timings of the last photo, for the hidden test mode (testMode.ts). */
+export let lastRun = '';
+
 export async function computeMask(img: ImageBitmap, id: ModelId): Promise<Mask> {
   const m = MODELS[id];
   const loaded = await loadModel(id);
   const size = inputSize(m);
+  const t0 = performance.now();
   const input = toTensor(loaded.ort, img, m, size);
+  const t1 = performance.now();
   let data = await run(loaded, input).catch((err) => {
     if (loaded.backend !== 'webgpu') throw err;
     return null;
@@ -92,5 +97,10 @@ export async function computeMask(img: ImageBitmap, id: ModelId): Promise<Mask> 
     // go through WASM, which matches the reference model.
     data = await run(await fallBackToWasm(id), input);
   }
-  return toMask(data, m, size, img.width, img.height);
+  const t2 = performance.now();
+  const mask = toMask(data, m, size, img.width, img.height);
+  const s = (a: number, b: number) => ((b - a) / 1000).toFixed(1) + 's';
+  lastRun = `${id} photo ${img.width}x${img.height} at ${size}: prepare ${s(t0, t1)}, ` +
+    `model ${s(t1, t2)} (${(await loadModel(id)).backend}), finish ${s(t2, performance.now())}`;
+  return mask;
 }

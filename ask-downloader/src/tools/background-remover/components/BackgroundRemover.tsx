@@ -10,6 +10,8 @@ import Dropzone from './Dropzone';
 import ProgressCard from './ProgressCard';
 import ResultView from './ResultView';
 import ToolError from './ToolError';
+import TestPanel from './TestPanel';
+import { freezeMs, logMemory, resetFreeze, testLog, testMode } from '../lib/testMode';
 
 type State =
   | { phase: 'idle' }
@@ -70,6 +72,8 @@ export default function BackgroundRemover({ t = en }: { t?: Strings }) {
   const runModel = useCallback(async (model: ModelId, live: () => boolean) => {
     const bitmap = kept.current!;
     const { preview, resized } = shown.current;
+    const started = performance.now();
+    resetFreeze();
     setState({ phase: 'loading', model, preview, download: 0 });
     await prepare(model, (p) => live() && setState({ phase: 'loading', model, preview, download: p }));
     if (!live()) return;
@@ -81,6 +85,10 @@ export default function BackgroundRemover({ t = en }: { t?: Strings }) {
     if (model === 'fast') fastMask.current = mask;
     else if (fastMask.current) mask = combineMasks(fastMask.current, mask);
     setState({ phase: 'done', model, preview, image: bitmap, mask, resized });
+    if (testMode) {
+      testLog(`${model} result shown after ${((performance.now() - started) / 1000).toFixed(1)}s, longest freeze ${freezeMs()}ms`);
+      logMemory();
+    }
   }, []);
 
   const process = useCallback(async (f: File) => {
@@ -91,6 +99,7 @@ export default function BackgroundRemover({ t = en }: { t?: Strings }) {
     fastMask.current = null;
     file.current = f;
     const preview = makeUrl(f);
+    testLog(`photo chosen (${(f.size / 1e6).toFixed(1)} MB)`);
     try {
       const { bitmap, resized } = await openImage(f);
       if (!live()) return bitmap.close();
@@ -103,7 +112,10 @@ export default function BackgroundRemover({ t = en }: { t?: Strings }) {
   }, [fail, runModel]);
 
   // Start fetching the fast model while the user is still picking a photo.
+  const warmed = useRef(false);
   const warmUp = useCallback(() => {
+    if (!warmed.current) testLog('download started');
+    warmed.current = true;
     prepare('fast').catch(() => {}); // a real attempt will show any error
   }, []);
 
@@ -114,7 +126,7 @@ export default function BackgroundRemover({ t = en }: { t?: Strings }) {
   useEffect(() => {
     const conn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } })
       .connection;
-    if (conn?.saveData || /2g/.test(conn?.effectiveType ?? '')) return;
+    if (conn?.saveData || /2g/.test(conn?.effectiveType ?? '') || testMode === '2') return;
     let timer = 0;
     const later = () => {
       timer = window.setTimeout(warmUp, 1500);
@@ -217,6 +229,7 @@ export default function BackgroundRemover({ t = en }: { t?: Strings }) {
           }}
         />
       )}
+      {testMode && <TestPanel />}
     </section>
   );
 }

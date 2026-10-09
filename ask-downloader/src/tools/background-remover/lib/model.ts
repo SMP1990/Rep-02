@@ -50,6 +50,9 @@ export interface Loaded {
 }
 
 const loading = new Map<ModelId, Promise<Loaded>>();
+/** How the last load went, for the hidden test mode (testMode.ts). */
+export const loadInfo = new Map<ModelId, string>();
+let cacheHits = 0;
 let runtime: Promise<{ ort: typeof Ort; gpu: boolean }> | null = null;
 
 /** A real graphics chip (software emulation is slower than WASM). */
@@ -99,6 +102,7 @@ async function fetchPart(m: ModelSpec, n: number, onBytes: (n: number) => void):
   const cache = await openCache(m);
   const hit = await cache?.match(key).catch(() => undefined);
   if (hit) {
+    cacheHits++;
     const buf = new Uint8Array(await hit.arrayBuffer());
     onBytes(buf.length);
     return buf;
@@ -150,21 +154,35 @@ export function loadModel(id: ModelId, onProgress?: (p: number) => void): Promis
   if (p) return p;
   const m = MODELS[id];
   p = (async () => {
+    const t0 = performance.now();
     const { ort, gpu } = await loadRuntime();
+    const t1 = performance.now();
+    const hits = cacheHits;
     let got = 0;
     const tick = (n: number) => {
       got += n;
       onProgress?.(Math.min(1, got / m.bytes));
     };
     const bytes = join(await Promise.all(Array.from({ length: m.parts }, (_, n) => fetchPart(m, n, tick))));
+    const t2 = performance.now();
+    const note = (backend: Backend) => {
+      const s = (a: number, b: number) => ((b - a) / 1000).toFixed(1) + 's';
+      loadInfo.set(id, `${id} ready: runtime ${s(t0, t1)}, download ${s(t1, t2)} ` +
+        `(${cacheHits - hits}/${m.parts} from cache), setup ${s(t2, performance.now())}, ` +
+        `${backend}, ${ort.env.wasm.numThreads} threads`);
+    };
     if (gpu) {
       try {
-        return { ort, session: await session(ort, bytes, 'webgpu'), backend: 'webgpu', bytes } as Loaded;
+        const l = { ort, session: await session(ort, bytes, 'webgpu'), backend: 'webgpu', bytes } as Loaded;
+        note('webgpu');
+        return l;
       } catch {
         // this GPU cannot run the model: WASM below
       }
     }
-    return { ort, session: await session(ort, bytes, 'wasm'), backend: 'wasm', bytes: null } as Loaded;
+    const l = { ort, session: await session(ort, bytes, 'wasm'), backend: 'wasm', bytes: null } as Loaded;
+    note('wasm');
+    return l;
   })();
   loading.set(id, p);
   p.catch(() => loading.delete(id)); // let the user retry after a failed download
