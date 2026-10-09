@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Header } from '../components/Header.tsx';
 import { DualToolSection } from '../components/DualToolSection.tsx';
 import { HomeBlogSection } from '../components/HomeBlogSection.tsx';
+import { ToolsSection } from '../components/ToolsSection.tsx';
 import { BlogLanguagesSection } from '../components/BlogLanguagesSection.tsx';
 import { FeaturesSection } from '../components/FeaturesSection.tsx';
 import { HowToGuide } from '../components/HowToGuide.tsx';
@@ -455,6 +456,18 @@ export const PublicHomePage: React.FC = () => {
           />
         </div>
       )}
+
+      {/* 3b. FREE ONLINE TOOLS (tiles; each tool has its own page) */}
+      <motion.section
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-60px' }}
+        transition={{ duration: 0.6 }}
+        id="section-tools" data-gsap-scope
+        className="relative z-10 py-6 max-w-7xl mx-auto w-full"
+      >
+        <ToolsSection />
+      </motion.section>
 
       {/* 4. BLOG & STORIES SECTION (Linked to Backend Dashboard) */}
       <motion.section 

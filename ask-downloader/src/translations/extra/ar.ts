@@ -84,4 +84,15 @@ export const ar: ExtraDict = {
     notFoundTitle: 'الفيديو غير موجود', notFoundMsg: 'ربما حُذف الفيديو أو أن الرابط غير مكتمل.',
     forbiddenTitle: 'تم حظر الوصول', forbiddenMsg: 'حظرت المنصة هذا الطلب. حاول لاحقًا أو برابط آخر.',
   },
+  toolsHub: {
+    badge: 'أدوات مجانية',
+    title: 'أدوات مجانية عبر الإنترنت',
+    subtitle: 'أدوات مفيدة تعمل مباشرة في متصفحك. مجانًا ودون تسجيل.',
+    bgRemoverTitle: 'إزالة الخلفية',
+    bgRemoverDesc: 'أزل خلفية أي صورة في ثوانٍ.',
+    open: 'افتح الأداة',
+    newLabel: 'جديد',
+    comingSoon: 'قريبًا',
+    comingSoonDesc: 'أداة مجانية جديدة في الطريق.',
+  },
 };

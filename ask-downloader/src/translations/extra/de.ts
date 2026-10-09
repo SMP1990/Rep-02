@@ -84,4 +84,15 @@ export const de: ExtraDict = {
     notFoundTitle: 'Video nicht gefunden', notFoundMsg: 'Das Video wurde möglicherweise gelöscht oder der Link ist unvollständig.',
     forbiddenTitle: 'Zugriff blockiert', forbiddenMsg: 'Die Plattform hat diese Anfrage blockiert. Bitte später oder mit einem anderen Link versuchen.',
   },
+  toolsHub: {
+    badge: 'Kostenlose Tools',
+    title: 'Kostenlose Online-Tools',
+    subtitle: 'Praktische Tools, die direkt in deinem Browser laufen. Kostenlos, ohne Anmeldung.',
+    bgRemoverTitle: 'Hintergrund entfernen',
+    bgRemoverDesc: 'Entferne den Hintergrund jedes Fotos in Sekunden.',
+    open: 'Tool öffnen',
+    newLabel: 'Neu',
+    comingSoon: 'Demnächst',
+    comingSoonDesc: 'Ein neues kostenloses Tool ist unterwegs.',
+  },
 };

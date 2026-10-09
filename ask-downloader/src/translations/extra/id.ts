@@ -84,4 +84,15 @@ export const id: ExtraDict = {
     notFoundTitle: 'Video Tidak Ditemukan', notFoundMsg: 'Video mungkin telah dihapus atau tautannya tidak lengkap.',
     forbiddenTitle: 'Akses Diblokir', forbiddenMsg: 'Platform memblokir permintaan ini. Coba lagi nanti atau dengan tautan lain.',
   },
+  toolsHub: {
+    badge: 'Alat gratis',
+    title: 'Alat online gratis',
+    subtitle: 'Alat praktis yang berjalan langsung di browser Anda. Gratis, tanpa daftar.',
+    bgRemoverTitle: 'Penghapus latar belakang',
+    bgRemoverDesc: 'Hapus latar belakang foto apa pun dalam hitungan detik.',
+    open: 'Buka alat',
+    newLabel: 'Baru',
+    comingSoon: 'Segera hadir',
+    comingSoonDesc: 'Alat gratis baru sedang disiapkan.',
+  },
 };

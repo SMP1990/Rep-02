@@ -87,5 +87,16 @@ export const en = {
     notFoundTitle: 'Video Not Found', notFoundMsg: 'The video may have been deleted or the link is incomplete.',
     forbiddenTitle: 'Access Blocked', forbiddenMsg: 'The platform blocked this request. Please try again later or with another link.',
   },
+  toolsHub: {
+    badge: 'Free Tools',
+    title: 'Free Online Tools',
+    subtitle: 'Handy tools that work right in your browser. Free, with no sign-up.',
+    bgRemoverTitle: 'Background Remover',
+    bgRemoverDesc: 'Remove the background from any photo in seconds.',
+    open: 'Open tool',
+    newLabel: 'New',
+    comingSoon: 'Coming soon',
+    comingSoonDesc: 'A new free tool is on its way.',
+  },
 };
 export type ExtraDict = typeof en;

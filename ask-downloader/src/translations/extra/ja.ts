@@ -84,4 +84,15 @@ export const ja: ExtraDict = {
     notFoundTitle: '動画が見つかりません', notFoundMsg: '動画が削除されたか、リンクが不完全な可能性があります。',
     forbiddenTitle: 'アクセスがブロックされました', forbiddenMsg: 'プラットフォームによりブロックされました。時間をおくか別のリンクでお試しください。',
   },
+  toolsHub: {
+    badge: '無料ツール',
+    title: '無料オンラインツール',
+    subtitle: 'ブラウザですぐに使える便利なツール。無料、登録不要です。',
+    bgRemoverTitle: '背景削除',
+    bgRemoverDesc: 'どんな写真の背景も数秒で削除できます。',
+    open: 'ツールを開く',
+    newLabel: '新着',
+    comingSoon: '近日公開',
+    comingSoonDesc: '新しい無料ツールを準備中です。',
+  },
 };

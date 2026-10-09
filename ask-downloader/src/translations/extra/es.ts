@@ -84,4 +84,15 @@ export const es: ExtraDict = {
     notFoundTitle: 'Vídeo no encontrado', notFoundMsg: 'Es posible que el vídeo se haya eliminado o que el enlace esté incompleto.',
     forbiddenTitle: 'Acceso bloqueado', forbiddenMsg: 'La plataforma bloqueó esta solicitud. Inténtalo más tarde o con otro enlace.',
   },
+  toolsHub: {
+    badge: 'Herramientas gratis',
+    title: 'Herramientas online gratuitas',
+    subtitle: 'Herramientas útiles que funcionan en tu navegador. Gratis y sin registro.',
+    bgRemoverTitle: 'Quitar fondo',
+    bgRemoverDesc: 'Elimina el fondo de cualquier foto en segundos.',
+    open: 'Abrir herramienta',
+    newLabel: 'Nuevo',
+    comingSoon: 'Próximamente',
+    comingSoonDesc: 'Una nueva herramienta gratuita está en camino.',
+  },
 };

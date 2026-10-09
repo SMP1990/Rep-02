@@ -84,4 +84,15 @@ export const fr: ExtraDict = {
     notFoundTitle: 'Vidéo introuvable', notFoundMsg: 'La vidéo a peut-être été supprimée ou le lien est incomplet.',
     forbiddenTitle: 'Accès bloqué', forbiddenMsg: 'La plateforme a bloqué cette requête. Réessayez plus tard ou avec un autre lien.',
   },
+  toolsHub: {
+    badge: 'Outils gratuits',
+    title: 'Outils en ligne gratuits',
+    subtitle: 'Des outils pratiques qui fonctionnent dans votre navigateur. Gratuits, sans inscription.',
+    bgRemoverTitle: 'Suppression d\'arrière-plan',
+    bgRemoverDesc: 'Supprimez l\'arrière-plan de n\'importe quelle photo en quelques secondes.',
+    open: 'Ouvrir l\'outil',
+    newLabel: 'Nouveau',
+    comingSoon: 'Bientôt disponible',
+    comingSoonDesc: 'Un nouvel outil gratuit arrive bientôt.',
+  },
 };
