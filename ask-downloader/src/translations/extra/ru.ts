@@ -94,5 +94,9 @@ export const ru: ExtraDict = {
     newLabel: 'Новое',
     comingSoon: 'Скоро',
     comingSoonDesc: 'Новый бесплатный инструмент уже в пути.',
+    swipeHint: 'Проведите, чтобы увидеть больше',
+    prevPage: 'Предыдущие инструменты',
+    nextPage: 'Ещё инструменты',
+    pageDot: 'Страница инструментов {n}',
   },
 };

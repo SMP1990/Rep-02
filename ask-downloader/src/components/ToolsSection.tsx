@@ -1,19 +1,43 @@
-import React from 'react';
-import { ArrowRight, Wand2 } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { ArrowRight, ChevronLeft, ChevronRight, ChevronsRight, Wand2 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext.tsx';
+import { fill } from '../utils/i18n.ts';
 import { TOOL_TILES, type ToolTile } from '../config/tools.ts';
 import { PageLink } from './PageLink';
 
 /**
  * "Free Online Tools" — the tool tiles above "Trending Stories" on the home
  * page. Same card language as the other home sections (white rounded-2xl
- * surface, violet accent, hover lift). 2 columns on phones, 4 from tablets.
- * Plain CSS transitions only: nothing here adds to the page's load.
+ * surface, violet accent, hover lift). Plain CSS only: nothing here adds to
+ * the page's load.
+ *
+ * Phones: pages of 4 tiles (2x2) in a swipeable row with snap, dots and
+ * arrows, so the tiles don't push the rest of the page down. From tablets up
+ * the page wrappers use `display: contents`, so all tiles sit in one 4-column
+ * grid. Same DOM for both: no tile is rendered twice.
  */
+const PER_PAGE = 4;
+const PAGES: ToolTile[][] = [];
+for (let i = 0; i < TOOL_TILES.length; i += PER_PAGE) PAGES.push(TOOL_TILES.slice(i, i + PER_PAGE));
+
 export const ToolsSection: React.FC = () => {
   const { t, currentLangInfo } = useLanguage();
   const rtl = currentLangInfo?.dir === 'rtl';
   const words = t.toolsHub;
+  const scroller = useRef<HTMLDivElement>(null);
+  const [page, setPage] = useState(0);
+
+  // scrollLeft is negative in right-to-left pages, hence abs / the sign.
+  const onScroll = () => {
+    const el = scroller.current;
+    if (el) setPage(Math.round(Math.abs(el.scrollLeft) / el.clientWidth));
+  };
+  const goTo = (i: number) => {
+    const el = scroller.current;
+    if (el) el.scrollTo({ left: (rtl ? -1 : 1) * i * el.clientWidth, behavior: 'smooth' });
+  };
+  const arrowBtn =
+    'w-9 h-9 rounded-full flex items-center justify-center border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#181224] text-[#6d46b8] dark:text-[#d1b9f7] shadow-xs disabled:opacity-35 active:scale-95 transition';
 
   const liveTile = (tool: ToolTile, Icon: ToolTile['icon']) => (
     <PageLink
@@ -69,11 +93,55 @@ export const ToolsSection: React.FC = () => {
         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">{words.title}</h2>
         <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-2 max-w-xl mx-auto">{words.subtitle}</p>
       </div>
-      <ul className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5">
-        {TOOL_TILES.map((tool) => (
-          <li key={tool.id}>{tool.path ? liveTile(tool, tool.icon) : soonTile(tool.icon)}</li>
+      <div
+        ref={scroller}
+        onScroll={onScroll}
+        className="flex overflow-x-auto snap-x snap-mandatory py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:grid md:grid-cols-4 md:gap-5 md:overflow-visible md:py-0"
+      >
+        {PAGES.map((tiles, i) => (
+          <ul
+            key={i}
+            aria-label={fill(words.pageDot, { n: i + 1 })}
+            className="grid grid-cols-2 gap-3 w-full shrink-0 snap-start md:contents"
+          >
+            {tiles.map((tool) => (
+              <li key={tool.id}>{tool.path ? liveTile(tool, tool.icon) : soonTile(tool.icon)}</li>
+            ))}
+          </ul>
         ))}
-      </ul>
+      </div>
+
+      {/* Phone-only pager: swipe hint, arrows and dots. */}
+      {PAGES.length > 1 && (
+        <div className="md:hidden mt-4 flex flex-col items-center gap-3">
+          {page === 0 && (
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#6d46b8] dark:text-[#d1b9f7] bg-[#f1e9fb] dark:bg-[#261b3b] px-3 py-1 rounded-full">
+              <ChevronsRight aria-hidden="true" className={`w-4 h-4 tools-nudge ${rtl ? 'rotate-180' : ''}`} />
+              {words.swipeHint}
+            </span>
+          )}
+          <div className="flex items-center gap-4">
+            <button type="button" className={arrowBtn} onClick={() => goTo(page - 1)} disabled={page === 0} aria-label={words.prevPage}>
+              <ChevronLeft aria-hidden="true" className={`w-5 h-5 ${rtl ? 'rotate-180' : ''}`} />
+            </button>
+            <div className="flex items-center gap-2">
+              {PAGES.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => goTo(i)}
+                  aria-label={fill(words.pageDot, { n: i + 1 })}
+                  aria-current={i === page ? 'true' : undefined}
+                  className={`h-2.5 rounded-full transition-all duration-300 ${i === page ? 'w-6 bg-[#6d46b8] dark:bg-[#d1b9f7]' : 'w-2.5 bg-slate-300 dark:bg-slate-700'}`}
+                />
+              ))}
+            </div>
+            <button type="button" className={arrowBtn} onClick={() => goTo(page + 1)} disabled={page === PAGES.length - 1} aria-label={words.nextPage}>
+              <ChevronRight aria-hidden="true" className={`w-5 h-5 ${rtl ? 'rotate-180' : ''}`} />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

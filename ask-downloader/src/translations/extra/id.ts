@@ -94,5 +94,9 @@ export const id: ExtraDict = {
     newLabel: 'Baru',
     comingSoon: 'Segera hadir',
     comingSoonDesc: 'Alat gratis baru sedang disiapkan.',
+    swipeHint: 'Geser untuk alat lainnya',
+    prevPage: 'Alat sebelumnya',
+    nextPage: 'Alat lainnya',
+    pageDot: 'Halaman alat {n}',
   },
 };

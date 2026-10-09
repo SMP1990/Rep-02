@@ -94,5 +94,9 @@ export const de: ExtraDict = {
     newLabel: 'Neu',
     comingSoon: 'Demnächst',
     comingSoonDesc: 'Ein neues kostenloses Tool ist unterwegs.',
+    swipeHint: 'Wischen für mehr Tools',
+    prevPage: 'Vorherige Tools',
+    nextPage: 'Weitere Tools',
+    pageDot: 'Tool-Seite {n}',
   },
 };

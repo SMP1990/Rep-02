@@ -97,6 +97,10 @@ export const en = {
     newLabel: 'New',
     comingSoon: 'Coming soon',
     comingSoonDesc: 'A new free tool is on its way.',
+    swipeHint: 'Swipe for more tools',
+    prevPage: 'Previous tools',
+    nextPage: 'More tools',
+    pageDot: 'Tools page {n}',
   },
 };
 export type ExtraDict = typeof en;

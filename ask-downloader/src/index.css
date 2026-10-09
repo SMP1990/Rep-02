@@ -454,3 +454,13 @@ html.dark ::-webkit-scrollbar-thumb:hover {
 [lang='ur'].line-clamp-3 {
   line-height: 1.95;
 }
+
+/* Tools section swipe hint (home page, phones). */
+@keyframes tools-nudge {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(4px); }
+}
+.tools-nudge { animation: tools-nudge 1.2s ease-in-out infinite; } /* in RTL the icon's rotate flips this too */
+@media (prefers-reduced-motion: reduce) {
+  .tools-nudge { animation: none; }
+}

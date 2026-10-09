@@ -94,5 +94,9 @@ export const ur: ExtraDict = {
     newLabel: 'نیا',
     comingSoon: 'جلد آ رہا ہے',
     comingSoonDesc: 'ایک نیا مفت ٹول جلد آ رہا ہے۔',
+    swipeHint: 'مزید ٹولز کے لیے سوائپ کریں',
+    prevPage: 'پچھلے ٹولز',
+    nextPage: 'مزید ٹولز',
+    pageDot: 'ٹولز صفحہ {n}',
   },
 };

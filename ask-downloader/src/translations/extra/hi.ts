@@ -94,5 +94,9 @@ export const hi: ExtraDict = {
     newLabel: 'नया',
     comingSoon: 'जल्द आ रहा है',
     comingSoonDesc: 'एक नया मुफ़्त टूल आने वाला है।',
+    swipeHint: 'और टूल्स के लिए स्वाइप करें',
+    prevPage: 'पिछले टूल्स',
+    nextPage: 'और टूल्स',
+    pageDot: 'टूल्स पेज {n}',
   },
 };

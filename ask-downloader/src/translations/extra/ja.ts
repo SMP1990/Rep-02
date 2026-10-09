@@ -94,5 +94,9 @@ export const ja: ExtraDict = {
     newLabel: '新着',
     comingSoon: '近日公開',
     comingSoonDesc: '新しい無料ツールを準備中です。',
+    swipeHint: 'スワイプして他のツールを見る',
+    prevPage: '前のツール',
+    nextPage: '他のツール',
+    pageDot: 'ツール {n} ページ目',
   },
 };
