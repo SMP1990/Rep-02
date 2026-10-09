@@ -18,6 +18,12 @@ branch is deleted.
 **Do not delete these tags.** The live site loads its AI models from GitHub
 through jsDelivr using the two model commits above.
 
+## Backup branch
+
+`backup/tools-v1` is a copy of the work at commit `1ed196e` (same state as
+`tools-v1`, including both model commits in its history). Never merge into it
+or delete it; it only exists so the code can always be found.
+
 ## Folders
 
 | Folder | Contents |
