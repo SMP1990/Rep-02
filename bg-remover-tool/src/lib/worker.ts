@@ -1,6 +1,6 @@
 // Runs the model off the main thread so the page stays smooth while it works.
 import { loadModel } from './model';
-import { computeMask, cutout } from './removeBackground';
+import { computeMask } from './removeBackground';
 
 export type WorkerRequest =
   | { type: 'load' }
@@ -9,7 +9,7 @@ export type WorkerRequest =
 export type WorkerResponse =
   | { type: 'progress'; p: number }
   | { type: 'ready' }
-  | { type: 'result'; id: number; png: Blob; mask: Uint8ClampedArray; width: number; height: number }
+  | { type: 'result'; id: number; mask: Uint8ClampedArray; width: number; height: number }
   | { type: 'error'; id?: number; code: string };
 
 const post = (msg: WorkerResponse, transfer: Transferable[] = []) =>
@@ -35,10 +35,9 @@ self.onmessage = async (e: MessageEvent<WorkerRequest>) => {
   }
   try {
     const mask = await computeMask(msg.image);
-    const png = await cutout(msg.image, mask);
     msg.image.close();
     post(
-      { type: 'result', id: msg.id, png, mask: mask.data, width: mask.width, height: mask.height },
+      { type: 'result', id: msg.id, mask: mask.data, width: mask.width, height: mask.height },
       [mask.data.buffer],
     );
   } catch (err) {

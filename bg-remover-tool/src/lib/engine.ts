@@ -2,7 +2,7 @@
 import type { WorkerRequest, WorkerResponse } from './worker';
 
 export interface Result {
-  png: Blob;
+  /** Alpha mask (0..255), one byte per pixel of the image. */
   mask: Uint8ClampedArray;
   width: number;
   height: number;
@@ -59,7 +59,7 @@ export function prepare(onProgress?: (p: number) => void): Promise<void> {
   return p;
 }
 
-/** Removes the background; the bitmap is handed to the worker (and closed). */
+/** Makes the mask; the bitmap is handed to the worker (and closed there). */
 export async function removeBackground(image: ImageBitmap): Promise<Result> {
   await prepare();
   const id = nextId++;

@@ -65,14 +65,3 @@ export async function computeMask(img: ImageBitmap): Promise<Mask> {
   const data = (await results[session.outputNames[0]].getData()) as Float32Array;
   return toMask(data, img.width, img.height);
 }
-
-/** Photo with the mask as its alpha channel, as a transparent PNG blob. */
-export async function cutout(img: ImageBitmap, mask: Mask): Promise<Blob> {
-  const c = new OffscreenCanvas(img.width, img.height);
-  const ctx = c.getContext('2d')!;
-  ctx.drawImage(img, 0, 0);
-  const px = ctx.getImageData(0, 0, img.width, img.height);
-  for (let i = 0; i < mask.data.length; i++) px.data[i * 4 + 3] = mask.data[i];
-  ctx.putImageData(px, 0, 0);
-  return c.convertToBlob({ type: 'image/png' });
-}

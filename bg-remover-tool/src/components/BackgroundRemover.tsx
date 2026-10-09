@@ -12,14 +12,14 @@ type State =
   | { phase: 'idle' }
   | { phase: 'loading'; preview: string; download: number }
   | { phase: 'processing'; preview: string }
-  | { phase: 'done'; preview: string; result: string; width: number; height: number; resized: boolean }
+  | { phase: 'done'; preview: string; image: ImageBitmap; mask: Uint8ClampedArray; resized: boolean }
   | { phase: 'error'; code: ErrorCode };
 
 const RETRY_SAME_FILE: ErrorCode[] = ['model-download-failed', 'processing-failed', 'out-of-memory'];
 
 function outName(file: File): string {
   const base = file.name.replace(/\.[^.]+$/, '') || 'image';
-  return `${base}-no-background.png`;
+  return `${base}-no-background`;
 }
 
 export default function BackgroundRemover({ t = en }: { t?: Strings }) {
@@ -27,6 +27,12 @@ export default function BackgroundRemover({ t = en }: { t?: Strings }) {
   const file = useRef<File | null>(null);
   const run = useRef(0); // ignores results of a run the user has left
   const urls = useRef<string[]>([]);
+  const kept = useRef<ImageBitmap | null>(null); // the photo shown in the result
+
+  const freeImage = () => {
+    kept.current?.close();
+    kept.current = null;
+  };
 
   const freeUrls = () => {
     urls.current.forEach((u) => URL.revokeObjectURL(u));
@@ -42,18 +48,21 @@ export default function BackgroundRemover({ t = en }: { t?: Strings }) {
     const id = ++run.current;
     const live = () => id === run.current;
     freeUrls();
+    freeImage();
     file.current = f;
     const preview = makeUrl(f);
     try {
       const { bitmap, resized } = await openImage(f);
+      if (!live()) return bitmap.close();
+      kept.current = bitmap; // closed by freeImage(), whatever happens next
       setState({ phase: 'loading', preview, download: 0 });
       await prepare((p) => live() && setState({ phase: 'loading', preview, download: p }));
-      if (!live()) return bitmap.close();
-      setState({ phase: 'processing', preview });
-      const { width, height } = bitmap;
-      const res = await removeBackground(bitmap);
       if (!live()) return;
-      setState({ phase: 'done', preview, result: makeUrl(res.png), width, height, resized });
+      setState({ phase: 'processing', preview });
+      // The worker gets its own copy; this one stays for editing and export.
+      const res = await removeBackground(await createImageBitmap(bitmap));
+      if (!live()) return;
+      setState({ phase: 'done', preview, image: bitmap, mask: res.mask, resized });
     } catch (err) {
       if (!live()) return;
       const code = err instanceof EngineError ? (err.message as ErrorCode) : 'processing-failed';
@@ -64,6 +73,7 @@ export default function BackgroundRemover({ t = en }: { t?: Strings }) {
   const reset = () => {
     run.current++;
     freeUrls();
+    freeImage();
     file.current = null;
     setState({ phase: 'idle' });
   };
@@ -79,7 +89,13 @@ export default function BackgroundRemover({ t = en }: { t?: Strings }) {
     return () => window.removeEventListener('paste', onPaste);
   }, [state.phase, process]);
 
-  useEffect(() => () => freeUrls(), []);
+  useEffect(
+    () => () => {
+      freeUrls();
+      freeImage();
+    },
+    [],
+  );
 
   return (
     <section className="mx-auto w-full max-w-3xl px-4" aria-label={t.title}>
@@ -89,10 +105,9 @@ export default function BackgroundRemover({ t = en }: { t?: Strings }) {
       {state.phase === 'done' && (
         <ResultView
           t={t}
+          image={state.image}
+          mask={state.mask}
           before={state.preview}
-          after={state.result}
-          width={state.width}
-          height={state.height}
           resized={state.resized}
           fileName={outName(file.current!)}
           onReset={reset}
