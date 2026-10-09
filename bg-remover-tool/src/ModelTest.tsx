@@ -12,12 +12,12 @@ export default function ModelTest() {
   async function onFile(file: File) {
     try {
       let t = performance.now();
-      const { backend } = await loadModel();
-      add(`model ready on ${backend} in ${Math.round(performance.now() - t)}ms`);
+      await loadModel((p) => p === 1 && add('model downloaded'));
+      add(`model ready in ${Math.round(performance.now() - t)}ms`);
       const img = await createImageBitmap(file);
       t = performance.now();
       const mask = await computeMask(img);
-      add(`[${(await loadModel()).backend}] mask ${img.width}x${img.height} in ${Math.round(performance.now() - t)}ms`);
+      add(`mask ${img.width}x${img.height} in ${Math.round(performance.now() - t)}ms`);
       const blob = await cutout(img, mask);
       setResult(URL.createObjectURL(blob));
       add('done');

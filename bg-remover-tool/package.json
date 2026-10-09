@@ -4,15 +4,13 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "predev": "node scripts/copy-ort.mjs",
     "dev": "vite",
-    "prebuild": "node scripts/copy-ort.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "onnxruntime-web": "^1.30.0",
+    "onnxruntime-web": "1.30.0",
     "react": "^19.0.1",
     "react-dom": "^19.0.1"
   },

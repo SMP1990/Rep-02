@@ -1,6 +1,6 @@
 // Image -> alpha mask with ISNet, all inside the browser.
-import * as ort from 'onnxruntime-web';
-import { fallBackToWasm, loadModel, MODEL_SIZE } from './model';
+import type * as Ort from 'onnxruntime-web';
+import { loadModel, MODEL_SIZE } from './model';
 
 /** Grayscale mask (0..255), same size as the source image. */
 export interface Mask {
@@ -9,7 +9,7 @@ export interface Mask {
   data: Uint8ClampedArray;
 }
 
-function toTensor(img: CanvasImageSource): ort.Tensor {
+function toTensor(ort: typeof Ort, img: CanvasImageSource): Ort.Tensor {
   const S = MODEL_SIZE;
   const canvas = new OffscreenCanvas(S, S);
   const ctx = canvas.getContext('2d')!;
@@ -59,36 +59,10 @@ function toMask(out: Float32Array, width: number, height: number): Mask {
   return { width, height, data };
 }
 
-async function run(session: ort.InferenceSession, input: ort.Tensor) {
-  const results = await session.run({ [session.inputNames[0]]: input });
-  return (await results[session.outputNames[0]].getData()) as Float32Array;
-}
-
-/** A blank or broken result (all one value, or NaN) means the GPU misbehaved. */
-function looksBroken(out: Float32Array): boolean {
-  let min = Infinity;
-  let max = -Infinity;
-  for (let i = 0; i < out.length; i++) {
-    const v = out[i];
-    if (Number.isNaN(v)) return true;
-    if (v < min) min = v;
-    if (v > max) max = v;
-  }
-  return max - min < 1e-3;
-}
-
 export async function computeMask(img: ImageBitmap): Promise<Mask> {
-  const loaded = await loadModel();
-  const input = toTensor(img);
-  let data = await run(loaded.session, input).catch((err) => {
-    if (loaded.backend !== 'webgpu') throw err;
-    return null;
-  });
-  if (!data || (loaded.backend === 'webgpu' && looksBroken(data))) {
-    // GPU error or a silently blank result: finish this photo (and later
-    // ones) on WASM, which gives the same result as the reference model.
-    data = await run((await fallBackToWasm()).session, input);
-  }
+  const { ort, session } = await loadModel();
+  const results = await session.run({ [session.inputNames[0]]: toTensor(ort, img) });
+  const data = (await results[session.outputNames[0]].getData()) as Float32Array;
   return toMask(data, img.width, img.height);
 }
 

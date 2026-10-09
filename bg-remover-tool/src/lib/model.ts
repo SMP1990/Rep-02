@@ -1,85 +1,107 @@
-// Loads the ISNet model once, on WebGPU when the browser has it, else WASM.
-import * as ort from 'onnxruntime-web';
+// Loads the ONNX runtime and the ISNet model from public CDNs, once.
+// Nothing heavy is bundled with the site: the app code stays small and the
+// ~47MB model and ~14MB runtime come only when someone uses the tool.
+import type * as Ort from 'onnxruntime-web';
 
-export const MODEL_URL = '/models/isnet-general-use.fp16.onnx';
 export const MODEL_SIZE = 1024; // ISNet works on a 1024x1024 input
 
-// Runtime files live in public/ort (see scripts/copy-ort.mjs).
-ort.env.wasm.wasmPaths = '/ort/';
+const ORT_VERSION = '1.30.0'; // keep equal to package.json
+// Commit that holds bg-remover-tool/model (made by scripts/prepare_model.py).
+const MODEL_COMMIT = 'f971bc30cfafb16e2a61650d4908f0cacfe0b3fb';
+const MODEL_PARTS = 3;
+const MODEL_BYTES = 46787316;
+const CACHE_NAME = `bg-remover-${MODEL_COMMIT.slice(0, 8)}`;
 
-export type Backend = 'webgpu' | 'wasm';
+const env = import.meta.env;
+const ORT_URL: string =
+  env.VITE_ORT_URL ||
+  `https://cdn.jsdelivr.net/npm/onnxruntime-web@${ORT_VERSION}/dist/ort.wasm.min.mjs`;
+// Same files from two hosts: jsDelivr first, GitHub raw if it fails.
+const MODEL_HOSTS: string[] = env.VITE_MODEL_BASE
+  ? [env.VITE_MODEL_BASE]
+  : [
+      `https://cdn.jsdelivr.net/gh/SMP1990/Rep-02@${MODEL_COMMIT}/bg-remover-tool/model/`,
+      `https://raw.githubusercontent.com/SMP1990/Rep-02/${MODEL_COMMIT}/bg-remover-tool/model/`,
+    ];
 
 export interface Loaded {
-  session: ort.InferenceSession;
-  backend: Backend;
-  model: Uint8Array;
+  ort: typeof Ort;
+  session: Ort.InferenceSession;
 }
 
 let loading: Promise<Loaded> | null = null;
 
-async function hasWebGPU(): Promise<boolean> {
-  const gpu = (navigator as Navigator & { gpu?: { requestAdapter(): Promise<unknown> } }).gpu;
-  if (!gpu) return false;
+async function openCache(): Promise<Cache | null> {
   try {
-    return (await gpu.requestAdapter()) != null;
+    return await caches.open(CACHE_NAME);
   } catch {
-    return false;
+    return null; // private mode or no Cache API: just download each time
   }
 }
 
-async function create(backend: Backend, model: Uint8Array): Promise<Loaded> {
-  const session = await ort.InferenceSession.create(model, {
-    executionProviders: [backend],
-    graphOptimizationLevel: 'all',
-  });
-  return { session, backend, model };
+/** One model part, from the browser cache or the first host that answers. */
+async function fetchPart(n: number, onBytes: (n: number) => void): Promise<Uint8Array> {
+  const file = `isnet.part${n}`;
+  const cache = await openCache();
+  const hit = await cache?.match(file);
+  if (hit) {
+    const buf = new Uint8Array(await hit.arrayBuffer());
+    onBytes(buf.length);
+    return buf;
+  }
+  for (const host of MODEL_HOSTS) {
+    try {
+      const res = await fetch(host + file);
+      if (!res.ok || !res.body) continue;
+      const reader = res.body.getReader();
+      const chunks: Uint8Array[] = [];
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        onBytes(value.length);
+      }
+      const buf = join(chunks);
+      cache?.put(file, new Response(buf)).catch(() => {});
+      return buf;
+    } catch {
+      // network error: try the next host
+    }
+  }
+  throw new Error('model-download-failed');
 }
 
-/** Called when a WebGPU run fails: rebuild the session on WASM for good. */
-export function fallBackToWasm(): Promise<Loaded> {
-  const prev = loading!;
-  loading = prev.then(async (l) => {
-    if (l.backend === 'wasm') return l;
-    await l.session.release().catch(() => {});
-    return create('wasm', l.model);
-  });
-  return loading;
+function join(chunks: Uint8Array[]): Uint8Array {
+  const out = new Uint8Array(chunks.reduce((s, c) => s + c.length, 0));
+  let off = 0;
+  for (const c of chunks) {
+    out.set(c, off);
+    off += c.length;
+  }
+  return out;
 }
 
-/** Downloads the model with progress (0..1) and keeps one shared session. */
-export function loadModel(onProgress?: (p: number) => void) {
+/** Downloads (or reads from cache) everything; progress goes 0..1. */
+export function loadModel(onProgress?: (p: number) => void): Promise<Loaded> {
   loading ??= (async () => {
-    const res = await fetch(MODEL_URL);
-    if (!res.ok || !res.body) throw new Error('model-download-failed');
-    const total = Number(res.headers.get('content-length')) || 0;
-    const reader = res.body.getReader();
-    const chunks: Uint8Array[] = [];
-    let got = 0;
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      chunks.push(value);
-      got += value.length;
-      if (total) onProgress?.(got / total);
-    }
-    const model = new Uint8Array(got);
-    let off = 0;
-    for (const c of chunks) {
-      model.set(c, off);
-      off += c.length;
-    }
-    // Multi-threaded WASM only works when the page is cross-origin isolated.
+    const ort = (await import(/* @vite-ignore */ ORT_URL)) as typeof Ort;
+    // Threads only work when the page is cross-origin isolated.
     ort.env.wasm.numThreads = self.crossOriginIsolated
       ? Math.min(4, navigator.hardwareConcurrency || 1)
       : 1;
-    if (await hasWebGPU()) {
-      try {
-        return await create('webgpu', model);
-      } catch {
-        // Some GPUs fail to compile the graph: fall back to WASM below.
-      }
-    }
-    return create('wasm', model);
+    let got = 0;
+    const tick = (n: number) => {
+      got += n;
+      onProgress?.(Math.min(1, got / MODEL_BYTES));
+    };
+    const parts = await Promise.all(
+      Array.from({ length: MODEL_PARTS }, (_, n) => fetchPart(n, tick)),
+    );
+    const session = await ort.InferenceSession.create(join(parts), {
+      executionProviders: ['wasm'],
+      graphOptimizationLevel: 'all',
+    });
+    return { ort, session };
   })();
   loading.catch(() => {
     loading = null; // let the user retry after a failed download
