@@ -1,1 +1,43 @@
 @import "tailwindcss";
+
+/* Same setup as the site: dark mode follows .dark on <html>. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    color: #2e2440;
+  }
+  html.dark body {
+    color: #f4eefb;
+  }
+  .font-heading {
+    font-family: 'Fraunces', serif;
+  }
+}
+
+/* Tool styles: these move to the site's index.css when the tool joins. */
+.checkerboard {
+  background-color: #ffffff;
+  background-image: conic-gradient(#e9e3f1 25%, transparent 0 50%, #e9e3f1 0 75%, transparent 0);
+  background-size: 20px 20px;
+}
+html.dark .checkerboard {
+  background-color: #2a2238;
+  background-image: conic-gradient(#352c46 25%, transparent 0 50%, #352c46 0 75%, transparent 0);
+}
+
+.scan-line {
+  animation: scan 1.8s ease-in-out infinite;
+}
+@keyframes scan {
+  0% { top: -33%; }
+  100% { top: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scan-line { animation: none; display: none; }
+}
