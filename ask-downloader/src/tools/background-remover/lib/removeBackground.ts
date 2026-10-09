@@ -84,7 +84,7 @@ export let lastRun = '';
 export async function computeMask(img: ImageBitmap, id: ModelId): Promise<Mask> {
   const m = MODELS[id];
   const loaded = await loadModel(id);
-  const size = inputSize(m);
+  const size = inputSize(m, loaded.backend === 'webgpu');
   const t0 = performance.now();
   const input = toTensor(loaded.ort, img, m, size);
   const t1 = performance.now();

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Sparkles } from 'lucide-react';
 import type { Strings } from '../i18n/en';
-import { inputSize, MODELS, type ModelId } from '../lib/models';
+import { isPhone, type ModelId } from '../lib/models';
 
 interface Props {
   t: Strings;
@@ -18,7 +18,7 @@ const DOWNLOAD_SHARE = 70;
 const took: Partial<Record<ModelId, number>> = {};
 
 function expectedSeconds(model: ModelId): number {
-  const phone = inputSize(MODELS.fast) !== MODELS.fast.size;
+  const phone = isPhone();
   return took[model] ?? (model === 'hd' ? (phone ? 8 : 3) : phone ? 13 : 4);
 }
 

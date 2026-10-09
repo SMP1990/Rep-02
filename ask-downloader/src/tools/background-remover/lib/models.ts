@@ -14,8 +14,8 @@ export interface ModelSpec {
   bytes: number;
   /** Square input size the model works at. */
   size: number;
-  /** Smaller size for phones: less work and memory (see phoneSize()). */
-  phoneSize?: number;
+  /** Smaller size for phones and slow computers (see inputSize()). */
+  smallSize?: number;
   /** How the photo is turned into numbers for this model. */
   mean: [number, number, number];
   std: [number, number, number];
@@ -36,7 +36,7 @@ export const MODELS: Record<ModelId, ModelSpec> = {
     size: 1024,
     // 2.7x faster than 1024 and close in quality on the test photos
     // (512 was measured too: it brings parts of the background back).
-    phoneSize: 768,
+    smallSize: 768,
     mean: [0.5, 0.5, 0.5],
     std: [1, 1, 1],
     scaleByMax: true,
@@ -57,12 +57,18 @@ export const MODELS: Record<ModelId, ModelSpec> = {
   },
 };
 
-/** Phones and low-memory devices: at 1024 the fast model needs more memory
- *  than many phones give a tab, and takes over a minute on their CPUs. */
-export function inputSize(m: ModelSpec): number {
-  if (!m.phoneSize) return m.size;
-  const nav = navigator as Navigator & { userAgentData?: { mobile?: boolean }; deviceMemory?: number };
-  const phone = nav.userAgentData?.mobile || /Android|iPhone|iPad|iPod|Mobi/i.test(nav.userAgent);
-  const lowMemory = nav.deviceMemory !== undefined && nav.deviceMemory <= 4;
-  return phone || lowMemory ? m.phoneSize : m.size;
+export function isPhone(): boolean {
+  const nav = navigator as Navigator & { userAgentData?: { mobile?: boolean } };
+  return !!nav.userAgentData?.mobile || /Android|iPhone|iPad|iPod|Mobi/i.test(nav.userAgent);
+}
+
+/** Size the model works at. On the CPU, phones, low-memory devices and
+ *  computers with 4 cores or fewer use the small size: measured on a 4GB
+ *  Android phone (13s at 768) and a 4-core laptop (21s at 1024). A real
+ *  graphics chip keeps the full size. */
+export function inputSize(m: ModelSpec, onGpu = false): number {
+  if (!m.smallSize || onGpu) return m.size;
+  const mem = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
+  const slow = isPhone() || (mem !== undefined && mem <= 4) || (navigator.hardwareConcurrency || 4) <= 4;
+  return slow ? m.smallSize : m.size;
 }

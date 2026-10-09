@@ -2,7 +2,7 @@
 // Nothing heavy is bundled with the site: the app code stays small and the
 // model and runtime come only when someone uses the tool.
 import type * as Ort from 'onnxruntime-web';
-import { MODELS, type ModelId, type ModelSpec } from './models';
+import { isPhone, MODELS, type ModelId, type ModelSpec } from './models';
 
 const ORT_VERSION = '1.30.0'; // keep equal to package.json
 // Same files on two npm CDNs: jsDelivr first, unpkg if it is unreachable.
@@ -55,8 +55,11 @@ export const loadInfo = new Map<ModelId, string>();
 let cacheHits = 0;
 let runtime: Promise<{ ort: typeof Ort; gpu: boolean }> | null = null;
 
-/** A real graphics chip (software emulation is slower than WASM). */
+/** A real graphics chip (software emulation is slower than WASM). Never on
+ *  phones: measured on a 4GB Android phone, the GPU took 12s to set up,
+ *  gave a broken result, and froze the whole screen for 8s. */
 async function realGpu(): Promise<boolean> {
+  if (isPhone()) return false;
   type Adapter = { info?: { architecture?: string; vendor?: string }; isFallbackAdapter?: boolean };
   const gpu = (navigator as Navigator & { gpu?: { requestAdapter(): Promise<Adapter | null> } }).gpu;
   if (!gpu) return false;
