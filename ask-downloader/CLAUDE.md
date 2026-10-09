@@ -74,6 +74,9 @@ Env vars (Hostinger panel): `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `DB_HOST`, `DB_PORT
     `dailymotionExtractor.ts`, `extractorCommon.ts`, `ytdlp.ts`, `mux.ts`
   - `store.ts` — JSON file storage (data folder). `redirects.ts` — 301 table.
     `media.ts` — Media Library + ALT edits. `analytics.ts` — GA4. `uploads.ts` — image upload (WebP, descriptive names).
+  - `bgRemover.ts` + `bgWorker.ts` + `bgRoutes.ts` — Background Remover on the server (worker thread,
+    one photo at a time). Needs the optional `onnxruntime-node` (CPU only via `.npmrc`); without it
+    the tool page falls back to running the model in the browser.
 - `src/pages/` — public pages (`Public*`, `AboutUsPage`, legal pages, `NotFoundPage`)
   and admin pages (`BlogManagerPage`, `MediaLibraryPage`, `RedirectsPage`, `SettingsPage`, …).
 - `src/components/` — UI. `Seo.tsx` sets title/meta/OG/canonical/JSON-LD on every page.

@@ -37,6 +37,7 @@ import { buildMediaList, applyAltChanges } from './server/media.ts';
 import { LEGAL_TEXT_DATE } from './src/config/legal.ts';
 import { syncPageTranslations, readTranslations, translationsForEditor, saveTranslationEdits } from './server/pageTranslations.ts';
 import { gaId, GA_CSP, gaHeadTags, gaInitScript } from './server/analytics.ts';
+import { registerBgRoutes, prefetchBgModels } from './server/bgRoutes.ts';
 import { addRedirect, findRedirect, clearRedirectFrom, listRedirects, deleteRedirect, normalizePath, normalizeTarget, isProtectedPath, setOwnHost } from './server/redirects.ts';
 
 const app = express();
@@ -601,6 +602,9 @@ app.use((req: Request, res: Response, next: Function): any => {
 });
 
 app.use('/api/', rateLimiter);
+
+// Background Remover on the server (server/bgRemover.ts).
+registerBgRoutes(app);
 
 /**
  * Health check endpoint
@@ -2553,7 +2557,7 @@ function getRouteMeta(pathname: string, isAdmin = false): RouteMeta {
     },
     '/background-remover': {
       title: `Background Remover - Free, No Sign-up - ${SEO_SITE_NAME}`,
-      description: 'Remove the background from any photo in seconds, right in your browser. Free, no sign-up, no watermark. Your photo never leaves your device.',
+      description: 'Remove the background from any photo in seconds. Free, no sign-up, no watermark. Photos are deleted right away, never stored.',
     },
     '/about-us': {
       title: `About Us - ${SEO_SITE_NAME}`,
@@ -2967,6 +2971,7 @@ async function startServer() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
+    prefetchBgModels();
     console.log(`ASK Downloader Server listening on http://0.0.0.0:${PORT}`);
     findFfmpeg().then((p) => console.log(`[startup] ffmpeg: ${p || 'NOT runnable'}`));
     getYtdlp().then(() => console.log(`[startup] yt-dlp: ${ytdlpStatus().note}`));

@@ -4,6 +4,7 @@ import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { en, type ErrorCode, type Strings } from '../i18n/en';
 import { prepare, removeBackground, ToolError as EngineError } from '../lib/engine';
 import { combineMasks } from '../lib/combine';
+import { serverAvailable, serverMask } from '../lib/serverEngine';
 import { openImage } from '../lib/image';
 import type { ModelId } from '../lib/models';
 import Dropzone from './Dropzone';
@@ -74,14 +75,22 @@ export default function BackgroundRemover({ t = en }: { t?: Strings }) {
     const { preview, resized } = shown.current;
     const started = performance.now();
     resetFreeze();
-    setState({ phase: 'loading', model, preview, download: 0 });
-    await prepare(model, (p) => live() && setState({ phase: 'loading', model, preview, download: p }));
-    if (!live()) return;
-    setState({ phase: 'processing', model, preview });
-    // The worker gets its own copy; this one stays for editing and export.
-    const res = await removeBackground(await createImageBitmap(bitmap), model);
-    if (!live()) return;
-    let mask = res.mask;
+    let mask: Uint8ClampedArray | null = null;
+    if (await serverAvailable()) {
+      setState({ phase: 'processing', model, preview });
+      mask = await serverMask(bitmap, model);
+      if (!live()) return;
+      testLog(mask ? `${model} done on the server` : `${model}: server could not, using the browser`);
+    }
+    if (!mask) {
+      setState({ phase: 'loading', model, preview, download: 0 });
+      await prepare(model, (p) => live() && setState({ phase: 'loading', model, preview, download: p }));
+      if (!live()) return;
+      setState({ phase: 'processing', model, preview });
+      // The worker gets its own copy; this one stays for editing and export.
+      mask = (await removeBackground(await createImageBitmap(bitmap), model)).mask;
+      if (!live()) return;
+    }
     if (model === 'fast') fastMask.current = mask;
     else if (fastMask.current) mask = combineMasks(fastMask.current, mask);
     setState({ phase: 'done', model, preview, image: bitmap, mask, resized });
@@ -112,11 +121,15 @@ export default function BackgroundRemover({ t = en }: { t?: Strings }) {
   }, [fail, runModel]);
 
   // Start fetching the fast model while the user is still picking a photo.
+  // (Only when the server cannot do the work: then the browser needs the model.)
   const warmed = useRef(false);
   const warmUp = useCallback(() => {
-    if (!warmed.current) testLog('download started');
-    warmed.current = true;
-    prepare('fast').catch(() => {}); // a real attempt will show any error
+    serverAvailable().then((server) => {
+      if (server) return;
+      if (!warmed.current) testLog('download started');
+      warmed.current = true;
+      prepare('fast').catch(() => {}); // a real attempt will show any error
+    });
   }, []);
 
   // Whoever opens this page has come to use it: fetch the fast model in the

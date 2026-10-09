@@ -27,6 +27,15 @@ through jsDelivr using the two model commits above.
 
 These commits are in the history of the protected branches, so they stay.
 
+## Where the Background Remover runs
+
+On the server first (`ask-downloader/server/bgRemover.ts`, model in a worker
+thread, one photo at a time, 768px): visitors download nothing big and
+phones are as fast as computers. The server fetches the model files from the
+commits above into its data folder on its own. If the host cannot install
+`onnxruntime-node`, or the server is busy, the page runs the model in the
+visitor's browser instead (the older way), so the tool always works.
+
 ## Backup branch
 
 `backup/tools-v1` is a copy of the work at commit `1ed196e` (same state as
