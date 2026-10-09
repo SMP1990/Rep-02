@@ -14,18 +14,15 @@ export const en = {
   formats: 'JPG, PNG or WEBP, up to {n} MB',
 
   loadingTitle: 'Getting our system ready…',
-  loadingFirstTime: 'First time only: about {n} MB. Next time it opens instantly.',
   processingTitle: 'Removing the background…',
   processingHint: 'This can take a few seconds on phones.',
   hdLoadingTitle: 'Getting the deeper check ready…',
-  hdLoadingNote: 'First time only: about {n} MB. Next time it starts right away.',
   hdProcessingTitle: 'Taking a closer look…',
   hdProcessingHint: 'Our system is checking the whole picture again.',
 
   betterButton: 'Need better results?',
-  betterHint: 'Our system checks the photo a second time, more closely, and brings back missing parts, like a cut-off body or arm (about {n} MB to download the first time).',
+  betterHint: 'Our system checks the photo a second time, more closely, and brings back missing parts, like a cut-off body or arm.',
   betterDone: 'Checked twice for the best result.',
-  seconds: '{n}s',
 
   before: 'Before',
   after: 'After',

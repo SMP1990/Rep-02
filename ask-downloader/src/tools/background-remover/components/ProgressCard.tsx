@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Sparkles } from 'lucide-react';
-import { fill, type Strings } from '../i18n/en';
-import { downloadMb, type ModelId } from '../lib/models';
+import type { Strings } from '../i18n/en';
+import { inputSize, MODELS, type ModelId } from '../lib/models';
 
 interface Props {
   t: Strings;
@@ -11,19 +11,47 @@ interface Props {
   model: ModelId;
 }
 
+/** Share of the bar used by the first-time download. */
+const DOWNLOAD_SHARE = 70;
+
+// Seconds the last photo took on this device, per model: paces the bar.
+const took: Partial<Record<ModelId, number>> = {};
+
+function expectedSeconds(model: ModelId): number {
+  const phone = inputSize(MODELS.fast) !== MODELS.fast.size;
+  return took[model] ?? (model === 'hd' ? (phone ? 8 : 3) : phone ? 13 : 4);
+}
+
+/** One bar for the whole wait. The download reports real progress; the
+ *  model itself cannot, so the bar then eases toward 99% over the time a
+ *  photo usually takes, and the result replaces it when it is ready. */
 export default function ProgressCard({ t, download, preview, model }: Props) {
   const hd = model === 'hd';
-  const [seconds, setSeconds] = useState(0);
   const processing = download === null;
+  const [pct, setPct] = useState(0);
+  const shown = useRef(0);
+  shown.current = pct;
+
+  useEffect(() => {
+    if (download !== null) setPct((p) => Math.max(p, Math.round(download * DOWNLOAD_SHARE)));
+  }, [download]);
 
   useEffect(() => {
     if (!processing) return;
-    setSeconds(0);
-    const timer = setInterval(() => setSeconds((s) => s + 1), 1000);
-    return () => clearInterval(timer);
+    const from = shown.current;
+    const start = performance.now();
+    const tau = expectedSeconds(model) / 2.5; // ~92% at the expected time
+    const timer = setInterval(() => {
+      const s = (performance.now() - start) / 1000;
+      setPct(Math.round(from + (99 - from) * (1 - Math.exp(-s / tau))));
+    }, 200);
+    return () => {
+      clearInterval(timer);
+      took[model] = (performance.now() - start) / 1000;
+    };
   }, [processing, model]);
 
-  const pct = Math.round((download ?? 0) * 100);
+  const title = processing ? (hd ? t.hdProcessingTitle : t.processingTitle) : hd ? t.hdLoadingTitle : t.loadingTitle;
   return (
     <div className="rounded-3xl bg-white/90 p-6 sm:p-8 shadow-xl shadow-[#6d46b8]/10 dark:bg-[#17112a]">
       <div className="relative mx-auto mb-6 w-fit overflow-hidden rounded-2xl">
@@ -33,34 +61,26 @@ export default function ProgressCard({ t, download, preview, model }: Props) {
       <div className="flex items-center justify-center gap-2 text-[#4b2e83] dark:text-[#d1b9f7]">
         <Sparkles className="h-5 w-5 animate-pulse" />
         <p className="font-heading text-lg font-bold" role="status" aria-live="polite">
-          {processing ? (hd ? t.hdProcessingTitle : t.processingTitle) : hd ? t.hdLoadingTitle : t.loadingTitle}
+          {title}
         </p>
       </div>
-      {processing ? (
-        <p className="mt-2 text-center text-sm text-slate-500 dark:text-slate-400">
-          {hd ? t.hdProcessingHint : t.processingHint} <span className="tabular-nums">{fill(t.seconds, { n: seconds })}</span>
-        </p>
-      ) : (
-        <>
-          <div
-            className="mx-auto mt-4 h-2.5 max-w-sm overflow-hidden rounded-full bg-[#f1e9fb] dark:bg-[#261b3b]"
-            role="progressbar"
-            aria-label={hd ? t.hdLoadingTitle : t.loadingTitle}
-            aria-valuenow={pct}
-            aria-valuemin={0}
-            aria-valuemax={100}
-          >
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-[#4b2e83] via-[#6d46b8] to-[#e6799f] transition-[width] duration-300"
-              style={{ width: `${pct}%` }}
-            />
-          </div>
-          <p className="mt-2 text-center text-sm text-slate-500 dark:text-slate-400">
-            <span className="font-semibold tabular-nums">{pct}%</span> ·{' '}
-            {fill(hd ? t.hdLoadingNote : t.loadingFirstTime, { n: downloadMb(model) })}
-          </p>
-        </>
-      )}
+      <div
+        className="mx-auto mt-4 h-2.5 max-w-sm overflow-hidden rounded-full bg-[#f1e9fb] dark:bg-[#261b3b]"
+        role="progressbar"
+        aria-label={title}
+        aria-valuenow={pct}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-[#4b2e83] via-[#6d46b8] to-[#e6799f] transition-[width] duration-300"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      <p className="mt-2 text-center text-sm text-slate-500 dark:text-slate-400">
+        <span className="font-semibold tabular-nums">{pct}%</span>
+        {processing && <> · {hd ? t.hdProcessingHint : t.processingHint}</>}
+      </p>
     </div>
   );
 }

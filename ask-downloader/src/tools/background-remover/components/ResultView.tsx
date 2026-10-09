@@ -4,7 +4,6 @@ import { AlertTriangle, BadgeCheck, Brush, Download, Info, Loader2, RotateCcw, S
 import { fill, type ErrorCode, type Strings } from '../i18n/en';
 import { exportImage, type Background, type Stroke } from '../lib/compose';
 import { MAX_FILE_MB } from '../lib/image';
-import { downloadMb } from '../lib/models';
 import { Preview } from '../lib/preview';
 import BackgroundPicker from './BackgroundPicker';
 import CompareSlider from './CompareSlider';
@@ -129,7 +128,7 @@ export default function ResultView({ t, image, mask, before, resized, fileName, 
                 {t.betterButton}
               </button>
               <p className="max-w-md text-xs text-amber-900/80 dark:text-amber-200/80">
-                {fill(t.betterHint, { n: downloadMb('hd') })}
+                {t.betterHint}
               </p>
             </div>
           )}

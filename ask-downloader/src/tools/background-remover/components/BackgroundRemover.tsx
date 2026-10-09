@@ -1,4 +1,5 @@
 // The whole tool: upload -> (first time: model download) -> processing -> result.
+// The fast model is fetched in the background as soon as the page has loaded.
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { en, type ErrorCode, type Strings } from '../i18n/en';
 import { prepare, removeBackground, ToolError as EngineError } from '../lib/engine';
@@ -106,6 +107,26 @@ export default function BackgroundRemover({ t = en }: { t?: Strings }) {
     prepare('fast').catch(() => {}); // a real attempt will show any error
   }, []);
 
+  // Whoever opens this page has come to use it: fetch the fast model in the
+  // background once the page has loaded, so the first photo waits less.
+  // Not with Data Saver on or on a very slow connection: there it still
+  // starts as soon as the user goes to pick a photo (warmUp above).
+  useEffect(() => {
+    const conn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } })
+      .connection;
+    if (conn?.saveData || /2g/.test(conn?.effectiveType ?? '')) return;
+    let timer = 0;
+    const later = () => {
+      timer = window.setTimeout(warmUp, 1500);
+    };
+    if (document.readyState === 'complete') later();
+    else window.addEventListener('load', later, { once: true });
+    return () => {
+      window.removeEventListener('load', later);
+      clearTimeout(timer);
+    };
+  }, [warmUp]);
+
   /** "Need better results?": same photo through the stronger model. */
   const improve = useCallback(async () => {
     const image = kept.current;
@@ -158,11 +179,16 @@ export default function BackgroundRemover({ t = en }: { t?: Strings }) {
   return (
     <section className="mx-auto w-full max-w-3xl px-4" aria-label={t.title}>
       {state.phase === 'idle' && <Dropzone t={t} onFile={process} onWarmUp={warmUp} />}
-      {state.phase === 'loading' && (
-        <ProgressCard t={t} model={state.model} download={state.download} preview={state.preview} />
-      )}
-      {state.phase === 'processing' && (
-        <ProgressCard t={t} model={state.model} download={null} preview={state.preview} />
+      {(state.phase === 'loading' || state.phase === 'processing') && (
+        // One card from download to result, so the bar never jumps back.
+        <Fragment key={state.model}>
+          <ProgressCard
+            t={t}
+            model={state.model}
+            download={state.phase === 'loading' ? state.download : null}
+            preview={state.preview}
+          />
+        </Fragment>
       )}
       {state.phase === 'done' && (
         // A new key when the HD result arrives: the result view starts fresh.

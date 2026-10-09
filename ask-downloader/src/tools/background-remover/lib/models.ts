@@ -57,12 +57,6 @@ export const MODELS: Record<ModelId, ModelSpec> = {
   },
 };
 
-/** First-time download in MB as shown to users (the fast model also brings
- *  the ~4MB runtime). */
-export function downloadMb(id: ModelId): number {
-  return Math.round(MODELS[id].bytes / 1e6) + (id === 'fast' ? 4 : 0);
-}
-
 /** Phones and low-memory devices: at 1024 the fast model needs more memory
  *  than many phones give a tab, and takes over a minute on their CPUs. */
 export function inputSize(m: ModelSpec): number {
