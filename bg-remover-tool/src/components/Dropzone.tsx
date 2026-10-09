@@ -6,9 +6,11 @@ import { MAX_FILE_MB } from '../lib/image';
 interface Props {
   t: Strings;
   onFile: (file: File) => void;
+  /** First sign the user is about to upload: start fetching the AI. */
+  onWarmUp: () => void;
 }
 
-export default function Dropzone({ t, onFile }: Props) {
+export default function Dropzone({ t, onFile, onWarmUp }: Props) {
   const input = useRef<HTMLInputElement>(null);
   const [over, setOver] = useState(false);
 
@@ -18,7 +20,11 @@ export default function Dropzone({ t, onFile }: Props) {
       tabIndex={0}
       aria-label={t.dropzoneLabel}
       onClick={() => input.current?.click()}
+      onPointerEnter={onWarmUp}
+      onTouchStart={onWarmUp}
+      onFocus={onWarmUp}
       onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && input.current?.click()}
+      onDragEnter={onWarmUp}
       onDragOver={(e) => {
         e.preventDefault();
         setOver(true);

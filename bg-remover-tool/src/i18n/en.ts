@@ -16,6 +16,14 @@ export const en = {
   loadingFirstTime: 'First time only: about {n} MB. Next time it opens instantly.',
   processingTitle: 'Removing the background…',
   processingHint: 'This can take a few seconds on phones.',
+  hdLoadingTitle: 'Getting the second AI ready…',
+  hdLoadingNote: 'First time only: about {n} MB. Next time it starts right away.',
+  hdProcessingTitle: 'Taking a closer look…',
+  hdProcessingHint: 'A second AI is checking the whole picture.',
+
+  betterButton: 'Need better results?',
+  betterHint: 'A second AI checks the photo again and brings back missing parts, like a cut-off body or arm (about {n} MB to download the first time).',
+  betterDone: 'Checked by both AIs.',
   seconds: '{n}s',
 
   before: 'Before',

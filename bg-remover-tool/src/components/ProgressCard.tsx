@@ -1,17 +1,18 @@
 import { useEffect, useState } from 'react';
 import { Sparkles } from 'lucide-react';
 import { fill, type Strings } from '../i18n/en';
+import { downloadMb, type ModelId } from '../lib/models';
 
 interface Props {
   t: Strings;
   /** Model download progress 0..1, or null while the photo is processed. */
   download: number | null;
   preview: string;
+  model: ModelId;
 }
 
-const MODEL_MB = 50;
-
-export default function ProgressCard({ t, download, preview }: Props) {
+export default function ProgressCard({ t, download, preview, model }: Props) {
+  const hd = model === 'hd';
   const [seconds, setSeconds] = useState(0);
   const processing = download === null;
 
@@ -20,7 +21,7 @@ export default function ProgressCard({ t, download, preview }: Props) {
     setSeconds(0);
     const timer = setInterval(() => setSeconds((s) => s + 1), 1000);
     return () => clearInterval(timer);
-  }, [processing]);
+  }, [processing, model]);
 
   const pct = Math.round((download ?? 0) * 100);
   return (
@@ -32,12 +33,12 @@ export default function ProgressCard({ t, download, preview }: Props) {
       <div className="flex items-center justify-center gap-2 text-[#4b2e83] dark:text-[#d1b9f7]">
         <Sparkles className="h-5 w-5 animate-pulse" />
         <p className="font-heading text-lg font-bold" role="status" aria-live="polite">
-          {processing ? t.processingTitle : t.loadingTitle}
+          {processing ? (hd ? t.hdProcessingTitle : t.processingTitle) : hd ? t.hdLoadingTitle : t.loadingTitle}
         </p>
       </div>
       {processing ? (
         <p className="mt-2 text-center text-sm text-slate-500 dark:text-slate-400">
-          {t.processingHint} <span className="tabular-nums">{fill(t.seconds, { n: seconds })}</span>
+          {hd ? t.hdProcessingHint : t.processingHint} <span className="tabular-nums">{fill(t.seconds, { n: seconds })}</span>
         </p>
       ) : (
         <>
@@ -55,7 +56,7 @@ export default function ProgressCard({ t, download, preview }: Props) {
           </div>
           <p className="mt-2 text-center text-sm text-slate-500 dark:text-slate-400">
             <span className="font-semibold tabular-nums">{pct}%</span> ·{' '}
-            {fill(t.loadingFirstTime, { n: MODEL_MB })}
+            {fill(hd ? t.hdLoadingNote : t.loadingFirstTime, { n: downloadMb(model) })}
           </p>
         </>
       )}

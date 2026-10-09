@@ -1,8 +1,9 @@
 // Result: compare slider, background choice, brush editing and downloads.
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Brush, Download, Info, Loader2, RotateCcw } from 'lucide-react';
+import { BadgeCheck, Brush, Download, Info, Loader2, RotateCcw, Sparkles } from 'lucide-react';
 import { fill, type Strings } from '../i18n/en';
 import { exportImage, type Background, type Stroke } from '../lib/compose';
+import { downloadMb } from '../lib/models';
 import { Preview } from '../lib/preview';
 import BackgroundPicker from './BackgroundPicker';
 import CompareSlider from './CompareSlider';
@@ -15,12 +16,15 @@ interface Props {
   before: string;
   resized: boolean;
   fileName: string;
+  /** True when this result already comes from the stronger model. */
+  hd: boolean;
+  onImprove: () => void;
   onReset: () => void;
 }
 
 type Format = 'png' | 'jpg';
 
-export default function ResultView({ t, image, mask, before, resized, fileName, onReset }: Props) {
+export default function ResultView({ t, image, mask, before, resized, fileName, hd, onImprove, onReset }: Props) {
   const preview = useMemo(() => new Preview(image, mask), [image, mask]);
   const [strokes, setStrokes] = useState<Stroke[]>([]);
   const [bg, setBg] = useState<Background>({ kind: 'none' });
@@ -95,6 +99,26 @@ export default function ResultView({ t, image, mask, before, resized, fileName, 
         <>
           {after && (
             <CompareSlider t={t} before={before} after={after} width={preview.width} height={preview.height} />
+          )}
+          {hd ? (
+            <p className="mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold text-[#6d46b8] dark:text-[#d1b9f7]">
+              <BadgeCheck className="h-4 w-4" />
+              {t.betterDone}
+            </p>
+          ) : (
+            <div className="mt-4 flex flex-col items-center gap-1.5 rounded-2xl border border-amber-200 bg-amber-50/80 px-4 py-3 text-center dark:border-amber-900/50 dark:bg-amber-950/20">
+              <button
+                type="button"
+                onClick={onImprove}
+                className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-amber-500/25 transition-all hover:bg-amber-600 active:scale-95"
+              >
+                <Sparkles className="h-4 w-4" />
+                {t.betterButton}
+              </button>
+              <p className="max-w-md text-xs text-amber-900/80 dark:text-amber-200/80">
+                {fill(t.betterHint, { n: downloadMb('hd') })}
+              </p>
+            </div>
           )}
           {resized && (
             <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">

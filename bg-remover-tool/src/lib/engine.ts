@@ -1,5 +1,6 @@
 // Main-thread side of the worker: one shared worker, promise-based calls.
 import createWorker from './createWorker';
+import type { ModelId } from './models';
 import type { WorkerRequest, WorkerResponse } from './worker';
 
 export interface Result {
@@ -12,12 +13,16 @@ export interface Result {
 /** Error with a code from src/i18n/en.ts `errors`. */
 export class ToolError extends Error {}
 
+interface Load {
+  promise: Promise<void>;
+  reject: (e: Error) => void;
+  listeners: Set<(p: number) => void>;
+}
+
 let worker: Worker | null = null;
-let ready: Promise<void> | null = null;
 let nextId = 1;
 const pending = new Map<number, { resolve: (r: Result) => void; reject: (e: Error) => void }>();
-const progressListeners = new Set<(p: number) => void>();
-let failLoad: ((e: Error) => void) | null = null;
+const loads = new Map<ModelId, Load>();
 
 /** The worker itself broke (script failed to load or crashed): fail
  *  everything waiting on it and start a fresh worker on the next try. */
@@ -26,7 +31,8 @@ function crash(ev: Event) {
   worker?.terminate();
   worker = null;
   const err = new ToolError('processing-failed');
-  failLoad?.(err);
+  loads.forEach((l) => l.reject(err));
+  loads.clear(); // a new worker has no model loaded
   pending.forEach((p) => p.reject(err));
   pending.clear();
 }
@@ -36,7 +42,7 @@ function getWorker(): Worker {
   worker = createWorker();
   worker.onmessage = (e: MessageEvent<WorkerResponse>) => {
     const msg = e.data;
-    if (msg.type === 'progress') progressListeners.forEach((f) => f(msg.p));
+    if (msg.type === 'progress') loads.get(msg.model)?.listeners.forEach((f) => f(msg.p));
     if (msg.type === 'result') {
       pending.get(msg.id)?.resolve(msg);
       pending.delete(msg.id);
@@ -54,34 +60,44 @@ function getWorker(): Worker {
 const send = (msg: WorkerRequest, transfer: Transferable[] = []) =>
   getWorker().postMessage(msg, transfer);
 
-/** Starts the model download (once); progress goes 0..1. */
-export function prepare(onProgress?: (p: number) => void): Promise<void> {
-  if (onProgress) progressListeners.add(onProgress);
-  ready ??= new Promise<void>((resolve, reject) => {
-    failLoad = reject;
-    const w = getWorker();
-    const onMsg = (e: MessageEvent<WorkerResponse>) => {
-      if (e.data.type === 'ready') resolve();
-      else if (e.data.type === 'error' && e.data.id === undefined) reject(new ToolError(e.data.code));
-      else return;
-      w.removeEventListener('message', onMsg);
-    };
-    w.addEventListener('message', onMsg);
-    send({ type: 'load' });
-  });
-  const p = ready.finally(() => onProgress && progressListeners.delete(onProgress));
-  ready.catch(() => {
-    ready = null; // a failed download can be retried
-  });
-  return p;
+/** Starts a model download (once per model); progress goes 0..1. */
+export function prepare(model: ModelId, onProgress?: (p: number) => void): Promise<void> {
+  let load = loads.get(model);
+  if (!load) {
+    const listeners = new Set<(p: number) => void>();
+    let reject!: (e: Error) => void;
+    const promise = new Promise<void>((res, rej) => {
+      reject = rej;
+      const w = getWorker();
+      const onMsg = (e: MessageEvent<WorkerResponse>) => {
+        const m = e.data;
+        if (m.type === 'ready' && m.model === model) res();
+        else if (m.type === 'error' && m.id === undefined && m.model === model) rej(new ToolError(m.code));
+        else return;
+        w.removeEventListener('message', onMsg);
+      };
+      w.addEventListener('message', onMsg);
+      send({ type: 'load', model });
+    });
+    load = { promise, reject, listeners };
+    loads.set(model, load);
+    const mine = load;
+    promise.catch(() => {
+      if (loads.get(model) === mine) loads.delete(model); // a failed download can be retried
+    });
+  }
+  if (!onProgress) return load.promise;
+  load.listeners.add(onProgress);
+  const listeners = load.listeners;
+  return load.promise.finally(() => listeners.delete(onProgress));
 }
 
 /** Makes the mask; the bitmap is handed to the worker (and closed there). */
-export async function removeBackground(image: ImageBitmap): Promise<Result> {
-  await prepare();
+export async function removeBackground(image: ImageBitmap, model: ModelId): Promise<Result> {
+  await prepare(model);
   const id = nextId++;
   return new Promise<Result>((resolve, reject) => {
     pending.set(id, { resolve, reject });
-    send({ type: 'run', id, image }, [image]);
+    send({ type: 'run', id, model, image }, [image]);
   });
 }

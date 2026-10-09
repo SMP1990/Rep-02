@@ -2,7 +2,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { en, type ErrorCode, type Strings } from '../i18n/en';
 import { prepare, removeBackground, ToolError as EngineError } from '../lib/engine';
+import { combineMasks } from '../lib/combine';
 import { openImage } from '../lib/image';
+import type { ModelId } from '../lib/models';
 import Dropzone from './Dropzone';
 import ProgressCard from './ProgressCard';
 import ResultView from './ResultView';
@@ -10,9 +12,9 @@ import ToolError from './ToolError';
 
 type State =
   | { phase: 'idle' }
-  | { phase: 'loading'; preview: string; download: number }
-  | { phase: 'processing'; preview: string }
-  | { phase: 'done'; preview: string; image: ImageBitmap; mask: Uint8ClampedArray; resized: boolean }
+  | { phase: 'loading'; model: ModelId; preview: string; download: number }
+  | { phase: 'processing'; model: ModelId; preview: string }
+  | { phase: 'done'; model: ModelId; preview: string; image: ImageBitmap; mask: Uint8ClampedArray; resized: boolean }
   | { phase: 'error'; code: ErrorCode };
 
 const RETRY_SAME_FILE: ErrorCode[] = ['model-download-failed', 'processing-failed', 'out-of-memory'];
@@ -28,6 +30,9 @@ export default function BackgroundRemover({ t = en }: { t?: Strings }) {
   const run = useRef(0); // ignores results of a run the user has left
   const urls = useRef<string[]>([]);
   const kept = useRef<ImageBitmap | null>(null); // the photo shown in the result
+  const shown = useRef<{ preview: string; resized: boolean }>({ preview: '', resized: false });
+  const lastModel = useRef<ModelId>('fast');
+  const fastMask = useRef<Uint8ClampedArray | null>(null); // base for the HD pass
 
   const freeImage = () => {
     kept.current?.close();
@@ -44,36 +49,73 @@ export default function BackgroundRemover({ t = en }: { t?: Strings }) {
     return u;
   };
 
+  const fail = useCallback(
+    (err: unknown) => {
+      const code = err instanceof EngineError ? (err.message as ErrorCode) : 'processing-failed';
+      setState({ phase: 'error', code: code in t.errors ? code : 'processing-failed' });
+    },
+    [t],
+  );
+
+  /** Model download (if needed) + mask for the kept photo. */
+  const runModel = useCallback(async (model: ModelId, live: () => boolean) => {
+    const bitmap = kept.current!;
+    const { preview, resized } = shown.current;
+    lastModel.current = model;
+    setState({ phase: 'loading', model, preview, download: 0 });
+    await prepare(model, (p) => live() && setState({ phase: 'loading', model, preview, download: p }));
+    if (!live()) return;
+    setState({ phase: 'processing', model, preview });
+    // The worker gets its own copy; this one stays for editing and export.
+    const res = await removeBackground(await createImageBitmap(bitmap), model);
+    if (!live()) return;
+    let mask = res.mask;
+    if (model === 'fast') fastMask.current = mask;
+    else if (fastMask.current) mask = combineMasks(fastMask.current, mask);
+    setState({ phase: 'done', model, preview, image: bitmap, mask, resized });
+  }, []);
+
   const process = useCallback(async (f: File) => {
     const id = ++run.current;
     const live = () => id === run.current;
     freeUrls();
     freeImage();
+    fastMask.current = null;
     file.current = f;
     const preview = makeUrl(f);
     try {
       const { bitmap, resized } = await openImage(f);
       if (!live()) return bitmap.close();
       kept.current = bitmap; // closed by freeImage(), whatever happens next
-      setState({ phase: 'loading', preview, download: 0 });
-      await prepare((p) => live() && setState({ phase: 'loading', preview, download: p }));
-      if (!live()) return;
-      setState({ phase: 'processing', preview });
-      // The worker gets its own copy; this one stays for editing and export.
-      const res = await removeBackground(await createImageBitmap(bitmap));
-      if (!live()) return;
-      setState({ phase: 'done', preview, image: bitmap, mask: res.mask, resized });
+      shown.current = { preview, resized };
+      await runModel('fast', live);
     } catch (err) {
-      if (!live()) return;
-      const code = err instanceof EngineError ? (err.message as ErrorCode) : 'processing-failed';
-      setState({ phase: 'error', code: code in t.errors ? code : 'processing-failed' });
+      if (live()) fail(err);
     }
-  }, [t]);
+  }, [fail, runModel]);
+
+  // Start fetching the fast model while the user is still picking a photo.
+  const warmUp = useCallback(() => {
+    prepare('fast').catch(() => {}); // a real attempt will show any error
+  }, []);
+
+  /** "Need better results?": same photo through the stronger model. */
+  const improve = useCallback(async () => {
+    if (!kept.current || !fastMask.current) return;
+    const id = ++run.current;
+    const live = () => id === run.current;
+    try {
+      await runModel('hd', live);
+    } catch (err) {
+      if (live()) fail(err);
+    }
+  }, [fail, runModel]);
 
   const reset = () => {
     run.current++;
     freeUrls();
     freeImage();
+    fastMask.current = null;
     file.current = null;
     setState({ phase: 'idle' });
   };
@@ -99,12 +141,19 @@ export default function BackgroundRemover({ t = en }: { t?: Strings }) {
 
   return (
     <section className="mx-auto w-full max-w-3xl px-4" aria-label={t.title}>
-      {state.phase === 'idle' && <Dropzone t={t} onFile={process} />}
-      {state.phase === 'loading' && <ProgressCard t={t} download={state.download} preview={state.preview} />}
-      {state.phase === 'processing' && <ProgressCard t={t} download={null} preview={state.preview} />}
+      {state.phase === 'idle' && <Dropzone t={t} onFile={process} onWarmUp={warmUp} />}
+      {state.phase === 'loading' && (
+        <ProgressCard t={t} model={state.model} download={state.download} preview={state.preview} />
+      )}
+      {state.phase === 'processing' && (
+        <ProgressCard t={t} model={state.model} download={null} preview={state.preview} />
+      )}
       {state.phase === 'done' && (
         <ResultView
+          key={state.model}
           t={t}
+          hd={state.model === 'hd'}
+          onImprove={improve}
           image={state.image}
           mask={state.mask}
           before={state.preview}
@@ -117,9 +166,11 @@ export default function BackgroundRemover({ t = en }: { t?: Strings }) {
         <ToolError
           t={t}
           code={state.code}
-          onRetry={() =>
-            file.current && RETRY_SAME_FILE.includes(state.code) ? process(file.current) : reset()
-          }
+          onRetry={() => {
+            if (!file.current || !RETRY_SAME_FILE.includes(state.code)) reset();
+            else if (lastModel.current === 'hd' && kept.current && fastMask.current) improve();
+            else process(file.current);
+          }}
         />
       )}
     </section>
