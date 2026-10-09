@@ -464,3 +464,23 @@ html.dark ::-webkit-scrollbar-thumb:hover {
 @media (prefers-reduced-motion: reduce) {
   .tools-nudge { animation: none; }
 }
+
+/* Background Remover tool (/background-remover) — names start with bgr-. */
+.bgr-checkerboard {
+  background-color: #ffffff;
+  background-image: conic-gradient(#e9e3f1 25%, transparent 0 50%, #e9e3f1 0 75%, transparent 0);
+  background-size: 20px 20px;
+}
+html.dark .bgr-checkerboard {
+  background-color: #2a2238;
+  background-image: conic-gradient(#352c46 25%, transparent 0 50%, #352c46 0 75%, transparent 0);
+}
+.bgr-scan-line { animation: bgr-scan 1.8s ease-in-out infinite; }
+@keyframes bgr-scan {
+  0% { top: -33%; }
+  100% { top: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bgr-scan-line { animation: none; display: none; }
+}
+

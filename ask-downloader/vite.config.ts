@@ -67,6 +67,9 @@ function aistudioMediaPlugin(): Plugin {
 export default defineConfig(() => {
   return {
     plugins: [react(), tailwindcss(), aistudioMediaPlugin()],
+    // Module workers (the Background Remover runs its AI in one). The site
+    // had no workers before, so nothing else is affected.
+    worker: { format: 'es' as const },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

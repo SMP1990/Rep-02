@@ -57,10 +57,26 @@ app.use((req: Request, res: Response, next: Function) =>
 app.use(express.urlencoded({ extended: true }));
 
 /**
+ * Pages that run an AI tool in the visitor's browser. Only these pages get
+ * extra CSP allowances (the CDN the AI files come from, WebAssembly, blob:
+ * images and workers) and cross-origin isolation, which lets the AI use
+ * several CPU threads (about 3x faster). Every other page keeps the exact
+ * headers it had. TOOL_ASSET_HOSTS can point the tools elsewhere for testing.
+ */
+const TOOL_PAGES = new Set(['/background-remover']);
+const TOOL_ASSET_HOSTS =
+  String(process.env.TOOL_ASSET_HOSTS || '').trim() || 'https://cdn.jsdelivr.net https://raw.githubusercontent.com';
+
+/**
  * Security HTTP Headers Middleware
  */
 app.use((req: Request, res: Response, next: Function) => {
   const ga = !!gaId(); // Google's domains are allowed only while GA is switched on
+  // A tool page, or the tool's Web Worker script: a worker gets its CSP and
+  // isolation from its own response, not from the page that starts it.
+  const toolPage = TOOL_PAGES.has(req.path);
+  const toolWorker = /^\/assets\/worker-[\w-]+\.js$/.test(req.path);
+  const tool = toolPage || toolWorker;
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');
   res.setHeader('X-XSS-Protection', '1; mode=block');
@@ -74,12 +90,14 @@ app.use((req: Request, res: Response, next: Function) => {
     'Content-Security-Policy',
     [
       "default-src 'self'",
-      `script-src 'self'${ga ? ' ' + GA_CSP.script : ''}`,
+      // blob: — the AI runtime wraps its CDN worker code in a blob: URL.
+      `script-src 'self'${tool ? ` ${TOOL_ASSET_HOSTS} 'wasm-unsafe-eval' blob:` : ''}${ga ? ' ' + GA_CSP.script : ''}`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
-      "img-src 'self' data: https:",
+      `img-src 'self' data: https:${tool ? ' blob:' : ''}`,
       "media-src 'self' https:",
-      `connect-src 'self'${ga ? ' ' + GA_CSP.connect : ''}`,
+      `connect-src 'self'${tool ? ' ' + TOOL_ASSET_HOSTS : ''}${ga ? ' ' + GA_CSP.connect : ''}`,
+      ...(tool ? ["worker-src 'self' blob:"] : []),
       "frame-src https://www.youtube-nocookie.com",
       "object-src 'none'",
       "base-uri 'self'",
@@ -87,6 +105,12 @@ app.use((req: Request, res: Response, next: Function) => {
       "frame-ancestors 'self'",
     ].join('; ')
   );
+  if (tool) {
+    // credentialless (not require-corp): fonts, analytics and other
+    // cross-origin files keep loading without needing special headers.
+    res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless');
+  }
+  if (toolPage) res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
   if (req.headers['x-forwarded-proto'] === 'https' || req.secure) {
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   }
@@ -2526,6 +2550,10 @@ function getRouteMeta(pathname: string, isAdmin = false): RouteMeta {
       title: `Contact Support & Help - ${SEO_SITE_NAME}`,
       description: `Get in touch with the ${SEO_SITE_NAME} support team for download assistance, bug reports, feature requests, or business inquiries.`,
     },
+    '/background-remover': {
+      title: `Background Remover - Free, No Sign-up - ${SEO_SITE_NAME}`,
+      description: 'Remove the background from any photo in seconds, right in your browser. Free, no sign-up, no watermark. Your photo never leaves your device.',
+    },
     '/about-us': {
       title: `About Us - ${SEO_SITE_NAME}`,
       description: `Learn about ${SEO_SITE_NAME} — a free, fast, watermark-free video and audio downloader for all major social platforms.`,
@@ -2662,6 +2690,7 @@ function renderSitemap(req: Request, res: Response) {
     { url: `${baseUrl}/blog`, changefreq: 'daily', priority: '0.9' },
     { url: `${baseUrl}/contact`, changefreq: 'monthly', priority: '0.5' },
     { url: `${baseUrl}/about-us`, changefreq: 'monthly', priority: '0.5' },
+    { url: `${baseUrl}/background-remover`, changefreq: 'monthly', priority: '0.8' },
     { url: `${baseUrl}/privacy-policy`, changefreq: 'yearly', priority: '0.3' },
     { url: `${baseUrl}/terms-of-use`, changefreq: 'yearly', priority: '0.3' },
     { url: `${baseUrl}/legal`, changefreq: 'yearly', priority: '0.3' },

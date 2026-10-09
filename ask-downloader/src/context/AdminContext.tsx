@@ -222,6 +222,11 @@ export function parseCurrentLocation(
     return { route: 'about-us', slug: null, language: null };
   }
 
+  // 3c. Tool pages
+  if (rawPath === '/background-remover') {
+    return { route: 'background-remover', slug: null, language: null };
+  }
+
   // 4. Admin subroutes
   const adminRoutes: RouteType[] = ['dashboard', 'subscribers', 'downloads', 'visitors', 'admin-users', 'content-editor', 'blog-manager', 'settings', 'messages', 'redirects', 'media'];
   for (const r of adminRoutes) {
@@ -855,6 +860,14 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           window.location.hash = 'login';
         }
       }
+      return;
+    }
+
+    // Tool pages get their own security headers from the server (a stricter
+    // isolation and the CDN their AI loads from), which only apply to a
+    // fresh page load. So they are always opened with a real navigation.
+    if (route === 'background-remover' && typeof window !== 'undefined') {
+      window.location.assign('/background-remover');
       return;
     }
 

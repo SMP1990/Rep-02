@@ -14,6 +14,7 @@ export const ROUTE_PATHS = {
   'privacy-policy': '/privacy-policy',
   'terms-of-use': '/terms-of-use',
   legal: '/legal',
+  'background-remover': '/background-remover',
 } as const;
 
 export type PublicRoute = keyof typeof ROUTE_PATHS;

@@ -22,6 +22,7 @@ export type RouteType =
   | 'terms-of-use'
   | 'legal'
   | 'about-us'
+  | 'background-remover'
   | 'not-found';
 
 export type ContactMessageTopic = 

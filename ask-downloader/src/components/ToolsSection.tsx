@@ -42,8 +42,8 @@ export const ToolsSection: React.FC = () => {
   const liveTile = (tool: ToolTile, Icon: ToolTile['icon']) => (
     <PageLink
       href={tool.path!}
-      // The tool page arrives in the next step; until then a full page load
-      // shows the site's own "page not found".
+      // Tool pages are always opened with a real page load: they get their
+      // own security headers from the server (see useOwnDocument).
       onNavigate={() => window.location.assign(tool.path!)}
       className="group relative flex flex-col h-full bg-white dark:bg-[#181224] rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-xl hover:-translate-y-1 hover:border-[#a78bda] dark:hover:border-[#6d46b8] transition-all duration-300"
     >
