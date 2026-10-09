@@ -7,8 +7,14 @@ The ONNX export comes from the rembg project's GitHub release.
   back into float when the model loads; all maths stays float32. This halves
   the download (178MB -> 47MB) and the result matches the original (0.08%).
   Full int8 (weights + maths) was tested and rejected: it leaves noise.
-- MaxPool ceil_mode is switched off: with the fixed 1024 input every pooled
-  size is even, so the result is identical, and more runtimes accept it.
+- MaxPool ceil_mode is switched off: at 1024 (and 512) every pooled size is
+  even, so the result is identical, and more runtimes accept it.
+- Any input size: the export wrote each upsample target (32x32 ... 1024x1024)
+  as a fixed number. Each one now reads the size of the tensor it is joined
+  with, so phones can run the model at 512 (4x less work and memory) while
+  the 1024 result stays identical.
+- Only the final mask is kept as output; the side outputs used in training
+  cost time and memory in the browser.
 - The file is cut into parts under 20MB so the jsDelivr CDN can serve them
   from GitHub; the browser joins them again (see src/lib/model.ts).
 
@@ -39,6 +45,84 @@ for node in graph.node:
         for attr in node.attribute:
             if attr.name == "ceil_mode":
                 attr.i = 0
+
+
+
+def any_input_size(graph):
+    """Resize sizes = Concat(Shape(x)[0:2], const HxW): swap the constant
+    for the HxW of the tensor the result is concatenated with (or, for the
+    side outputs, of the input image)."""
+    consumers = {}
+    for n in graph.node:
+        for i in n.input:
+            consumers.setdefault(i, []).append(n)
+    producer = {o: n for n in graph.node for o in n.output}
+    extra = []
+    for n in [n for n in graph.node if n.op_type == "Resize"]:
+        sizes = producer[n.input[3]]
+        assert sizes.op_type == "Concat" and producer[sizes.input[1]].op_type == "Constant"
+        user = consumers[n.output[0]][0]
+        if user.op_type == "Concat":
+            target = [i for i in user.input if i != n.output[0]][0]
+        else:
+            target = graph.input[0].name
+        k = n.name.strip("/").replace("/", "_")
+        extra += [
+            helper.make_node("Shape", [target], [k + "_hw_shape"]),
+            helper.make_node("Slice", [k + "_hw_shape", "hw_from", "hw_to"], [k + "_hw"]),
+        ]
+        sizes.input[1] = k + "_hw"
+    graph.initializer.extend([
+        numpy_helper.from_array(np.array([2], np.int64), "hw_from"),
+        numpy_helper.from_array(np.array([4], np.int64), "hw_to"),
+    ])
+    graph.node.extend(extra)
+    for dim in graph.input[0].type.tensor_type.shape.dim[2:]:
+        dim.dim_param = "size"
+    del graph.value_info[:]
+
+
+def only_main_output(graph):
+    keep = graph.output[0]
+    del graph.output[:]
+    graph.output.append(keep)
+    keep = graph.output[0]  # append() stored a copy
+    for dim in keep.type.tensor_type.shape.dim[2:]:
+        dim.dim_param = "size"
+    needed = {keep.name}
+    live = []
+    for n in reversed(list(graph.node)):
+        if any(o in needed for o in n.output):
+            live.append(n)
+            needed.update(i for i in n.input if i)
+    del graph.node[:]
+    graph.node.extend(reversed(live))
+    used = [t for t in graph.initializer if t.name in needed]
+    del graph.initializer[:]
+    graph.initializer.extend(used)
+
+
+def sort_nodes(graph):
+    """Topological order (the added Shape nodes must come before use)."""
+    ready = {i.name for i in graph.input} | {t.name for t in graph.initializer} | {""}
+    todo, done = list(graph.node), []
+    while todo:
+        rest = []
+        for n in todo:
+            if all(i in ready for i in n.input):
+                done.append(n)
+                ready.update(n.output)
+            else:
+                rest.append(n)
+        assert len(rest) < len(todo), "cycle"
+        todo = rest
+    del graph.node[:]
+    graph.node.extend(done)
+
+
+any_input_size(graph)
+sort_nodes(graph)
+only_main_output(graph)
 
 inits = {t.name: t for t in graph.initializer}
 dequant = []
