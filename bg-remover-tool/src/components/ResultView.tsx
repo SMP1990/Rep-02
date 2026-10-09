@@ -1,8 +1,9 @@
 // Result: compare slider, background choice, brush editing and downloads.
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { BadgeCheck, Brush, Download, Info, Loader2, RotateCcw, Sparkles } from 'lucide-react';
-import { fill, type Strings } from '../i18n/en';
+import { AlertTriangle, BadgeCheck, Brush, Download, Info, Loader2, RotateCcw, Sparkles } from 'lucide-react';
+import { fill, type ErrorCode, type Strings } from '../i18n/en';
 import { exportImage, type Background, type Stroke } from '../lib/compose';
+import { MAX_FILE_MB } from '../lib/image';
 import { downloadMb } from '../lib/models';
 import { Preview } from '../lib/preview';
 import BackgroundPicker from './BackgroundPicker';
@@ -18,19 +19,22 @@ interface Props {
   fileName: string;
   /** True when this result already comes from the stronger model. */
   hd: boolean;
+  /** A problem to mention above the result (the result itself is fine). */
+  notice?: ErrorCode;
   onImprove: () => void;
   onReset: () => void;
 }
 
 type Format = 'png' | 'jpg';
 
-export default function ResultView({ t, image, mask, before, resized, fileName, hd, onImprove, onReset }: Props) {
+export default function ResultView({ t, image, mask, before, resized, fileName, hd, notice, onImprove, onReset }: Props) {
   const preview = useMemo(() => new Preview(image, mask), [image, mask]);
   const [strokes, setStrokes] = useState<Stroke[]>([]);
   const [bg, setBg] = useState<Background>({ kind: 'none' });
   const [editing, setEditing] = useState(false);
   const [after, setAfter] = useState('');
   const [busy, setBusy] = useState<Format | null>(null);
+  const [problem, setProblem] = useState<ErrorCode | undefined>(notice);
   const prevBgImage = useRef<ImageBitmap | null>(null);
 
   // Refresh the "after" picture whenever edits or the background change.
@@ -65,6 +69,7 @@ export default function ResultView({ t, image, mask, before, resized, fileName, 
 
   async function download(format: Format) {
     setBusy(format);
+    setProblem(undefined);
     try {
       const type = format === 'png' ? 'image/png' : 'image/jpeg';
       const blob = await exportImage(image, mask, strokes, bg, type);
@@ -74,6 +79,8 @@ export default function ResultView({ t, image, mask, before, resized, fileName, 
       a.download = `${fileName}.${format}`;
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 10_000);
+    } catch {
+      setProblem('out-of-memory'); // a full-size picture did not fit in memory
     } finally {
       setBusy(null);
     }
@@ -97,6 +104,12 @@ export default function ResultView({ t, image, mask, before, resized, fileName, 
         />
       ) : (
         <>
+          {problem && (
+            <p role="alert" className="mb-4 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-300">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+              {fill(t.errors[problem], { n: MAX_FILE_MB })}
+            </p>
+          )}
           {after && (
             <CompareSlider t={t} before={before} after={after} width={preview.width} height={preview.height} />
           )}
@@ -110,7 +123,7 @@ export default function ResultView({ t, image, mask, before, resized, fileName, 
               <button
                 type="button"
                 onClick={onImprove}
-                className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-amber-500/25 transition-all hover:bg-amber-600 active:scale-95"
+                className="inline-flex items-center gap-2 rounded-xl bg-amber-700 px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-amber-700/25 transition-all hover:bg-amber-800 active:scale-95"
               >
                 <Sparkles className="h-4 w-4" />
                 {t.betterButton}

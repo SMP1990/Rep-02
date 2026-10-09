@@ -45,6 +45,7 @@ export default function ProgressCard({ t, download, preview, model }: Props) {
           <div
             className="mx-auto mt-4 h-2.5 max-w-sm overflow-hidden rounded-full bg-[#f1e9fb] dark:bg-[#261b3b]"
             role="progressbar"
+            aria-label={hd ? t.hdLoadingTitle : t.loadingTitle}
             aria-valuenow={pct}
             aria-valuemin={0}
             aria-valuemax={100}

@@ -10,7 +10,6 @@ export const en = {
   chooseButton: 'Choose image',
   pasteHint: 'You can also paste an image (Ctrl + V)',
   formats: 'JPG, PNG or WEBP, up to {n} MB',
-  dropzoneLabel: 'Upload an image to remove its background',
 
   loadingTitle: 'Getting the AI ready…',
   loadingFirstTime: 'First time only: about {n} MB. Next time it opens instantly.',

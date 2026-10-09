@@ -20,7 +20,7 @@ function errorCode(err: unknown): string {
   console.error('background remover:', err); // the real reason, for debugging
   const msg = err instanceof Error ? err.message : String(err);
   if (msg === 'model-download-failed') return msg;
-  if (/memory|allocation|RangeError/i.test(msg)) return 'out-of-memory';
+  if (/memory|alloc|RangeError/i.test(msg)) return 'out-of-memory'; // incl. std::bad_alloc
   return 'processing-failed';
 }
 

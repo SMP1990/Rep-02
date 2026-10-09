@@ -16,7 +16,7 @@ export default function ToolError({ t, code, onRetry }: Props) {
           <AlertTriangle className="h-6 w-6" />
         </div>
         <div className="flex-1">
-          <h3 className="mb-1 text-base sm:text-lg font-bold text-red-950 dark:text-red-200">{t.errorTitle}</h3>
+          <h2 className="mb-1 text-base sm:text-lg font-bold text-red-950 dark:text-red-200">{t.errorTitle}</h2>
           <p className="mb-4 text-sm leading-relaxed text-red-800/90 dark:text-red-300/90">
             {fill(t.errors[code], { n: MAX_FILE_MB })}
           </p>

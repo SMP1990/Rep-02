@@ -14,7 +14,16 @@ type State =
   | { phase: 'idle' }
   | { phase: 'loading'; model: ModelId; preview: string; download: number }
   | { phase: 'processing'; model: ModelId; preview: string }
-  | { phase: 'done'; model: ModelId; preview: string; image: ImageBitmap; mask: Uint8ClampedArray; resized: boolean }
+  | {
+      phase: 'done';
+      model: ModelId;
+      preview: string;
+      image: ImageBitmap;
+      mask: Uint8ClampedArray;
+      resized: boolean;
+      /** Shown above the result, e.g. when "better results" failed. */
+      notice?: ErrorCode;
+    }
   | { phase: 'error'; code: ErrorCode };
 
 const RETRY_SAME_FILE: ErrorCode[] = ['model-download-failed', 'processing-failed', 'out-of-memory'];
@@ -31,7 +40,6 @@ export default function BackgroundRemover({ t = en }: { t?: Strings }) {
   const urls = useRef<string[]>([]);
   const kept = useRef<ImageBitmap | null>(null); // the photo shown in the result
   const shown = useRef<{ preview: string; resized: boolean }>({ preview: '', resized: false });
-  const lastModel = useRef<ModelId>('fast');
   const fastMask = useRef<Uint8ClampedArray | null>(null); // base for the HD pass
 
   const freeImage = () => {
@@ -61,7 +69,6 @@ export default function BackgroundRemover({ t = en }: { t?: Strings }) {
   const runModel = useCallback(async (model: ModelId, live: () => boolean) => {
     const bitmap = kept.current!;
     const { preview, resized } = shown.current;
-    lastModel.current = model;
     setState({ phase: 'loading', model, preview, download: 0 });
     await prepare(model, (p) => live() && setState({ phase: 'loading', model, preview, download: p }));
     if (!live()) return;
@@ -101,15 +108,24 @@ export default function BackgroundRemover({ t = en }: { t?: Strings }) {
 
   /** "Need better results?": same photo through the stronger model. */
   const improve = useCallback(async () => {
-    if (!kept.current || !fastMask.current) return;
+    const image = kept.current;
+    const mask = fastMask.current;
+    if (!image || !mask) return;
     const id = ++run.current;
     const live = () => id === run.current;
     try {
       await runModel('hd', live);
     } catch (err) {
-      if (live()) fail(err);
+      if (!live()) return;
+      // Keep the first result on screen and say what went wrong.
+      const code = err instanceof EngineError ? (err.message as ErrorCode) : 'processing-failed';
+      const { preview, resized } = shown.current;
+      setState({
+        phase: 'done', model: 'fast', preview, image, mask, resized,
+        notice: code in t.errors ? code : 'processing-failed',
+      });
     }
-  }, [fail, runModel]);
+  }, [runModel, t]);
 
   const reset = () => {
     run.current++;
@@ -153,6 +169,7 @@ export default function BackgroundRemover({ t = en }: { t?: Strings }) {
           key={state.model}
           t={t}
           hd={state.model === 'hd'}
+          notice={state.notice}
           onImprove={improve}
           image={state.image}
           mask={state.mask}
@@ -168,7 +185,6 @@ export default function BackgroundRemover({ t = en }: { t?: Strings }) {
           code={state.code}
           onRetry={() => {
             if (!file.current || !RETRY_SAME_FILE.includes(state.code)) reset();
-            else if (lastModel.current === 'hd' && kept.current && fastMask.current) improve();
             else process(file.current);
           }}
         />
