@@ -1,5 +1,7 @@
-// Every word the tool shows. When the tool joins the site these keys move to
-// src/translations/extra/*.ts (all 11 languages) as `t.bgRemover.*`.
+// Every word of the Background Remover (tool + its page), English. The other
+// 10 languages live next to this file, typed as `Strings`, so TypeScript
+// fails if one misses a key. They load only with the tool page, never with
+// the rest of the site. Placeholders: {n} number, {w}/{h} size, {c} colour.
 export const en = {
   title: 'Background Remover',
   subtitle: 'Remove the background from any photo in seconds. Free, no sign-up, no watermark.',
@@ -52,6 +54,25 @@ export const en = {
   resetEdits: 'Reset edits',
   done: 'Done',
   editorLabel: 'Editing area: paint to erase or restore parts of the picture',
+
+  howTitle: 'How to remove a background from a photo',
+  step1Title: 'Upload your photo',
+  step1Desc: 'Drop a JPG, PNG or WEBP image here, choose it from your device, or paste it.',
+  step2Title: 'Let the AI do the work',
+  step2Desc: 'The background is removed in seconds, right in your browser. Not perfect? Tap "Need better results?" or fix it with the Erase / Restore brush.',
+  step3Title: 'Download',
+  step3Desc: 'Save a transparent PNG, or choose a colour or your own background and save it as PNG or JPG.',
+  faqTitle: 'Frequently asked questions',
+  faq1Q: 'Is the Background Remover free?',
+  faq1A: 'Yes. It is completely free, with no sign-up, no watermark and no daily limit.',
+  faq2Q: 'Are my photos uploaded to a server?',
+  faq2A: 'No. The AI runs inside your browser, so your photo never leaves your device.',
+  faq3Q: 'Why is it slower the first time?',
+  faq3A: 'The first time, the AI (about 50 MB) is downloaded and saved in your browser. After that it starts right away.',
+  faq4Q: 'Which photos work best?',
+  faq4A: 'People, products, animals and objects with clear edges. Hair, glass, or a background with the same colour as the subject is harder: use "Need better results?" or the Erase / Restore brush.',
+  faq5Q: 'Which file types and sizes can I use?',
+  faq5A: 'JPG, PNG and WEBP images up to 25 MB. Very large photos are scaled down so your device stays fast.',
 
   errorTitle: 'Something went wrong',
   tryAgain: 'Try again',

@@ -2,11 +2,12 @@ import React from 'react';
 import { Header } from '../components/Header.tsx';
 import { Footer } from '../components/Footer.tsx';
 import { Seo } from '../components/Seo.tsx';
-import { buildWebPageSchema, buildBreadcrumbSchema } from '../utils/seoSchema.ts';
+import { buildWebPageSchema, buildBreadcrumbSchema, buildFaqSchema } from '../utils/seoSchema.ts';
 import { useAdmin } from '../context/AdminContext.tsx';
 import { useLanguage } from '../context/LanguageContext.tsx';
 import BackgroundRemover from '../tools/background-remover/components/BackgroundRemover.tsx';
-import { en as toolWords } from '../tools/background-remover/i18n/en.ts';
+import ToolGuide, { faqItems } from '../tools/background-remover/components/ToolGuide.tsx';
+import { toolStrings } from '../tools/background-remover/i18n/index.ts';
 import { useOwnDocument } from '../tools/background-remover/useOwnDocument.ts';
 
 const PATH = '/background-remover';
@@ -18,11 +19,10 @@ const PATH = '/background-remover';
  */
 export const BackgroundRemoverPage: React.FC = () => {
   const { siteSettings } = useAdmin();
-  const { t } = useLanguage();
+  const { t, currentLang } = useLanguage();
   useOwnDocument(PATH);
 
-  // Tool words are English until their translations are added.
-  const words = toolWords;
+  const words = toolStrings(currentLang);
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
   const title = `${words.title} - ${siteSettings.siteName}`;
 
@@ -39,6 +39,17 @@ export const BackgroundRemoverPage: React.FC = () => {
             { name: t.header?.home || 'Home', url: origin + '/' },
             { name: words.title, url: origin + PATH },
           ]),
+          buildFaqSchema(faqItems(words)),
+          {
+            '@context': 'https://schema.org',
+            '@type': 'WebApplication',
+            name: words.title,
+            description: words.subtitle,
+            url: origin + PATH,
+            applicationCategory: 'MultimediaApplication',
+            operatingSystem: 'Any (web browser)',
+            offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+          },
         ]}
       />
       <Header />
@@ -53,6 +64,7 @@ export const BackgroundRemoverPage: React.FC = () => {
           <p className="mt-3 text-base sm:text-lg text-slate-600 dark:text-slate-300">{words.subtitle}</p>
         </div>
         <BackgroundRemover t={words} />
+        <ToolGuide t={words} />
       </main>
 
       <Footer />
