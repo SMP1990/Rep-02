@@ -23,6 +23,9 @@ Live at **social.al-marifat.org**, hosted on **Hostinger "Web Apps" (Node.js)**.
 - **If the same request arrives twice by mistake,** ask before redoing the work.
 - **Test what you build**, in the real app where possible (see section 7), and say
   what you tested. Never claim something works without checking it.
+- **Measure before choosing an approach** (speed, memory, phone limits) and test fully
+  here before delivering, so the owner does not have to test again and again.
+- **New session?** Read ../AI-HANDOVER.md first: it says which branch holds this work.
 
 ## 2. Deploying (owner does this; you prepare the zip)
 
