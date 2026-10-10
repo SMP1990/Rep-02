@@ -90,6 +90,8 @@ export const fr: ExtraDict = {
     subtitle: 'Des outils pratiques qui fonctionnent dans votre navigateur. Gratuits, sans inscription.',
     bgRemoverTitle: 'Suppression d\'arrière-plan',
     bgRemoverDesc: 'Supprimez l\'arrière-plan de n\'importe quelle photo en quelques secondes.',
+    pwGenTitle: 'Générateur de mots de passe',
+    pwGenDesc: 'Créez des mots de passe forts et aléatoires en un clic.',
     open: 'Ouvrir l\'outil',
     newLabel: 'Nouveau',
     comingSoon: 'Bientôt disponible',

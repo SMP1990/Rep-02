@@ -90,6 +90,8 @@ export const ar: ExtraDict = {
     subtitle: 'أدوات مفيدة تعمل مباشرة في متصفحك. مجانًا ودون تسجيل.',
     bgRemoverTitle: 'إزالة الخلفية',
     bgRemoverDesc: 'أزل خلفية أي صورة في ثوانٍ.',
+    pwGenTitle: 'مولّد كلمات المرور',
+    pwGenDesc: 'أنشئ كلمات مرور قوية وعشوائية بنقرة واحدة.',
     open: 'افتح الأداة',
     newLabel: 'جديد',
     comingSoon: 'قريبًا',

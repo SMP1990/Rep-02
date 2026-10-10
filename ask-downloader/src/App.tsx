@@ -30,6 +30,7 @@ const TermsOfUsePage = lazy(() => import('./pages/TermsOfUsePage').then((m) => (
 const LegalPage = lazy(() => import('./pages/LegalPage').then((m) => ({ default: m.LegalPage })));
 const AboutUsPage = lazy(() => import('./pages/AboutUsPage').then((m) => ({ default: m.AboutUsPage })));
 const BackgroundRemoverPage = lazy(() => import('./pages/BackgroundRemoverPage').then((m) => ({ default: m.BackgroundRemoverPage })));
+const PasswordGeneratorPage = lazy(() => import('./pages/PasswordGeneratorPage').then((m) => ({ default: m.PasswordGeneratorPage })));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));
 
 const PageLoadingFallback: React.FC = () => (
@@ -121,6 +122,14 @@ const AppContent: React.FC = () => {
     return (
       <div className="min-h-screen bg-[#f6f0f4] dark:bg-[#0e0a17] font-sans antialiased text-[#2e2440] dark:text-[#f1e9fb]">
         <BackgroundRemoverPage />
+      </div>
+    );
+  }
+
+  if (currentRoute === 'password-generator') {
+    return (
+      <div className="min-h-screen bg-[#f6f0f4] dark:bg-[#0e0a17] font-sans antialiased text-[#2e2440] dark:text-[#f1e9fb]">
+        <PasswordGeneratorPage />
       </div>
     );
   }

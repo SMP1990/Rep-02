@@ -226,6 +226,9 @@ export function parseCurrentLocation(
   if (rawPath === '/background-remover') {
     return { route: 'background-remover', slug: null, language: null };
   }
+  if (rawPath === '/password-generator') {
+    return { route: 'password-generator', slug: null, language: null };
+  }
 
   // 4. Admin subroutes
   const adminRoutes: RouteType[] = ['dashboard', 'subscribers', 'downloads', 'visitors', 'admin-users', 'content-editor', 'blog-manager', 'settings', 'messages', 'redirects', 'media'];
@@ -901,6 +904,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           window.history.pushState(null, '', '/legal');
         } else if (route === 'about-us') {
           window.history.pushState(null, '', '/about-us');
+        } else if (route === 'password-generator') {
+          window.history.pushState(null, '', '/password-generator');
         }
       } catch {
         window.location.hash = route;

@@ -90,6 +90,8 @@ export const de: ExtraDict = {
     subtitle: 'Praktische Tools, die direkt in deinem Browser laufen. Kostenlos, ohne Anmeldung.',
     bgRemoverTitle: 'Hintergrund entfernen',
     bgRemoverDesc: 'Entferne den Hintergrund jedes Fotos in Sekunden.',
+    pwGenTitle: 'Passwort-Generator',
+    pwGenDesc: 'Erstelle starke, zufällige Passwörter mit einem Klick.',
     open: 'Tool öffnen',
     newLabel: 'Neu',
     comingSoon: 'Demnächst',

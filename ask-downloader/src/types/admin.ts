@@ -23,6 +23,7 @@ export type RouteType =
   | 'legal'
   | 'about-us'
   | 'background-remover'
+  | 'password-generator'
   | 'not-found';
 
 export type ContactMessageTopic = 

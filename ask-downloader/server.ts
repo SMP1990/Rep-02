@@ -2559,6 +2559,10 @@ function getRouteMeta(pathname: string, isAdmin = false): RouteMeta {
       title: `Background Remover - Free, No Sign-up - ${SEO_SITE_NAME}`,
       description: 'Remove the background from any photo in seconds. Free, no sign-up, no watermark. Photos are deleted right away, never stored.',
     },
+    '/password-generator': {
+      title: `Password Generator - Strong & Random, Free - ${SEO_SITE_NAME}`,
+      description: 'Create strong, random passwords in one click. Choose the length and characters, then copy. Free, no sign-up; passwords are made on your device and never stored.',
+    },
     '/about-us': {
       title: `About Us - ${SEO_SITE_NAME}`,
       description: `Learn about ${SEO_SITE_NAME} — a free, fast, watermark-free video and audio downloader for all major social platforms.`,
@@ -2696,6 +2700,7 @@ function renderSitemap(req: Request, res: Response) {
     { url: `${baseUrl}/contact`, changefreq: 'monthly', priority: '0.5' },
     { url: `${baseUrl}/about-us`, changefreq: 'monthly', priority: '0.5' },
     { url: `${baseUrl}/background-remover`, changefreq: 'monthly', priority: '0.8' },
+    { url: `${baseUrl}/password-generator`, changefreq: 'monthly', priority: '0.8' },
     { url: `${baseUrl}/privacy-policy`, changefreq: 'yearly', priority: '0.3' },
     { url: `${baseUrl}/terms-of-use`, changefreq: 'yearly', priority: '0.3' },
     { url: `${baseUrl}/legal`, changefreq: 'yearly', priority: '0.3' },

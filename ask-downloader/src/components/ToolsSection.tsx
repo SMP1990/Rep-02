@@ -3,7 +3,8 @@ import { ArrowRight, ChevronLeft, ChevronRight, ChevronsRight, Wand2 } from 'luc
 import { useLanguage } from '../context/LanguageContext.tsx';
 import { fill } from '../utils/i18n.ts';
 import { TOOL_TILES, type ToolTile } from '../config/tools.ts';
-import { PageLink } from './PageLink';
+import { PageLink, ROUTE_PATHS } from './PageLink';
+import { useAdmin } from '../context/AdminContext.tsx';
 
 /**
  * "Free Online Tools" — the tool tiles above "Trending Stories" on the home
@@ -22,6 +23,7 @@ for (let i = 0; i < TOOL_TILES.length; i += PER_PAGE) PAGES.push(TOOL_TILES.slic
 
 export const ToolsSection: React.FC = () => {
   const { t, currentLangInfo } = useLanguage();
+  const { setCurrentRoute } = useAdmin();
   const rtl = currentLangInfo?.dir === 'rtl';
   const words = t.toolsHub;
   const scroller = useRef<HTMLDivElement>(null);
@@ -41,10 +43,10 @@ export const ToolsSection: React.FC = () => {
 
   const liveTile = (tool: ToolTile, Icon: ToolTile['icon']) => (
     <PageLink
-      href={tool.path!}
-      // Tool pages are always opened with a real page load: they get their
-      // own security headers from the server (see useOwnDocument).
-      onNavigate={() => window.location.assign(tool.path!)}
+      href={ROUTE_PATHS[tool.route!]}
+      // Some tool pages need a real page load: they get their own security
+      // headers from the server (see useOwnDocument).
+      onNavigate={() => (tool.fullLoad ? window.location.assign(ROUTE_PATHS[tool.route!]) : setCurrentRoute(tool.route!))}
       className="group relative flex flex-col h-full bg-white dark:bg-[#181224] rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-xl hover:-translate-y-1 hover:border-[#a78bda] dark:hover:border-[#6d46b8] transition-all duration-300"
     >
       <div className="flex items-start justify-between gap-2 mb-3 sm:mb-4">
@@ -105,7 +107,7 @@ export const ToolsSection: React.FC = () => {
             className="grid grid-cols-2 gap-3 w-full shrink-0 snap-start md:contents"
           >
             {tiles.map((tool) => (
-              <li key={tool.id}>{tool.path ? liveTile(tool, tool.icon) : soonTile(tool.icon)}</li>
+              <li key={tool.id}>{tool.route ? liveTile(tool, tool.icon) : soonTile(tool.icon)}</li>
             ))}
           </ul>
         ))}

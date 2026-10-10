@@ -90,6 +90,8 @@ export const ja: ExtraDict = {
     subtitle: 'ブラウザですぐに使える便利なツール。無料、登録不要です。',
     bgRemoverTitle: '背景削除',
     bgRemoverDesc: 'どんな写真の背景も数秒で削除できます。',
+    pwGenTitle: 'パスワード生成ツール',
+    pwGenDesc: '強力なランダムパスワードをワンクリックで作成。',
     open: 'ツールを開く',
     newLabel: '新着',
     comingSoon: '近日公開',

@@ -90,6 +90,8 @@ export const id: ExtraDict = {
     subtitle: 'Alat praktis yang berjalan langsung di browser Anda. Gratis, tanpa daftar.',
     bgRemoverTitle: 'Penghapus latar belakang',
     bgRemoverDesc: 'Hapus latar belakang foto apa pun dalam hitungan detik.',
+    pwGenTitle: 'Pembuat Kata Sandi',
+    pwGenDesc: 'Buat kata sandi yang kuat dan acak dengan satu klik.',
     open: 'Buka alat',
     newLabel: 'Baru',
     comingSoon: 'Segera hadir',

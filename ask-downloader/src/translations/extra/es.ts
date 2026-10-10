@@ -90,6 +90,8 @@ export const es: ExtraDict = {
     subtitle: 'Herramientas útiles que funcionan en tu navegador. Gratis y sin registro.',
     bgRemoverTitle: 'Quitar fondo',
     bgRemoverDesc: 'Elimina el fondo de cualquier foto en segundos.',
+    pwGenTitle: 'Generador de contraseñas',
+    pwGenDesc: 'Crea contraseñas seguras y aleatorias con un clic.',
     open: 'Abrir herramienta',
     newLabel: 'Nuevo',
     comingSoon: 'Próximamente',
