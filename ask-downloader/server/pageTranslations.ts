@@ -16,6 +16,8 @@
 import * as store from './store.ts';
 import { translateText } from './translator.ts';
 import { INITIAL_SITE_PAGES, INITIAL_LANDING_CONTENT } from '../src/data/mockAdminData.ts';
+import { TOOL_PAGE_LIST } from '../src/config/toolPages.ts';
+import { defaultToolFaqs } from '../src/tools/defaultFaqs.ts';
 
 export const SITE_LANGUAGES = ['en', 'ur', 'ar', 'hi', 'es', 'pt', 'fr', 'de', 'id', 'ru', 'ja'];
 const MACHINE = 'pageTranslations';
@@ -35,7 +37,7 @@ const own = (value: unknown, shipped?: unknown): string | null => {
 };
 
 /** Every piece of admin-written text, in the order it appears on the site. */
-export function authoredEntries(pages: any, landing: any): PageTextEntry[] {
+export function authoredEntries(pages: any, landing: any, tools: any = {}): PageTextEntry[] {
   const d: any = INITIAL_SITE_PAGES;
   const out: PageTextEntry[] = [];
   const seen = new Set<string>();
@@ -102,12 +104,28 @@ export function authoredEntries(pages: any, landing: any): PageTextEntry[] {
       add(own(s?.body), name, `Section ${i + 1} — text`);
     });
   }
+
+  // Tool pages (Admin -> Tools SEO & FAQ). A FAQ list exists only once the
+  // admin changed the built-in one, which the tool's dictionaries translate.
+  for (const tool of TOOL_PAGE_LIST) {
+    const c = tools?.[tool.id] || {};
+    const page = `Tool — ${tool.name}`;
+    add(own(c.metaTitle), page, 'SEO title');
+    add(own(c.metaDescription), page, 'SEO description');
+    const builtIn = new Set(defaultToolFaqs(tool.id).map((f) => `${f.question.trim()}\n${f.answer.trim()}`));
+    (Array.isArray(c.faqs) ? c.faqs : []).forEach((f: any, i: number) => {
+      if (builtIn.has(`${String(f?.question).trim()}\n${String(f?.answer).trim()}`)) return; // has its human translation
+      add(own(f?.question), page, `FAQ ${i + 1} — question`);
+      add(own(f?.answer), page, `FAQ ${i + 1} — answer`);
+    });
+  }
   return out;
 }
 
 const currentEntries = () => authoredEntries(
   store.read<any>('sitePages', INITIAL_SITE_PAGES),
   store.read<any>('landingContent', INITIAL_LANDING_CONTENT),
+  store.read<any>('toolsContent', {}),
 );
 
 /** What visitors get: the admin's correction, else the machine translation. */

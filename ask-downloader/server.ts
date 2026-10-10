@@ -38,6 +38,7 @@ import { LEGAL_TEXT_DATE } from './src/config/legal.ts';
 import { syncPageTranslations, readTranslations, translationsForEditor, saveTranslationEdits } from './server/pageTranslations.ts';
 import { gaId, GA_CSP, gaHeadTags, gaInitScript } from './server/analytics.ts';
 import { registerBgRoutes, prefetchBgModels } from './server/bgRoutes.ts';
+import { TOOL_PAGE_LIST, cleanToolsContent, type ToolsContent } from './src/config/toolPages.ts';
 import { addRedirect, findRedirect, clearRedirectFrom, listRedirects, deleteRedirect, normalizePath, normalizeTarget, isProtectedPath, setOwnHost } from './server/redirects.ts';
 
 const app = express();
@@ -1765,7 +1766,19 @@ app.get('/api/site-config', (_req: Request, res: Response): any => {
     sitePages: store.read<any>('sitePages', INITIAL_SITE_PAGES),
     // Machine translations of the admin's page text, by language.
     pageTranslations: readTranslations(),
+    toolsContent: readToolsContent(),
   });
+});
+
+/** Admin -> Tools SEO & FAQ: SEO fields and FAQ per tool page. */
+app.put('/api/admin/tools-content', requirePermission('settings.edit'), (req: Request, res: Response): any => {
+  if (!hasValidAdminSession(req)) return res.status(401).json({ error: 'UNAUTHORIZED' });
+  if (!req.body?.toolsContent || typeof req.body.toolsContent !== 'object') return res.status(400).json({ success: false });
+  const toolsContent = cleanToolsContent(req.body.toolsContent);
+  store.write('toolsContent', toolsContent);
+  // New SEO / FAQ text gets translated into every language, in the background.
+  void syncPageTranslations();
+  return res.json({ success: true, toolsContent });
 });
 
 app.put('/api/admin/site-settings', requirePermission('settings.edit'), (req: Request, res: Response): any => {
@@ -2295,7 +2308,7 @@ app.put('/api/admin/blog-categories', requirePermission('blog.edit'), (req: Requ
 /** Media Library: every image, grouped by month on the page, with its ALT text. */
 app.get('/api/admin/media', requirePermission('media.manage'), (_req: Request, res: Response): any => {
   const siteJson = JSON.stringify(
-    ['siteSettings', 'landingContent', 'sitePages', 'adminProfile', 'adminUsers'].map((k) => store.read<any>(k, null))
+    ['siteSettings', 'landingContent', 'sitePages', 'adminProfile', 'adminUsers', 'toolsContent'].map((k) => store.read<any>(k, null))
   );
   return res.json({ items: buildMediaList(uploadsDir(), allPosts(), siteJson, readMediaFiles()) });
 });
@@ -2536,12 +2549,15 @@ const seoTagline = () =>
   INITIAL_SITE_SETTINGS.siteTagline;
 
 /** `image`: the page's own share image (a post's cover); Settings' share image is the fallback. */
-type RouteMeta = { title: string; description: string; noindex: boolean; status: number; image?: string };
+type RouteMeta = { title: string; description: string; noindex: boolean; status: number; image?: string; keywords?: string };
+
+/** Admin -> Tools SEO & FAQ (src/config/toolPages.ts has the defaults). */
+const readToolsContent = (): ToolsContent => store.read<ToolsContent>('toolsContent', {}) || {};
 
 function getRouteMeta(pathname: string, isAdmin = false): RouteMeta {
   const SEO_SITE_NAME = seoSiteName();
   const SEO_DEFAULT_DESCRIPTION = seoDescription();
-  const routes: Record<string, { title: string; description: string; noindex?: boolean }> = {
+  const routes: Record<string, { title: string; description: string; noindex?: boolean; image?: string; keywords?: string }> = {
     '/': {
       // Same string the home page sets in the browser, from Settings.
       title: `${SEO_SITE_NAME} - ${seoTagline()}`,
@@ -2554,14 +2570,6 @@ function getRouteMeta(pathname: string, isAdmin = false): RouteMeta {
     '/contact': {
       title: `Contact Support & Help - ${SEO_SITE_NAME}`,
       description: `Get in touch with the ${SEO_SITE_NAME} support team for download assistance, bug reports, feature requests, or business inquiries.`,
-    },
-    '/background-remover': {
-      title: `Background Remover - Free, No Sign-up - ${SEO_SITE_NAME}`,
-      description: 'Remove the background from any photo in seconds. Free, no sign-up, no watermark. Photos are deleted right away, never stored.',
-    },
-    '/password-generator': {
-      title: `Password Generator - Strong & Random, Free - ${SEO_SITE_NAME}`,
-      description: 'Create strong, random passwords in one click. Choose the length and characters, then copy. Free, no sign-up; passwords are made on your device and never stored.',
     },
     '/about-us': {
       title: `About Us - ${SEO_SITE_NAME}`,
@@ -2585,6 +2593,20 @@ function getRouteMeta(pathname: string, isAdmin = false): RouteMeta {
       noindex: true,
     },
   };
+
+  // Tool pages: the admin's SEO fields, else the built-in defaults.
+  const toolsContent = readToolsContent();
+  for (const tool of TOOL_PAGE_LIST) {
+    const c = toolsContent[tool.id] || {};
+    const brand = (v: unknown) => String(v || '').split('{brand}').join(SEO_SITE_NAME);
+    routes[tool.path] = {
+      title: brand(c.metaTitle) || `${tool.seoTitle} - ${SEO_SITE_NAME}`,
+      description: brand(c.metaDescription) || tool.seoDescription,
+      keywords: c.keywords || tool.keywords,
+      image: c.ogImage || undefined,
+      noindex: !!c.noindex,
+    };
+  }
 
   if (routes[pathname]) return { noindex: false, status: 200, ...routes[pathname] };
 
@@ -2699,8 +2721,10 @@ function renderSitemap(req: Request, res: Response) {
     { url: `${baseUrl}/blog`, changefreq: 'daily', priority: '0.9' },
     { url: `${baseUrl}/contact`, changefreq: 'monthly', priority: '0.5' },
     { url: `${baseUrl}/about-us`, changefreq: 'monthly', priority: '0.5' },
-    { url: `${baseUrl}/background-remover`, changefreq: 'monthly', priority: '0.8' },
-    { url: `${baseUrl}/password-generator`, changefreq: 'monthly', priority: '0.8' },
+    // Tool pages, unless the admin keeps one out of search engines.
+    ...TOOL_PAGE_LIST.filter((t) => !readToolsContent()[t.id]?.noindex).map((t) => ({
+      url: `${baseUrl}${t.path}`, changefreq: 'monthly', priority: '0.8',
+    })),
     { url: `${baseUrl}/privacy-policy`, changefreq: 'yearly', priority: '0.3' },
     { url: `${baseUrl}/terms-of-use`, changefreq: 'yearly', priority: '0.3' },
     { url: `${baseUrl}/legal`, changefreq: 'yearly', priority: '0.3' },
@@ -2927,6 +2951,12 @@ async function startServer() {
         /<meta property="og:description" content=".*?" \/>/,
         `<meta property="og:description" content="${escapeHtml(meta.description)}" />`
       );
+      if (meta.keywords) {
+        html = html.replace(
+          /<meta name="keywords" content=".*?" \/>/,
+          `<meta name="keywords" content="${escapeHtml(meta.keywords)}" />`
+        );
+      }
       // Insert og:url, og:site_name, canonical, and robots right after og:type
       const settings = store.read<any>('siteSettings', INITIAL_SITE_SETTINGS) || {};
       // Ownership-verification tokens. These have to be in the raw HTML —

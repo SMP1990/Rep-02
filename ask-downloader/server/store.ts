@@ -90,7 +90,7 @@ export function write<T>(name: string, value: T): T {
  * immediate, so there is nothing pending to flush. */
 export async function flushAll(): Promise<void> {}
 
-export const COLLECTIONS = ['adminAccount', 'adminUsers', 'adminProfile', 'messages', 'subscribers', 'blogPosts', 'blogCategories', 'blogComments', 'blogSeedRemoved', 'siteSettings', 'landingContent', 'sitePages', 'downloadStats', 'downloadTotals', 'visitors', 'notificationsRead', 'redirects', 'pageTranslations', 'pageTranslationEdits', 'mediaFiles'];
+export const COLLECTIONS = ['adminAccount', 'adminUsers', 'adminProfile', 'messages', 'subscribers', 'blogPosts', 'blogCategories', 'blogComments', 'blogSeedRemoved', 'siteSettings', 'landingContent', 'sitePages', 'downloadStats', 'downloadTotals', 'visitors', 'notificationsRead', 'redirects', 'pageTranslations', 'pageTranslationEdits', 'mediaFiles', 'toolsContent'];
 
 /** The shape each collection must have. A restore that writes the wrong
  * type (a string where a list belongs) breaks the site, so the file is
@@ -103,6 +103,7 @@ const SHAPES: Record<string, 'array' | 'object'> = {
   landingContent: 'object', downloadStats: 'array', downloadTotals: 'object',
   visitors: 'object', notificationsRead: 'array', redirects: 'array',
   pageTranslations: 'object', pageTranslationEdits: 'object', mediaFiles: 'array',
+  toolsContent: 'object',
 };
 
 const shapeOf = (v: any) => (Array.isArray(v) ? 'array' : v && typeof v === 'object' ? 'object' : typeof v);

@@ -3,8 +3,8 @@ import { Header } from '../components/Header.tsx';
 import { Footer } from '../components/Footer.tsx';
 import { Seo } from '../components/Seo.tsx';
 import { buildWebPageSchema, buildBreadcrumbSchema, buildFaqSchema } from '../utils/seoSchema.ts';
-import { useAdmin } from '../context/AdminContext.tsx';
 import { useLanguage } from '../context/LanguageContext.tsx';
+import { useToolSeo } from '../tools/shared/useToolSeo.ts';
 import PasswordGenerator from '../tools/password-generator/components/PasswordGenerator.tsx';
 import Guide, { faqItems } from '../tools/password-generator/components/Guide.tsx';
 import { toolStrings } from '../tools/password-generator/i18n/index.ts';
@@ -17,32 +17,34 @@ const PATH = '/password-generator';
  * no special headers, nothing stored.
  */
 export const PasswordGeneratorPage: React.FC = () => {
-  const { siteSettings } = useAdmin();
   const { t, currentLang } = useLanguage();
 
   const words = toolStrings(currentLang);
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
-  const title = `${words.title} - ${siteSettings.siteName}`;
+  // Admin -> Tools SEO & FAQ, else the built-in words.
+  const seo = useToolSeo('password-generator', { title: words.title, description: words.subtitle, faq: faqItems(words) });
+  const title = seo.title;
 
   return (
     <div className="min-h-screen bg-[#f6f0f4] dark:bg-[#0e0a17] text-[#2e2440] dark:text-[#f4eefb] flex flex-col transition-colors duration-200">
       <Seo
         title={title}
-        description={words.subtitle}
+        description={seo.description}
         path={PATH}
-        image={siteSettings.ogImage || undefined}
+        image={seo.image}
+        noindex={seo.noindex}
         jsonLd={[
-          buildWebPageSchema(title, words.subtitle, origin + PATH),
+          buildWebPageSchema(title, seo.description, origin + PATH),
           buildBreadcrumbSchema([
             { name: t.header?.home || 'Home', url: origin + '/' },
             { name: words.title, url: origin + PATH },
           ]),
-          buildFaqSchema(faqItems(words)),
+          buildFaqSchema(seo.faq),
           {
             '@context': 'https://schema.org',
             '@type': 'WebApplication',
             name: words.title,
-            description: words.subtitle,
+            description: seo.description,
             url: origin + PATH,
             applicationCategory: 'SecurityApplication',
             operatingSystem: 'Any (web browser)',
@@ -62,7 +64,7 @@ export const PasswordGeneratorPage: React.FC = () => {
           <p className="mt-3 text-base sm:text-lg text-slate-600 dark:text-slate-300">{words.subtitle}</p>
         </div>
         <PasswordGenerator t={words} />
-        <Guide t={words} />
+        <Guide t={words} faq={seo.faq} />
       </main>
 
       <Footer />

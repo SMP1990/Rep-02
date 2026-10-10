@@ -77,6 +77,8 @@ Env vars (Hostinger panel): `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `DB_HOST`, `DB_PORT
   - `bgRemover.ts` + `bgWorker.ts` + `bgRoutes.ts` — Background Remover on the server (worker thread,
     one photo at a time). Needs the optional `onnxruntime-node` (CPU only via `.npmrc`); without it
     the tool page falls back to running the model in the browser.
+- `src/config/toolPages.ts` — every tool page (default SEO); `src/tools/<tool>/` — each tool;
+  Admin → Tools SEO & FAQ (`ToolsSeoPage.tsx`) edits their SEO and FAQ. See ../TOOLS-GUIDE.md.
 - `src/pages/` — public pages (`Public*`, `AboutUsPage`, legal pages, `NotFoundPage`)
   and admin pages (`BlogManagerPage`, `MediaLibraryPage`, `RedirectsPage`, `SettingsPage`, …).
 - `src/components/` — UI. `Seo.tsx` sets title/meta/OG/canonical/JSON-LD on every page.

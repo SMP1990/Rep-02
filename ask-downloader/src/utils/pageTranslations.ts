@@ -152,3 +152,44 @@ export function localizeFeatures<T extends { title: string; description: string 
   }
   return pending ? list : out;
 }
+
+/**
+ * One piece of the admin's text in this language: the translation, the text
+ * as written while it is not translated yet, or null when it is translated
+ * into other languages but not this one (the caller shows its default).
+ */
+export function localizeText(value: unknown, lang: string, table: TranslationTable | undefined): string | null {
+  const r = lookup(value, lang, table);
+  if (r === MISSING) return null;
+  return r === null ? String(value ?? '') : r;
+}
+
+/**
+ * A tool's FAQ as the admin set it, in this language. An unchanged built-in
+ * question uses the tool's own translation (`builtIn`, by position in the
+ * English `builtInEnglish`). Like localizeFaqs, the list is shown whole in
+ * one language: translated, as written while pending, or the built-in FAQ
+ * when part of it cannot be shown in this language.
+ */
+export function localizeToolFaqs(
+  faqs: { question: string; answer: string }[],
+  builtInEnglish: { question: string; answer: string }[],
+  builtIn: { question: string; answer: string }[],
+  lang: string,
+  table: TranslationTable | undefined
+): { question: string; answer: string }[] {
+  const key = (f: { question: string; answer: string }) => `${f.question.trim()}\n${f.answer.trim()}`;
+  const shipped = builtInEnglish.map(key);
+  let pending = false;
+  const out: { question: string; answer: string }[] = [];
+  for (const f of faqs.filter((x) => x?.question && x?.answer)) {
+    const i = shipped.indexOf(key(f));
+    if (i >= 0 && builtIn[i]) { out.push(builtIn[i]); continue; }
+    const q = lookup(f.question, lang, table);
+    const a = lookup(f.answer, lang, table);
+    if (q === MISSING || a === MISSING) return builtIn;
+    if (q === null || a === null) pending = true;
+    out.push({ question: (q || f.question) as string, answer: (a || f.answer) as string });
+  }
+  return pending ? faqs : out;
+}

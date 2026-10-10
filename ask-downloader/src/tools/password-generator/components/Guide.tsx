@@ -10,7 +10,7 @@ export function faqItems(t: Strings) {
   }));
 }
 
-export default function Guide({ t }: { t: Strings }) {
+export default function Guide({ t, faq = faqItems(t) }: { t: Strings; faq?: { question: string; answer: string }[] }) {
   return (
     <ToolGuide
       howTitle={t.howTitle}
@@ -20,7 +20,7 @@ export default function Guide({ t }: { t: Strings }) {
         { icon: Copy, title: t.step3Title, desc: t.step3Desc },
       ]}
       faqTitle={t.faqTitle}
-      faq={faqItems(t)}
+      faq={faq}
     />
   );
 }

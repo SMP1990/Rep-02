@@ -18,7 +18,8 @@ import {   LayoutDashboard,
   Globe,
   MessageSquare,
   Shuffle,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Wrench,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -87,6 +88,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, setMobileOpen }) =
       route: 'redirects',
       label: '301 Redirects',
       icon: Shuffle,
+    },
+    {
+      route: 'tools-seo',
+      label: 'Tools SEO & FAQ',
+      icon: Wrench,
     },
     {
       route: 'settings',

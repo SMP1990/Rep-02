@@ -10,7 +10,7 @@ export function faqItems(t: Strings) {
   }));
 }
 
-export default function ToolGuide({ t }: { t: Strings }) {
+export default function ToolGuide({ t, faq = faqItems(t) }: { t: Strings; faq?: { question: string; answer: string }[] }) {
   const steps = [
     { icon: ImageUp, title: t.step1Title, desc: t.step1Desc },
     { icon: Sparkles, title: t.step2Title, desc: t.step2Desc },
@@ -46,7 +46,7 @@ export default function ToolGuide({ t }: { t: Strings }) {
           {t.faqTitle}
         </h2>
         <div className="mx-auto max-w-3xl space-y-3">
-          {faqItems(t).map(({ question, answer }) => (
+          {faq.map(({ question, answer }) => (
             <details
               key={question}
               className="group rounded-2xl border border-slate-200/80 bg-white px-5 py-4 dark:border-slate-800/80 dark:bg-[#181224]"

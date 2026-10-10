@@ -76,10 +76,27 @@ zip -qr ../releases/ask-downloader-<name>.zip . -x "node_modules/*" -x ".git/*"
 
 ## Adding the next tool
 
-1. Build it as its own folder under `ask-downloader/src/tools/<tool-name>/`.
-2. Give it its own lazy-loaded page and route (see the Background Remover:
-   `App.tsx`, `AdminContext.tsx`, `types/admin.ts`, `PageLink.tsx`).
-3. Add its server title/description and sitemap entry in `server.ts`; only
-   if it needs a CDN or extra speed, add its path to `TOOL_PAGES`.
-4. Turn one "Coming soon" tile into it in `src/config/tools.ts`.
-5. Words in all 11 languages; run the full site check before deploying.
+1. Build it as its own folder under `ask-downloader/src/tools/<tool-name>/`
+   (words in `i18n/en.ts` + 10 languages, with `faq1Q`/`faq1A`... for its FAQ).
+2. Add it to `ask-downloader/src/config/toolPages.ts` (path, name, default SEO
+   title, description, keywords). That alone gives it: server title /
+   description / keywords / share image / robots tag, a sitemap entry, and a
+   section in Admin -> Tools SEO & FAQ.
+3. Add one line for its FAQ in `ask-downloader/src/tools/defaultFaqs.ts`.
+4. Give it a lazy-loaded page that calls `useToolSeo('<id>', ...)` and shows
+   the shared `tools/shared/ToolGuide.tsx` (see `PasswordGeneratorPage.tsx`),
+   plus its route (`App.tsx`, `AdminContext.tsx`, `types/admin.ts`,
+   `PageLink.tsx` ROUTE_PATHS).
+5. Turn one "Coming soon" tile into it in `src/config/tools.ts`
+   (`fullLoad: true` only if it needs its own server headers).
+6. Only if it needs a CDN or extra speed, add its path to `TOOL_PAGES` in
+   `server.ts`. Run the full site check before deploying.
+
+## Admin -> Tools SEO & FAQ
+
+Per tool: meta title ({brand} = site name), meta description, keywords,
+share image, "hide from search engines" (noindex + out of the sitemap), and
+the FAQ. Empty fields use the defaults. Saved in the `toolsContent` data file
+(included in Settings backups). The admin's English text is translated into
+all languages automatically (Content Editor -> Translations to correct it);
+FAQ questions left as built in keep their human translations.

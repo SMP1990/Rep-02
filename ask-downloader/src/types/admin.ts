@@ -14,6 +14,7 @@ export type RouteType =
   | 'blog-manager' 
   | 'settings' 
   | 'redirects'
+  | 'tools-seo'
   | 'media'
   | 'public-blog' 
   | 'public-blog-language'

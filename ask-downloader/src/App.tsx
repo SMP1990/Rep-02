@@ -21,6 +21,7 @@ const MessagesPage = lazy(() => import('./pages/MessagesPage').then((m) => ({ de
 const SettingsPage = lazy(() => import('./pages/SettingsPage').then((m) => ({ default: m.SettingsPage })));
 const MediaLibraryPage = lazy(() => import('./pages/MediaLibraryPage').then((m) => ({ default: m.MediaLibraryPage })));
 const RedirectsPage = lazy(() => import('./pages/RedirectsPage').then((m) => ({ default: m.RedirectsPage })));
+const ToolsSeoPage = lazy(() => import('./pages/ToolsSeoPage').then((m) => ({ default: m.ToolsSeoPage })));
 const PublicHomePage = lazy(() => import('./pages/PublicHomePage').then((m) => ({ default: m.PublicHomePage })));
 const PublicContactPage = lazy(() => import('./pages/PublicContactPage').then((m) => ({ default: m.PublicContactPage })));
 const PublicBlogListingPage = lazy(() => import('./pages/PublicBlogListingPage').then((m) => ({ default: m.PublicBlogListingPage })));
@@ -190,6 +191,9 @@ const AppContent: React.FC = () => {
           )}
           {currentRoute === 'redirects' && (
             <RedirectsPage onOpenMobileMenu={() => setMobileOpen(true)} />
+          )}
+          {currentRoute === 'tools-seo' && (
+            <ToolsSeoPage onOpenMobileMenu={() => setMobileOpen(true)} />
           )}
           {currentRoute === 'settings' && (
             <SettingsPage onOpenMobileMenu={() => setMobileOpen(true)} />

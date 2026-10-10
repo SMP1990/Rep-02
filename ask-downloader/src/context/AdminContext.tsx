@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { confirmLeave } from '../utils/unsavedGuard';
+import type { ToolsContent } from '../config/toolPages';
 import { 
   AdminUser, 
   Subscriber, 
@@ -129,6 +130,9 @@ interface AdminContextType {
   pageTranslations: Record<string, Record<string, string>>;
   /** Re-reads the translations after the admin corrects one. */
   refreshPageTranslations: () => void;
+  /** Admin -> Tools SEO & FAQ, per tool id (src/config/toolPages.ts). */
+  toolsContent: ToolsContent;
+  setToolsContent: (content: ToolsContent) => void;
   updateSiteSettings: (settings: Partial<SiteSettings>) => void;
   updateAdminProfile: (name: string, email: string, avatar: string) => void;
   changePassword: (oldPass: string, newPass: string) => { success: boolean; message: string };
@@ -231,7 +235,7 @@ export function parseCurrentLocation(
   }
 
   // 4. Admin subroutes
-  const adminRoutes: RouteType[] = ['dashboard', 'subscribers', 'downloads', 'visitors', 'admin-users', 'content-editor', 'blog-manager', 'settings', 'messages', 'redirects', 'media'];
+  const adminRoutes: RouteType[] = ['dashboard', 'subscribers', 'downloads', 'visitors', 'admin-users', 'content-editor', 'blog-manager', 'settings', 'messages', 'redirects', 'media', 'tools-seo'];
   for (const r of adminRoutes) {
     if (rawPath === `/admin/${r}` || rawHash === r) {
       return { route: isAuth ? r : 'login', slug: null, language: null };
@@ -307,7 +311,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (!data.valid) {
           setIsAuthenticated(false);
           localStorage.removeItem('fdownloader_admin_auth');
-          const adminRoutes: RouteType[] = ['dashboard', 'subscribers', 'downloads', 'visitors', 'admin-users', 'content-editor', 'blog-manager', 'settings', 'messages', 'redirects', 'media'];
+          const adminRoutes: RouteType[] = ['dashboard', 'subscribers', 'downloads', 'visitors', 'admin-users', 'content-editor', 'blog-manager', 'settings', 'messages', 'redirects', 'media', 'tools-seo'];
           if (adminRoutes.includes(currentRoute)) {
             setCurrentRouteState('login');
           }
@@ -853,7 +857,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const setCurrentRoute = (route: RouteType) => {
     // An editor with unsaved changes asks first (see utils/unsavedGuard).
     if (route !== currentRoute && !confirmLeave()) return;
-    const adminRoutes: RouteType[] = ['dashboard', 'subscribers', 'downloads', 'visitors', 'admin-users', 'content-editor', 'blog-manager', 'settings', 'messages', 'redirects', 'media'];
+    const adminRoutes: RouteType[] = ['dashboard', 'subscribers', 'downloads', 'visitors', 'admin-users', 'content-editor', 'blog-manager', 'settings', 'messages', 'redirects', 'media', 'tools-seo'];
     if (!isAuthenticated && adminRoutes.includes(route)) {
       setCurrentRouteState('login');
       if (typeof window !== 'undefined') {
@@ -1095,6 +1099,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // About Us / Contact page content, edited in Content Editor.
   const [sitePages, setSitePages] = useState<any>(INITIAL_SITE_PAGES);
   const [pageTranslations, setPageTranslations] = useState<Record<string, Record<string, string>>>({});
+  const [toolsContent, setToolsContent] = useState<ToolsContent>({});
 
   const updateSitePages = (pages: any) => {
     setSitePages(pages);
@@ -1119,6 +1124,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         // Legal pages were editable has no entry for them.
         if (d.sitePages) setSitePages({ ...INITIAL_SITE_PAGES, ...d.sitePages });
         if (d.pageTranslations) setPageTranslations(d.pageTranslations);
+        if (d.toolsContent) setToolsContent(d.toolsContent);
       })
       .catch(() => {});
   }, []);
@@ -1889,6 +1895,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         updateSitePages,
         pageTranslations,
         refreshPageTranslations,
+        toolsContent,
+        setToolsContent,
         updateSiteSettings,
         updateAdminProfile,
         changePassword,
