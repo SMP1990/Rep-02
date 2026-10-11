@@ -16,7 +16,7 @@ import { extractTwitterVideo } from './server/twitterExtractor.ts';
 import { extractPinterestVideo } from './server/pinterestExtractor.ts';
 import { extractViaSaverApi, resolveHlsTracks, getSizesForUrls, looksLikeLegitimateMediaUrl, formatBytes } from './server/extractorCommon.ts';
 import { canMux, muxAudioVideo, findFfmpeg, extractAudioAsMp3, redditAudioCandidates } from './server/mux.ts';
-import { extractViaYtdlp, getYtdlp, ytdlpStatus, handleYtdlpStream } from './server/ytdlp.ts';
+import { extractViaYtdlp, getYtdlp, ytdlpStatus, handleYtdlpStream, ytdlpFile } from './server/ytdlp.ts';
 import { testConnection } from './server/db.ts';
 import * as store from './server/store.ts';
 import * as users from './server/adminUsers.ts';
@@ -2402,6 +2402,13 @@ app.get('/api/video/download-proxy', trackRoute('download'), async (req: Request
       headers['Referer'] = 'https://www.instagram.com/';
     }
 
+    // Files this server found with yt-dlp (TikTok, Reddit, Pinterest, ...)
+    // are read in-process: fetching our own /api/... over HTTP fails on
+    // Hostinger, where the app does not listen on 127.0.0.1:PORT.
+    const ytdlpToken = /^\/api\/video\/ytdlp-stream\/([\w-]+)$/.exec(fileUrl)?.[1];
+    const fetchSource = (): Promise<globalThis.Response> =>
+      ytdlpToken ? ytdlpFile(ytdlpToken) : fetch(targetUrl, { headers });
+
     // The MP3 option must produce a genuinely audio-only file, not the
     // same video bytes under a different name — otherwise it downloads
     // at full video size and isn't really an MP3 at all.
@@ -2472,7 +2479,7 @@ app.get('/api/video/download-proxy', trackRoute('download'), async (req: Request
 
     if (wantsMp3 && (await canMux())) {
       try {
-        const srcRes = await fetch(targetUrl, { headers });
+        const srcRes = await fetchSource();
         if (srcRes.ok) {
           const mp3 = await extractAudioAsMp3(Buffer.from(await srcRes.arrayBuffer()));
           res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`);
@@ -2486,7 +2493,7 @@ app.get('/api/video/download-proxy', trackRoute('download'), async (req: Request
       }
     }
 
-    const upstreamRes = await fetch(targetUrl, { headers });
+    const upstreamRes = await fetchSource();
 
     if (!upstreamRes.ok) {
       // Redirecting the browser to the raw CDN URL here used to hide the

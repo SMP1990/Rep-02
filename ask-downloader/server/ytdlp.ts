@@ -272,34 +272,46 @@ async function grab(m: Media): Promise<globalThis.Response> {
   return fetch(m.url, { headers: m.headers });
 }
 
-export async function handleYtdlpStream(req: Request, res: Response): Promise<any> {
-  const entry = tokens.get(String(req.params.token || ''));
-  if (!entry) return res.status(404).send('This download link is no longer available. Please fetch the video again.');
-  try {
-    // Platform links expire; if this one has, fetch a fresh one and carry on.
-    if (!entry.video) {
-      if (!(await refresh(entry))) return res.status(502).send('This video is no longer available from the source.');
+const fail = (status: number, message: string) => new globalThis.Response(message, { status, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+
+/**
+ * The file behind a token, as a fetch Response (audio+video muxed when
+ * needed), or an error Response. Used by the stream route and directly by
+ * /api/video/download-proxy — the proxy must not call this server over
+ * HTTP: on Hostinger the app does not listen on 127.0.0.1:PORT.
+ */
+export async function ytdlpFile(token: string): Promise<globalThis.Response> {
+  const entry = tokens.get(token);
+  if (!entry) return fail(404, 'This download link is no longer available. Please fetch the video again.');
+  // Platform links expire; if this one has, fetch a fresh one and carry on.
+  if (!entry.video) {
+    if (!(await refresh(entry))) return fail(502, 'This video is no longer available from the source.');
+  } else {
+    const probe = await grab(entry.video).catch(() => null);
+    if (!probe || !probe.ok) {
+      probe?.body?.cancel().catch(() => {});
+      if (!(await refresh(entry))) return fail(502, 'This video is no longer available from the source.');
     } else {
-      const probe = await grab(entry.video).catch(() => null);
-      if (!probe || !probe.ok) {
-        probe?.body?.cancel().catch(() => {});
-        if (!(await refresh(entry))) return res.status(502).send('This video is no longer available from the source.');
-      } else {
-        probe.body?.cancel().catch(() => {});
-      }
+      probe.body?.cancel().catch(() => {});
     }
+  }
 
-    if (entry.audio && (await canMux())) {
-      const [v, a] = await Promise.all([grab(entry.video!), grab(entry.audio)]);
-      if (!v.ok || !a.ok) return res.status(502).send('The source refused this download. Please fetch the video again.');
-      const merged = await muxAudioVideo(Buffer.from(await v.arrayBuffer()), Buffer.from(await a.arrayBuffer()));
-      res.setHeader('Content-Type', 'video/mp4');
-      res.setHeader('Content-Length', String(merged.length));
-      return res.end(merged);
-    }
+  if (entry.audio && (await canMux())) {
+    const [v, a] = await Promise.all([grab(entry.video!), grab(entry.audio)]);
+    if (!v.ok || !a.ok) return fail(502, 'The source refused this download. Please fetch the video again.');
+    const merged = await muxAudioVideo(Buffer.from(await v.arrayBuffer()), Buffer.from(await a.arrayBuffer()));
+    return new globalThis.Response(merged, { headers: { 'Content-Type': 'video/mp4', 'Content-Length': String(merged.length) } });
+  }
 
-    const up = await grab(entry.video!);
-    if (!up.ok || !up.body) return res.status(502).send('The source refused this download. Please fetch the video again.');
+  const up = await grab(entry.video!);
+  if (!up.ok || !up.body) return fail(502, 'The source refused this download. Please fetch the video again.');
+  return up;
+}
+
+export async function handleYtdlpStream(req: Request, res: Response): Promise<any> {
+  try {
+    const up = await ytdlpFile(String(req.params.token || ''));
+    if (!up.ok || !up.body) return res.status(up.status).send(await up.text());
     res.setHeader('Content-Type', up.headers.get('content-type') || 'video/mp4');
     const len = up.headers.get('content-length');
     if (len) res.setHeader('Content-Length', len);
