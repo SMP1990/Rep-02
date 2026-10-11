@@ -95,6 +95,8 @@ export const en = {
     bgRemoverDesc: 'Remove the background from any photo in seconds.',
     pwGenTitle: 'Password Generator',
     pwGenDesc: 'Create strong, random passwords in one click.',
+    ageCalcTitle: 'Age Calculator',
+    ageCalcDesc: 'Find your exact age in years, months and days.',
     open: 'Open tool',
     newLabel: 'New',
     comingSoon: 'Coming soon',

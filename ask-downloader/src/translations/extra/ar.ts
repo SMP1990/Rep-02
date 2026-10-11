@@ -92,6 +92,8 @@ export const ar: ExtraDict = {
     bgRemoverDesc: 'أزل خلفية أي صورة في ثوانٍ.',
     pwGenTitle: 'مولّد كلمات المرور',
     pwGenDesc: 'أنشئ كلمات مرور قوية وعشوائية بنقرة واحدة.',
+    ageCalcTitle: 'حاسبة العمر',
+    ageCalcDesc: 'اعرف عمرك بدقة بالسنوات والأشهر والأيام.',
     open: 'افتح الأداة',
     newLabel: 'جديد',
     comingSoon: 'قريبًا',

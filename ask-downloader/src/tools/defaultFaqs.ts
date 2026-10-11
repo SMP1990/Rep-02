@@ -6,6 +6,7 @@
  */
 import { en as backgroundRemover } from './background-remover/i18n/en';
 import { en as passwordGenerator } from './password-generator/i18n/en';
+import { en as ageCalculator } from './age-calculator/i18n/en';
 
 export interface FaqPair {
   question: string;
@@ -25,6 +26,7 @@ export function faqsOf(words: object): FaqPair[] {
 const ENGLISH: Record<string, object> = {
   'background-remover': backgroundRemover,
   'password-generator': passwordGenerator,
+  'age-calculator': ageCalculator,
 };
 
 export const defaultToolFaqs = (toolId: string): FaqPair[] => faqsOf(ENGLISH[toolId] || {});

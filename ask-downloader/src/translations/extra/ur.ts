@@ -92,6 +92,8 @@ export const ur: ExtraDict = {
     bgRemoverDesc: 'کسی بھی تصویر کا بیک گراؤنڈ چند سیکنڈ میں ہٹائیں۔',
     pwGenTitle: 'پاس ورڈ جنریٹر',
     pwGenDesc: 'ایک کلک میں مضبوط اور رینڈم پاس ورڈ بنائیں۔',
+    ageCalcTitle: 'عمر کیلکولیٹر',
+    ageCalcDesc: 'اپنی درست عمر سالوں، مہینوں اور دنوں میں جانیں۔',
     open: 'ٹول کھولیں',
     newLabel: 'نیا',
     comingSoon: 'جلد آ رہا ہے',

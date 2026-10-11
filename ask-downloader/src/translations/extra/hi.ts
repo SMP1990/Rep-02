@@ -92,6 +92,8 @@ export const hi: ExtraDict = {
     bgRemoverDesc: 'किसी भी फ़ोटो का बैकग्राउंड कुछ ही सेकंड में हटाएँ।',
     pwGenTitle: 'पासवर्ड जनरेटर',
     pwGenDesc: 'एक क्लिक में मज़बूत, रैंडम पासवर्ड बनाएँ।',
+    ageCalcTitle: 'आयु कैलकुलेटर',
+    ageCalcDesc: 'अपनी सटीक उम्र साल, महीने और दिनों में जानें।',
     open: 'टूल खोलें',
     newLabel: 'नया',
     comingSoon: 'जल्द आ रहा है',

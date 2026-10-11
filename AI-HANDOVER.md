@@ -5,7 +5,7 @@ without the old chat. Read it fully, then `ask-downloader/CLAUDE.md` (owner
 rules and site details) and `TOOLS-GUIDE.md` (tools map), before changing
 anything.
 
-Last updated: 2026-10-10.
+Last updated: 2026-10-11.
 
 ## 1. Where the work is
 
@@ -76,7 +76,8 @@ phones show 4 per swipe page. Config: `ask-downloader/src/config/tools.ts`.
 |---|---|---|---|
 | 1 | Background Remover | `/background-remover` | Live. Runs **on the server** (onnxruntime-node in a worker thread, ISNet 768px + U2Net "Need better results?"), browser fallback if the server can't. |
 | 2 | Password Generator | `/password-generator` | Live. Runs in the browser (Web Crypto), nothing sent or stored. Logic ported from generate-password (MIT). |
-| 3–8 | "Coming soon" | — | Placeholders. The owner said 3–4 more tools will come. |
+| 3 | Age Calculator | `/age-calculator` | Built 2026-10-11. Runs in the browser (`lib/age.ts`, no library), nothing sent or stored. 29 Feb birthdays count on 28 Feb in common years (owner's choice). Its page links to the other live tools (`tools/shared/RelatedTools.tsx`, on this page only, owner's choice). |
+| 4–8 | "Coming soon" | — | Placeholders. The owner said more tools will come. |
 
 **Admin → Tools SEO & FAQ** (`src/pages/ToolsSeoPage.tsx`): per tool meta
 title ({brand}), description, keywords, share image, noindex, and the FAQ.
@@ -118,12 +119,18 @@ How to add the next tool (registry, page, route, tile, SEO, FAQ): see
   first admin via `POST /api/admin/setup`. Always check desktop and a
   390 px-wide phone, English + Urdu + one Latin language, and that the admin
   pages still open.
+- The owner may also work on a Windows PC (PowerShell, no `zip`/`rm`): build
+  the deploy ZIP with .NET `System.IO.Compression` using `/` in entry names
+  (PowerShell 5's `Compress-Archive` writes `\`, which breaks on Linux), and
+  start Vite with `--host 127.0.0.1` so the browser can reach it.
 
 ## 6. Last state
 
-- Last delivered ZIP: `releases/ask-downloader-tools.zip` at commit `acf0cad`
-  (Background Remover on the server, Password Generator, Tools SEO & FAQ).
-  Ask the owner whether it is deployed and working before building on it.
+- Last delivered ZIP: `releases/ask-downloader-age-calculator.zip` (Age
+  Calculator added; everything from `ask-downloader-tools.zip` still in it).
+  The previous one, `releases/ask-downloader-tools.zip` (commit `acf0cad`),
+  stays as the fallback. Ask the owner whether the newest one is deployed and
+  working before building on it.
 - Next: the owner will name the next tool. Plan it the same way: check the
   code, research GitHub for compatible MIT/Apache code (no GPL), measure,
   build step by step, add it to the registry so its SEO and FAQ are ready.

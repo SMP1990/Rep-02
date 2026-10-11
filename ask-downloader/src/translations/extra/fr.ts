@@ -92,6 +92,8 @@ export const fr: ExtraDict = {
     bgRemoverDesc: 'Supprimez l\'arrière-plan de n\'importe quelle photo en quelques secondes.',
     pwGenTitle: 'Générateur de mots de passe',
     pwGenDesc: 'Créez des mots de passe forts et aléatoires en un clic.',
+    ageCalcTitle: "Calculateur d'âge",
+    ageCalcDesc: 'Trouvez votre âge exact en années, mois et jours.',
     open: 'Ouvrir l\'outil',
     newLabel: 'Nouveau',
     comingSoon: 'Bientôt disponible',

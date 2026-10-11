@@ -40,6 +40,15 @@ export const TOOL_PAGE_LIST: ToolPage[] = [
       'Create strong, random passwords in one click. Choose the length and characters, then copy. Free, no sign-up; passwords are made on your device and never stored.',
     keywords: 'password generator, strong password generator, random password, secure password, password maker, free password generator',
   },
+  {
+    id: 'age-calculator',
+    path: '/age-calculator',
+    name: 'Age Calculator',
+    seoTitle: 'Age Calculator - Exact Age & Next Birthday',
+    seoDescription:
+      'Calculate your exact age in years, months and days from your date of birth, and count down to your next birthday. Free, no sign-up; nothing is stored.',
+    keywords: 'age calculator, calculate age, age calculator by date of birth, how old am I, exact age, birthday calculator, date of birth calculator',
+  },
 ];
 
 /** What the admin set for one tool. Empty fields mean "use the default". */

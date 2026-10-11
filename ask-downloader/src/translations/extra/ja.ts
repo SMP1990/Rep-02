@@ -92,6 +92,8 @@ export const ja: ExtraDict = {
     bgRemoverDesc: 'どんな写真の背景も数秒で削除できます。',
     pwGenTitle: 'パスワード生成ツール',
     pwGenDesc: '強力なランダムパスワードをワンクリックで作成。',
+    ageCalcTitle: '年齢計算ツール',
+    ageCalcDesc: '年・月・日で正確な年齢を調べます。',
     open: 'ツールを開く',
     newLabel: '新着',
     comingSoon: '近日公開',

@@ -92,6 +92,8 @@ export const es: ExtraDict = {
     bgRemoverDesc: 'Elimina el fondo de cualquier foto en segundos.',
     pwGenTitle: 'Generador de contraseñas',
     pwGenDesc: 'Crea contraseñas seguras y aleatorias con un clic.',
+    ageCalcTitle: 'Calculadora de edad',
+    ageCalcDesc: 'Descubre tu edad exacta en años, meses y días.',
     open: 'Abrir herramienta',
     newLabel: 'Nuevo',
     comingSoon: 'Próximamente',

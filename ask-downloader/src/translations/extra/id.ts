@@ -92,6 +92,8 @@ export const id: ExtraDict = {
     bgRemoverDesc: 'Hapus latar belakang foto apa pun dalam hitungan detik.',
     pwGenTitle: 'Pembuat Kata Sandi',
     pwGenDesc: 'Buat kata sandi yang kuat dan acak dengan satu klik.',
+    ageCalcTitle: 'Kalkulator Umur',
+    ageCalcDesc: 'Ketahui umur pasti Anda dalam tahun, bulan, dan hari.',
     open: 'Buka alat',
     newLabel: 'Baru',
     comingSoon: 'Segera hadir',
