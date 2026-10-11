@@ -126,7 +126,7 @@ How to add the next tool (registry, page, route, tile, SEO, FAQ): see
 
 ## 6. Last state
 
-- Last delivered ZIP: `releases/ask-downloader-age-calculator-v3.zip` (Age
+- Last delivered ZIP: `releases/ask-downloader-age-calculator-v4.zip` (Age
   Calculator added; everything from `ask-downloader-tools.zip` still in it).
   v2 also fixes a crash that was in the site since its first commit: after
   "Download", English and 7 other languages showed "Something went wrong"
@@ -140,9 +140,12 @@ How to add the next tool (registry, page, route, tile, SEO, FAQ): see
   file from the source". The proxy now reads the token in-process
   (`ytdlpFile()` in `server/ytdlp.ts`). Never make the server call itself
   over HTTP.
-- Known open issue: TikTok video files (not MP3) also got 502 "The source
-  refused this download" from `/api/video/ytdlp-stream/` itself on the live
-  server (TikTok's CDN refuses). Check again after v3 is live.
+- After v3 went live (2026-10-12): Reddit and Pinterest video + MP3, and
+  TikTok MP3, download. TikTok VIDEO still got 502: `ytdlpFile()` probed the
+  CDN link (OK) and then fetched it again, and TikTok refused the second
+  request. v4 uses the first successful response as the download. NOT yet
+  verified live: check TikTok video after v4 is deployed; if it still fails,
+  look at the headers/cookies yt-dlp gives for TikTok formats.
   The previous one, `releases/ask-downloader-tools.zip` (commit `acf0cad`),
   stays as the fallback. Ask the owner whether the newest one is deployed and
   working before building on it.

@@ -284,26 +284,25 @@ export async function ytdlpFile(token: string): Promise<globalThis.Response> {
   const entry = tokens.get(token);
   if (!entry) return fail(404, 'This download link is no longer available. Please fetch the video again.');
   // Platform links expire; if this one has, fetch a fresh one and carry on.
-  if (!entry.video) {
-    if (!(await refresh(entry))) return fail(502, 'This video is no longer available from the source.');
-  } else {
+  // The first successful response IS the download: some CDNs (TikTok) refuse
+  // a second request for the same link, so it is never thrown away and
+  // fetched again.
+  let first: globalThis.Response | null = null;
+  if (entry.video) {
     const probe = await grab(entry.video).catch(() => null);
-    if (!probe || !probe.ok) {
-      probe?.body?.cancel().catch(() => {});
-      if (!(await refresh(entry))) return fail(502, 'This video is no longer available from the source.');
-    } else {
-      probe.body?.cancel().catch(() => {});
-    }
+    if (probe?.ok) first = probe;
+    else probe?.body?.cancel().catch(() => {});
   }
+  if (!first && !(await refresh(entry))) return fail(502, 'This video is no longer available from the source.');
 
   if (entry.audio && (await canMux())) {
-    const [v, a] = await Promise.all([grab(entry.video!), grab(entry.audio)]);
+    const [v, a] = await Promise.all([first || grab(entry.video!), grab(entry.audio)]);
     if (!v.ok || !a.ok) return fail(502, 'The source refused this download. Please fetch the video again.');
     const merged = await muxAudioVideo(Buffer.from(await v.arrayBuffer()), Buffer.from(await a.arrayBuffer()));
     return new globalThis.Response(merged, { headers: { 'Content-Type': 'video/mp4', 'Content-Length': String(merged.length) } });
   }
 
-  const up = await grab(entry.video!);
+  const up = first || (await grab(entry.video!));
   if (!up.ok || !up.body) return fail(502, 'The source refused this download. Please fetch the video again.');
   return up;
 }
