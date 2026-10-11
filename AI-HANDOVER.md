@@ -143,9 +143,11 @@ How to add the next tool (registry, page, route, tile, SEO, FAQ): see
 - After v3 went live (2026-10-12): Reddit and Pinterest video + MP3, and
   TikTok MP3, download. TikTok VIDEO still got 502: `ytdlpFile()` probed the
   CDN link (OK) and then fetched it again, and TikTok refused the second
-  request. v4 uses the first successful response as the download. NOT yet
-  verified live: check TikTok video after v4 is deployed; if it still fails,
-  look at the headers/cookies yt-dlp gives for TikTok formats.
+  request. v4 uses the first successful response as the download.
+- **TOP PRIORITY for the next session (owner's order, 2026-10-12):** with v4
+  live, TikTok VIDEO still fails (MP3 works). Fix this FIRST, before any new
+  tool: investigate the headers/cookies yt-dlp gives for TikTok video formats
+  (`mediaOf()` in `server/ytdlp.ts`) and what TikTok's CDN answers.
   The previous one, `releases/ask-downloader-tools.zip` (commit `acf0cad`),
   stays as the fallback. Ask the owner whether the newest one is deployed and
   working before building on it.
