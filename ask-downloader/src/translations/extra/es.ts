@@ -103,4 +103,24 @@ export const es: ExtraDict = {
     nextPage: 'Más herramientas',
     pageDot: 'Página de herramientas {n}',
   },
+  // Download box and preview window (these words were missing in most languages).
+  notifications: {
+    enablePrompt: 'Avisarme al terminar',
+  },
+  preview: {
+    verifySubtitle: 'Revisa el vídeo y su sonido antes de descargarlo',
+    closePreview: 'Cerrar vista previa',
+    closeEsc: 'Cerrar vista previa (Esc)',
+    switchQuality: 'Calidad de la vista previa:',
+    resolutionLabel: 'Resolución:',
+    verifiedBadge: 'Vídeo y audio comprobados',
+    watermarkBadge: 'Original, sin marca de agua',
+    readyBadge: 'Listo para descargar',
+    downloadNow: 'Descargar',
+    buffering: 'Cargando vista previa...',
+    directBlocked: 'El origen bloquea la vista previa',
+    directBlockedDesc: 'El sitio del vídeo no permite reproducirlo aquí. Prueba el proxy o descarga el vídeo directamente.',
+    tryProxy: 'Probar proxy',
+    proceedDownload: 'Ir a la descarga',
+  },
 };

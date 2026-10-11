@@ -103,4 +103,24 @@ export const ar: ExtraDict = {
     nextPage: 'المزيد من الأدوات',
     pageDot: 'صفحة الأدوات {n}',
   },
+  // Download box and preview window (these words were missing in most languages).
+  notifications: {
+    enablePrompt: 'أبلغني عند الانتهاء',
+  },
+  preview: {
+    verifySubtitle: 'تحقق من الفيديو وصوته قبل التنزيل',
+    closePreview: 'إغلاق المعاينة',
+    closeEsc: 'إغلاق المعاينة (Esc)',
+    switchQuality: 'جودة المعاينة:',
+    resolutionLabel: 'الدقة:',
+    verifiedBadge: 'تم التحقق من الصوت والفيديو',
+    watermarkBadge: 'أصلي بدون علامة مائية',
+    readyBadge: 'جاهز للتنزيل',
+    downloadNow: 'تنزيل',
+    buffering: 'جارٍ تحميل المعاينة...',
+    directBlocked: 'المصدر يمنع المعاينة',
+    directBlockedDesc: 'موقع الفيديو لا يسمح بتشغيله هنا. جرّب البث عبر الوكيل، أو نزّل الفيديو مباشرة.',
+    tryProxy: 'جرّب البث عبر الوكيل',
+    proceedDownload: 'الانتقال إلى التنزيل',
+  },
 };

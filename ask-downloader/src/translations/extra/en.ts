@@ -106,5 +106,25 @@ export const en = {
     nextPage: 'More tools',
     pageDot: 'Tools page {n}',
   },
+  // Download box and preview window (these words were missing in most languages).
+  notifications: {
+    enablePrompt: 'Notify me when done',
+  },
+  preview: {
+    verifySubtitle: 'Check the video and its sound before you download',
+    closePreview: 'Close preview',
+    closeEsc: 'Close preview (Esc)',
+    switchQuality: 'Preview quality:',
+    resolutionLabel: 'Resolution:',
+    verifiedBadge: 'Video and audio checked',
+    watermarkBadge: 'Original, no watermark',
+    readyBadge: 'Ready to download',
+    downloadNow: 'Download',
+    buffering: 'Loading preview...',
+    directBlocked: 'Preview blocked by the source',
+    directBlockedDesc: 'The video site does not allow playing it here. Try the proxy stream, or download the video directly.',
+    tryProxy: 'Try proxy stream',
+    proceedDownload: 'Go to download',
+  },
 };
 export type ExtraDict = typeof en;

@@ -103,4 +103,24 @@ export const de: ExtraDict = {
     nextPage: 'Weitere Tools',
     pageDot: 'Tool-Seite {n}',
   },
+  // Download box and preview window (these words were missing in most languages).
+  notifications: {
+    enablePrompt: 'Benachrichtigen, wenn fertig',
+  },
+  preview: {
+    verifySubtitle: 'Prüfe Video und Ton vor dem Herunterladen',
+    closePreview: 'Vorschau schließen',
+    closeEsc: 'Vorschau schließen (Esc)',
+    switchQuality: 'Vorschauqualität:',
+    resolutionLabel: 'Auflösung:',
+    verifiedBadge: 'Video und Ton geprüft',
+    watermarkBadge: 'Original, ohne Wasserzeichen',
+    readyBadge: 'Bereit zum Download',
+    downloadNow: 'Herunterladen',
+    buffering: 'Vorschau wird geladen...',
+    directBlocked: 'Vorschau von der Quelle blockiert',
+    directBlockedDesc: 'Die Videoseite erlaubt das Abspielen hier nicht. Versuche den Proxy-Stream oder lade das Video direkt herunter.',
+    tryProxy: 'Proxy-Stream versuchen',
+    proceedDownload: 'Zum Download',
+  },
 };

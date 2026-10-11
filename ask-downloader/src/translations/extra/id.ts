@@ -103,4 +103,24 @@ export const id: ExtraDict = {
     nextPage: 'Alat lainnya',
     pageDot: 'Halaman alat {n}',
   },
+  // Download box and preview window (these words were missing in most languages).
+  notifications: {
+    enablePrompt: 'Beri tahu saya jika selesai',
+  },
+  preview: {
+    verifySubtitle: 'Periksa video dan suaranya sebelum mengunduh',
+    closePreview: 'Tutup pratinjau',
+    closeEsc: 'Tutup pratinjau (Esc)',
+    switchQuality: 'Kualitas pratinjau:',
+    resolutionLabel: 'Resolusi:',
+    verifiedBadge: 'Video dan audio terverifikasi',
+    watermarkBadge: 'Asli, tanpa watermark',
+    readyBadge: 'Siap diunduh',
+    downloadNow: 'Unduh',
+    buffering: 'Memuat pratinjau...',
+    directBlocked: 'Pratinjau diblokir oleh sumber',
+    directBlockedDesc: 'Situs video tidak mengizinkan pemutaran di sini. Coba stream proxy, atau unduh video secara langsung.',
+    tryProxy: 'Coba stream proxy',
+    proceedDownload: 'Lanjut ke unduhan',
+  },
 };

@@ -103,4 +103,24 @@ export const hi: ExtraDict = {
     nextPage: 'और टूल्स',
     pageDot: 'टूल्स पेज {n}',
   },
+  // Download box and preview window (these words were missing in most languages).
+  notifications: {
+    enablePrompt: 'समाप्त होने पर सूचित करें',
+  },
+  preview: {
+    verifySubtitle: 'डाउनलोड करने से पहले सामग्री और ऑडियो गुणवत्ता की जाँच करें',
+    closePreview: 'पूर्वावलोकन बंद करें',
+    closeEsc: 'पूर्वावलोकन बंद करें (Esc)',
+    switchQuality: 'गुणवत्ता बदलें:',
+    resolutionLabel: 'रिज़ॉल्यूशन:',
+    verifiedBadge: 'सत्यापित ऑडियो और वीडियो',
+    watermarkBadge: 'मूल बिना वॉटरमार्क',
+    readyBadge: 'तेज़ डाउनलोड के लिए तैयार',
+    downloadNow: 'डाउनलोड करें',
+    buffering: 'बफ़र हो रहा है...',
+    directBlocked: 'डायरेक्ट पूर्वावलोकन अवरुद्ध',
+    directBlockedDesc: 'बाहरी CDN सुरक्षा प्रतिबंधों के कारण इनलाइन प्लेबैक अवरुद्ध है। आप प्रॉक्सी स्ट्रीम आज़मा सकते हैं या सीधे डाउनलोड कर सकते हैं।',
+    tryProxy: 'प्रॉक्सी स्ट्रीम आज़माएँ',
+    proceedDownload: 'डाउनलोड जारी रखें',
+  },
 };

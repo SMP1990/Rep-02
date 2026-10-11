@@ -103,4 +103,24 @@ export const ru: ExtraDict = {
     nextPage: 'Ещё инструменты',
     pageDot: 'Страница инструментов {n}',
   },
+  // Download box and preview window (these words were missing in most languages).
+  notifications: {
+    enablePrompt: 'Сообщить по завершении',
+  },
+  preview: {
+    verifySubtitle: 'Проверьте видео и звук перед скачиванием',
+    closePreview: 'Закрыть предпросмотр',
+    closeEsc: 'Закрыть предпросмотр (Esc)',
+    switchQuality: 'Качество предпросмотра:',
+    resolutionLabel: 'Разрешение:',
+    verifiedBadge: 'Видео и звук проверены',
+    watermarkBadge: 'Оригинал, без водяного знака',
+    readyBadge: 'Готово к скачиванию',
+    downloadNow: 'Скачать',
+    buffering: 'Загрузка предпросмотра...',
+    directBlocked: 'Источник блокирует предпросмотр',
+    directBlockedDesc: 'Сайт видео не разрешает воспроизводить его здесь. Попробуйте прокси-поток или скачайте видео напрямую.',
+    tryProxy: 'Попробовать прокси',
+    proceedDownload: 'Перейти к скачиванию',
+  },
 };

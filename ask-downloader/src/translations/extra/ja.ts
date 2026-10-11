@@ -103,4 +103,24 @@ export const ja: ExtraDict = {
     nextPage: '他のツール',
     pageDot: 'ツール {n} ページ目',
   },
+  // Download box and preview window (these words were missing in most languages).
+  notifications: {
+    enablePrompt: '完了時に通知',
+  },
+  preview: {
+    verifySubtitle: 'ダウンロード前に映像と音声を直接確認できます',
+    closePreview: 'プレビューを閉じる',
+    closeEsc: '閉じる (Esc)',
+    switchQuality: '画質切り替え:',
+    resolutionLabel: '解像度:',
+    verifiedBadge: '映像・音声確認済み',
+    watermarkBadge: '透かしなしオリジナル',
+    readyBadge: 'ダウンロード可能',
+    downloadNow: 'ダウンロード',
+    buffering: 'プレビューを読み込み中...',
+    directBlocked: '直接プレビュー再生がブロックされました',
+    directBlockedDesc: '外部CDNのセキュリティ設定により再生できない場合があります。プロキシ再生を試すか、直接ダウンロードしてください。',
+    tryProxy: 'プロキシ再生を試す',
+    proceedDownload: 'ダウンロードへ進む',
+  },
 };

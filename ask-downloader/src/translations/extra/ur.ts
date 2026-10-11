@@ -103,4 +103,24 @@ export const ur: ExtraDict = {
     nextPage: 'مزید ٹولز',
     pageDot: 'ٹولز صفحہ {n}',
   },
+  // Download box and preview window (these words were missing in most languages).
+  notifications: {
+    enablePrompt: 'ڈاؤن لوڈ مکمل ہونے پر مطلع کریں',
+  },
+  preview: {
+    verifySubtitle: 'ڈاؤن لوڈ کرنے سے پہلے ویڈیو مواد اور آڈیو کوالٹی چیک کریں',
+    closePreview: 'پریویو بند کریں',
+    closeEsc: 'پریویو بند کریں (Esc)',
+    switchQuality: 'پریویو کوالٹی تبدیل کریں:',
+    resolutionLabel: 'ریزولوشن:',
+    verifiedBadge: 'تصدیق شدہ آڈیو اور ویڈیو',
+    watermarkBadge: 'اصل بغیر واٹر مارک',
+    readyBadge: 'تیز ڈاؤن لوڈ کے لیے تیار',
+    downloadNow: 'ڈاؤن لوڈ کریں',
+    buffering: 'پریویو بفر ہو رہا ہے...',
+    directBlocked: 'ڈائریکٹ پریویو اسٹریم بلاک ہے',
+    directBlockedDesc: 'بیرونی سی ڈی این سیکیورٹی پابندیوں کی وجہ سے اندرونی پلے بیک بلاک ہے۔ آپ سرور پراکسی موڈ آزما سکتے ہیں یا براہ راست ڈاؤن لوڈ کر سکتے ہیں۔',
+    tryProxy: 'پراکسی اسٹریم آزمائیں',
+    proceedDownload: 'ڈاؤن لوڈ کی طرف بڑھیں',
+  },
 };

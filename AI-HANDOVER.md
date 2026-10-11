@@ -126,8 +126,16 @@ How to add the next tool (registry, page, route, tile, SEO, FAQ): see
 
 ## 6. Last state
 
-- Last delivered ZIP: `releases/ask-downloader-age-calculator.zip` (Age
+- Last delivered ZIP: `releases/ask-downloader-age-calculator-v2.zip` (Age
   Calculator added; everything from `ask-downloader-tools.zip` still in it).
+  v2 also fixes a crash that was in the site since its first commit: after
+  "Download", English and 7 other languages showed "Something went wrong"
+  whenever the browser had not yet been asked about notifications
+  (`t.notifications` / `t.preview` existed only in ur/hi/ja). Those words now
+  live in `translations/extra` (all 11 languages, type-checked).
+- Known open issue: TikTok video files (not MP3) return 502 "The source
+  refused this download" from `/api/video/ytdlp-stream/` on the live server.
+  Not investigated yet.
   The previous one, `releases/ask-downloader-tools.zip` (commit `acf0cad`),
   stays as the fallback. Ask the owner whether the newest one is deployed and
   working before building on it.
