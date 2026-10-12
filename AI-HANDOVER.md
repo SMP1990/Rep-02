@@ -78,7 +78,8 @@ phones show 4 per swipe page. Config: `ask-downloader/src/config/tools.ts`.
 | 2 | Password Generator | `/password-generator` | Live. Runs in the browser (Web Crypto), nothing sent or stored. Logic ported from generate-password (MIT). |
 | 3 | Age Calculator | `/age-calculator` | Built 2026-10-11. Runs in the browser (`lib/age.ts`, no library), nothing sent or stored. 29 Feb birthdays count on 28 Feb in common years (owner's choice). Its page links to the other live tools (`tools/shared/RelatedTools.tsx`, on this page only, owner's choice). |
 | 4 | Word Counter | `/word-counter` | Built 2026-10-12. Runs in the browser (`lib/count.ts`): words = whitespace-separated pieces with a letter/digit; Japanese/Chinese/Thai via `Intl.Segmenter` only when present (10x slower, measured); characters = Unicode graphemes (fast path verified against Intl.Segmenter on 20,000 random texts); text over 20,000 chars is counted when typing pauses (`lib/useSettled.ts`). Paste/Copy/Clear with Undo. |
-| 5–8 | "Coming soon" | — | Placeholders. The owner said more tools will come. |
+| 5 | Image Compressor | `/image-compressor` | Built 2026-10-13, ideas from Sethispr/image-compressor (MIT). Runs in the browser in Web Workers (`lib/worker.ts` builds to `assets/worker-*.js`, which server.ts already lets use WebAssembly — no server change). Codecs: jSquash (Apache-2.0) MozJPEG / WebP (Safari only) / OxiPNG, bundled, loaded on demand; WebP uses the browser's own encoder (same size, measured). No AVIF (14–31 s per photo). Phones 1 image at a time, desktop 2. Target-size mode keeps quality >= 40 and shrinks the image instead. |
+| 6–8 | "Coming soon" | — | Placeholders. The owner said more tools will come. |
 
 **Admin → Tools SEO & FAQ** (`src/pages/ToolsSeoPage.tsx`): per tool meta
 title ({brand}), description, keywords, share image, noindex, and the FAQ.
@@ -127,8 +128,8 @@ How to add the next tool (registry, page, route, tile, SEO, FAQ): see
 
 ## 6. Last state
 
-- Last delivered ZIP: `releases/ask-downloader-v6-word-counter.zip` (Word
-  Counter added on top of v5). v5 = `ask-downloader-age-calculator-v5.zip`
+- Last delivered ZIP: `releases/ask-downloader-v7-image-compressor.zip`
+  (Image Compressor added on top of v6 = Word Counter). v5 = `ask-downloader-age-calculator-v5.zip`
   (Age Calculator; everything from `ask-downloader-tools.zip` still in it).
   v2 also fixes a crash that was in the site since its first commit: after
   "Download", English and 7 other languages showed "Something went wrong"

@@ -96,6 +96,8 @@ export const id: ExtraDict = {
     ageCalcDesc: 'Ketahui umur pasti Anda dalam tahun, bulan, dan hari.',
     wordCountTitle: 'Penghitung Kata',
     wordCountDesc: 'Hitung kata, karakter, dan waktu baca sambil mengetik.',
+    imgCompTitle: 'Kompresor Gambar',
+    imgCompDesc: 'Perkecil foto hingga 90% tanpa penurunan kualitas yang terlihat.',
     open: 'Buka alat',
     newLabel: 'Baru',
     comingSoon: 'Segera hadir',

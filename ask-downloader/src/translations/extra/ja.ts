@@ -96,6 +96,8 @@ export const ja: ExtraDict = {
     ageCalcDesc: '年・月・日で正確な年齢を調べます。',
     wordCountTitle: '文字数カウンター',
     wordCountDesc: '入力しながら単語数・文字数・読む時間を数えます。',
+    imgCompTitle: '画像圧縮ツール',
+    imgCompDesc: '画質を落とさず写真を最大90%小さくします。',
     open: 'ツールを開く',
     newLabel: '新着',
     comingSoon: '近日公開',

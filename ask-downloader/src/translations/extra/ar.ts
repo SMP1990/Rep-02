@@ -96,6 +96,8 @@ export const ar: ExtraDict = {
     ageCalcDesc: 'اعرف عمرك بدقة بالسنوات والأشهر والأيام.',
     wordCountTitle: 'عداد الكلمات',
     wordCountDesc: 'عُدّ الكلمات والأحرف ووقت القراءة أثناء الكتابة.',
+    imgCompTitle: 'ضاغط الصور',
+    imgCompDesc: 'صغّر الصور حتى 90% دون فقدان ملحوظ في الجودة.',
     open: 'افتح الأداة',
     newLabel: 'جديد',
     comingSoon: 'قريبًا',

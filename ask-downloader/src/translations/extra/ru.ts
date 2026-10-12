@@ -96,6 +96,8 @@ export const ru: ExtraDict = {
     ageCalcDesc: 'Узнайте точный возраст в годах, месяцах и днях.',
     wordCountTitle: 'Счётчик слов',
     wordCountDesc: 'Считайте слова, символы и время чтения при наборе.',
+    imgCompTitle: 'Сжатие изображений',
+    imgCompDesc: 'Уменьшайте фото до 90% без заметной потери качества.',
     open: 'Открыть инструмент',
     newLabel: 'Новое',
     comingSoon: 'Скоро',

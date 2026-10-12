@@ -96,6 +96,8 @@ export const fr: ExtraDict = {
     ageCalcDesc: 'Trouvez votre âge exact en années, mois et jours.',
     wordCountTitle: 'Compteur de mots',
     wordCountDesc: 'Comptez mots, caractères et temps de lecture pendant la saisie.',
+    imgCompTitle: 'Compresseur d\'images',
+    imgCompDesc: 'Réduisez vos photos jusqu’à 90 % sans perte de qualité visible.',
     open: 'Ouvrir l\'outil',
     newLabel: 'Nouveau',
     comingSoon: 'Bientôt disponible',

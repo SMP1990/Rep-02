@@ -34,6 +34,7 @@ const BackgroundRemoverPage = lazy(() => import('./pages/BackgroundRemoverPage')
 const PasswordGeneratorPage = lazy(() => import('./pages/PasswordGeneratorPage').then((m) => ({ default: m.PasswordGeneratorPage })));
 const AgeCalculatorPage = lazy(() => import('./pages/AgeCalculatorPage').then((m) => ({ default: m.AgeCalculatorPage })));
 const WordCounterPage = lazy(() => import('./pages/WordCounterPage').then((m) => ({ default: m.WordCounterPage })));
+const ImageCompressorPage = lazy(() => import('./pages/ImageCompressorPage').then((m) => ({ default: m.ImageCompressorPage })));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));
 
 const PageLoadingFallback: React.FC = () => (
@@ -149,6 +150,14 @@ const AppContent: React.FC = () => {
     return (
       <div className="min-h-screen bg-[#f6f0f4] dark:bg-[#0e0a17] font-sans antialiased text-[#2e2440] dark:text-[#f1e9fb]">
         <WordCounterPage />
+      </div>
+    );
+  }
+
+  if (currentRoute === 'image-compressor') {
+    return (
+      <div className="min-h-screen bg-[#f6f0f4] dark:bg-[#0e0a17] font-sans antialiased text-[#2e2440] dark:text-[#f1e9fb]">
+        <ImageCompressorPage />
       </div>
     );
   }

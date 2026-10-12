@@ -239,6 +239,9 @@ export function parseCurrentLocation(
   if (rawPath === '/word-counter') {
     return { route: 'word-counter', slug: null, language: null };
   }
+  if (rawPath === '/image-compressor') {
+    return { route: 'image-compressor', slug: null, language: null };
+  }
 
   // 4. Admin subroutes
   const adminRoutes: RouteType[] = ['dashboard', 'subscribers', 'downloads', 'visitors', 'admin-users', 'content-editor', 'blog-manager', 'settings', 'messages', 'redirects', 'media', 'tools-seo'];
@@ -920,6 +923,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           window.history.pushState(null, '', '/age-calculator');
         } else if (route === 'word-counter') {
           window.history.pushState(null, '', '/word-counter');
+        } else if (route === 'image-compressor') {
+          window.history.pushState(null, '', '/image-compressor');
         }
       } catch {
         window.location.hash = route;

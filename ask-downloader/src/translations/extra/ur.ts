@@ -96,6 +96,8 @@ export const ur: ExtraDict = {
     ageCalcDesc: 'اپنی درست عمر سالوں، مہینوں اور دنوں میں جانیں۔',
     wordCountTitle: 'ورڈ کاؤنٹر',
     wordCountDesc: 'لکھتے ہی الفاظ، حروف اور پڑھنے کا وقت گنیں۔',
+    imgCompTitle: 'امیج کمپریسر',
+    imgCompDesc: 'تصاویر کو معیار کھوئے بغیر 90% تک چھوٹا کریں۔',
     open: 'ٹول کھولیں',
     newLabel: 'نیا',
     comingSoon: 'جلد آ رہا ہے',

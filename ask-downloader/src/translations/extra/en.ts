@@ -99,6 +99,8 @@ export const en = {
     ageCalcDesc: 'Find your exact age in years, months and days.',
     wordCountTitle: 'Word Counter',
     wordCountDesc: 'Count words, characters and reading time as you type.',
+    imgCompTitle: 'Image Compressor',
+    imgCompDesc: 'Make photos up to 90% smaller without visible quality loss.',
     open: 'Open tool',
     newLabel: 'New',
     comingSoon: 'Coming soon',

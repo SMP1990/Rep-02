@@ -58,6 +58,15 @@ export const TOOL_PAGE_LIST: ToolPage[] = [
       'Count words, characters, sentences and paragraphs as you type, and see the reading time. Free, works in any language; your text is never stored.',
     keywords: 'word counter, character counter, count words, word count tool, letter counter, sentence counter, reading time calculator',
   },
+  {
+    id: 'image-compressor',
+    path: '/image-compressor',
+    name: 'Image Compressor',
+    seoTitle: 'Image Compressor - Reduce JPG, PNG & WebP Size',
+    seoDescription:
+      'Compress JPG, PNG and WebP images up to 90% without visible quality loss. Resize, convert to WebP, set a max size. Free; photos never leave your device.',
+    keywords: 'image compressor, compress image, reduce image size, compress jpg, compress png, webp converter, photo compressor, image size reducer',
+  },
 ];
 
 /** What the admin set for one tool. Empty fields mean "use the default". */

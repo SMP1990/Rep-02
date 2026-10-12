@@ -8,6 +8,7 @@ import { en as backgroundRemover } from './background-remover/i18n/en';
 import { en as passwordGenerator } from './password-generator/i18n/en';
 import { en as ageCalculator } from './age-calculator/i18n/en';
 import { en as wordCounter } from './word-counter/i18n/en';
+import { en as imageCompressor } from './image-compressor/i18n/en';
 
 export interface FaqPair {
   question: string;
@@ -29,6 +30,7 @@ const ENGLISH: Record<string, object> = {
   'password-generator': passwordGenerator,
   'age-calculator': ageCalculator,
   'word-counter': wordCounter,
+  'image-compressor': imageCompressor,
 };
 
 export const defaultToolFaqs = (toolId: string): FaqPair[] => faqsOf(ENGLISH[toolId] || {});

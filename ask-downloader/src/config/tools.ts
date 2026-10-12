@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { Cake, Clock, FileText, ImageMinus, KeyRound } from 'lucide-react';
+import { Cake, Clock, FileText, ImageDown, ImageMinus, KeyRound } from 'lucide-react';
 import type { PublicRoute } from '../components/PageLink';
 
 /**
@@ -51,7 +51,13 @@ export const TOOL_TILES: ToolTile[] = [
     titleKey: 'wordCountTitle',
     descKey: 'wordCountDesc',
   },
-  { id: 'soon-4', icon: Clock },
+  {
+    id: 'image-compressor',
+    icon: ImageDown,
+    route: 'image-compressor',
+    titleKey: 'imgCompTitle',
+    descKey: 'imgCompDesc',
+  },
   { id: 'soon-5', icon: Clock },
   { id: 'soon-6', icon: Clock },
   { id: 'soon-7', icon: Clock },
