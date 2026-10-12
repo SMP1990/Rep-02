@@ -272,44 +272,118 @@ async function grab(m: Media): Promise<globalThis.Response> {
   return fetch(m.url, { headers: m.headers });
 }
 
-const fail = (status: number, message: string) => new globalThis.Response(message, { status, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+const fail = (status: number, message: string, source = '') =>
+  new globalThis.Response(message, { status, headers: { 'Content-Type': 'text/plain; charset=utf-8', 'X-Source-Status': source } });
+
+/** Adds a short note on how the file was obtained (diagnostics, no secrets). */
+function tagged(r: globalThis.Response, source: string): globalThis.Response {
+  const headers = new Headers(r.headers);
+  headers.set('X-Source-Status', source);
+  return new globalThis.Response(r.body, { status: r.status, headers });
+}
+
+/**
+ * Runs a downloader that writes the file to stdout and returns it as a
+ * streamed Response once the first bytes arrive, or null if it exits
+ * without producing any. Exported for tests.
+ */
+export function streamFromProcess(bin: string, args: string[], env: NodeJS.ProcessEnv, contentType: string, startTimeoutMs = 60000): Promise<globalThis.Response | null> {
+  return new Promise((resolve) => {
+    let settled = false;
+    let err = '';
+    const p = spawn(bin, args, { env });
+    const done = (r: globalThis.Response | null) => { if (!settled) { settled = true; clearTimeout(timer); resolve(r); } };
+    const timer = setTimeout(() => { p.kill('SIGKILL'); done(null); }, startTimeoutMs);
+    p.stderr.on('data', (d) => { if (err.length < 4000) err += d; });
+    p.on('error', () => done(null));
+    p.stdout.once('readable', () => {
+      if (!p.stdout.readableLength) return; // ended without data; 'close' reports it
+      // @ts-ignore — node stream to web stream
+      done(new globalThis.Response(Readable.toWeb(p.stdout), { headers: { 'Content-Type': contentType } }));
+    });
+    p.on('close', (code) => {
+      if (!settled) console.warn(`[yt-dlp] direct download gave no data (exit ${code}): ${err.trim().split('\n').pop()?.slice(0, 300)}`);
+      done(null);
+    });
+  });
+}
+
+let directActive = 0;
+/** Last resort: yt-dlp downloads the file itself (its own client knows how
+ * each platform wants to be asked; TikTok refuses Node's fetch). One
+ * progressive file at the chosen height, streamed straight through. */
+async function viaYtdlp(entry: Entry): Promise<globalThis.Response | null> {
+  const bin = await getYtdlp();
+  if (!bin || directActive >= MAX_CONCURRENT) return null;
+  directActive++;
+  // The slot stays taken until the stream has ended or been cancelled.
+  let release = () => { release = () => {}; directActive--; };
+  try {
+    const fmt = entry.kind === 'audio' ? 'ba/b' : entry.height ? `b[height<=${entry.height}]/b` : 'b';
+    const args = ['-f', fmt, '--no-playlist', '--no-warnings', '--no-cache-dir', '--no-part', '--socket-timeout', '15', '-o', '-', entry.pageUrl];
+    const r = await streamFromProcess(bin, args, await ytEnv(), entry.kind === 'audio' ? 'audio/mp4' : 'video/mp4');
+    if (!r?.body) { release(); return null; }
+    const pass = new TransformStream({ flush: () => release() });
+    r.body.pipeTo(pass.writable).catch(() => release());
+    console.log(`[yt-dlp] serving ${entry.platform} ${entry.kind} through yt-dlp itself`);
+    return new globalThis.Response(pass.readable, { headers: r.headers });
+  } catch (err) {
+    release();
+    console.warn('[yt-dlp] direct download failed:', err);
+    return null;
+  }
+}
 
 /**
  * The file behind a token, as a fetch Response (audio+video muxed when
  * needed), or an error Response. Used by the stream route and directly by
  * /api/video/download-proxy — the proxy must not call this server over
  * HTTP: on Hostinger the app does not listen on 127.0.0.1:PORT.
+ * X-Source-Status says which way it worked: "cdn 200", "yt-dlp after cdn 403", ...
  */
 export async function ytdlpFile(token: string): Promise<globalThis.Response> {
   const entry = tokens.get(token);
   if (!entry) return fail(404, 'This download link is no longer available. Please fetch the video again.');
+  const seen: string[] = [];
+  const note = (r: globalThis.Response | null) => { seen.push(r ? String(r.status) : 'error'); return r; };
   // Platform links expire; if this one has, fetch a fresh one and carry on.
   // The first successful response IS the download: some CDNs (TikTok) refuse
   // a second request for the same link, so it is never thrown away and
   // fetched again.
   let first: globalThis.Response | null = null;
   if (entry.video) {
-    const probe = await grab(entry.video).catch(() => null);
+    const probe = note(await grab(entry.video).catch(() => null));
     if (probe?.ok) first = probe;
     else probe?.body?.cancel().catch(() => {});
   }
-  if (!first && !(await refresh(entry))) return fail(502, 'This video is no longer available from the source.');
+  const fallback = async () => {
+    const r = await viaYtdlp(entry);
+    if (r) return tagged(r, `yt-dlp after cdn ${seen.join(',')}`);
+    return fail(502, 'The source refused this download. Please fetch the video again.', `cdn ${seen.join(',')}; yt-dlp failed`);
+  };
+  if (!first && !(await refresh(entry))) return fallback();
 
   if (entry.audio && (await canMux())) {
     const [v, a] = await Promise.all([first || grab(entry.video!), grab(entry.audio)]);
-    if (!v.ok || !a.ok) return fail(502, 'The source refused this download. Please fetch the video again.');
+    note(v); note(a);
+    if (!v.ok || !a.ok) return fallback();
     const merged = await muxAudioVideo(Buffer.from(await v.arrayBuffer()), Buffer.from(await a.arrayBuffer()));
-    return new globalThis.Response(merged, { headers: { 'Content-Type': 'video/mp4', 'Content-Length': String(merged.length) } });
+    return new globalThis.Response(merged, { headers: { 'Content-Type': 'video/mp4', 'Content-Length': String(merged.length), 'X-Source-Status': 'cdn muxed' } });
   }
 
-  const up = first || (await grab(entry.video!));
-  if (!up.ok || !up.body) return fail(502, 'The source refused this download. Please fetch the video again.');
-  return up;
+  const up = first || note(await grab(entry.video!).catch(() => null));
+  if (!up?.ok || !up.body) {
+    up?.body?.cancel().catch(() => {});
+    return fallback();
+  }
+  return tagged(up, `cdn ${seen.join(',')}`);
 }
 
 export async function handleYtdlpStream(req: Request, res: Response): Promise<any> {
   try {
     const up = await ytdlpFile(String(req.params.token || ''));
+    const source = up.headers.get('x-source-status');
+    if (source) res.setHeader('X-Source-Status', source);
     if (!up.ok || !up.body) return res.status(up.status).send(await up.text());
     res.setHeader('Content-Type', up.headers.get('content-type') || 'video/mp4');
     const len = up.headers.get('content-length');

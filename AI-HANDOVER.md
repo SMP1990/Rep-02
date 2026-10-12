@@ -126,7 +126,7 @@ How to add the next tool (registry, page, route, tile, SEO, FAQ): see
 
 ## 6. Last state
 
-- Last delivered ZIP: `releases/ask-downloader-age-calculator-v4.zip` (Age
+- Last delivered ZIP: `releases/ask-downloader-age-calculator-v5.zip` (Age
   Calculator added; everything from `ask-downloader-tools.zip` still in it).
   v2 also fixes a crash that was in the site since its first commit: after
   "Download", English and 7 other languages showed "Something went wrong"
@@ -144,10 +144,15 @@ How to add the next tool (registry, page, route, tile, SEO, FAQ): see
   TikTok MP3, download. TikTok VIDEO still got 502: `ytdlpFile()` probed the
   CDN link (OK) and then fetched it again, and TikTok refused the second
   request. v4 uses the first successful response as the download.
-- **TOP PRIORITY for the next session (owner's order, 2026-10-12):** with v4
-  live, TikTok VIDEO still fails (MP3 works). Fix this FIRST, before any new
-  tool: investigate the headers/cookies yt-dlp gives for TikTok video formats
-  (`mediaOf()` in `server/ytdlp.ts`) and what TikTok's CDN answers.
+- **TOP PRIORITY (owner's order, 2026-10-12):** with v4 live, TikTok VIDEO
+  still failed (MP3 worked). v5: when the CDN refuses Node's fetch,
+  `ytdlpFile()` falls back to `viaYtdlp()` — yt-dlp downloads the file itself
+  (`-f b[height<=H] -o -`) and it is streamed through (max 3 at once).
+  Every yt-dlp download response carries `X-Source-Status` ("cdn 200",
+  "yt-dlp after cdn 403", "cdn 403; yt-dlp failed") — read it with curl on
+  `/api/video/ytdlp-stream/<token>` to see what happened. NOT yet verified
+  live; if yt-dlp also fails, its stderr is logged as
+  "[yt-dlp] direct download gave no data".
   The previous one, `releases/ask-downloader-tools.zip` (commit `acf0cad`),
   stays as the fallback. Ask the owner whether the newest one is deployed and
   working before building on it.
