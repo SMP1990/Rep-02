@@ -94,6 +94,8 @@ export const ur: ExtraDict = {
     pwGenDesc: 'ایک کلک میں مضبوط اور رینڈم پاس ورڈ بنائیں۔',
     ageCalcTitle: 'عمر کیلکولیٹر',
     ageCalcDesc: 'اپنی درست عمر سالوں، مہینوں اور دنوں میں جانیں۔',
+    wordCountTitle: 'ورڈ کاؤنٹر',
+    wordCountDesc: 'لکھتے ہی الفاظ، حروف اور پڑھنے کا وقت گنیں۔',
     open: 'ٹول کھولیں',
     newLabel: 'نیا',
     comingSoon: 'جلد آ رہا ہے',

@@ -94,6 +94,8 @@ export const id: ExtraDict = {
     pwGenDesc: 'Buat kata sandi yang kuat dan acak dengan satu klik.',
     ageCalcTitle: 'Kalkulator Umur',
     ageCalcDesc: 'Ketahui umur pasti Anda dalam tahun, bulan, dan hari.',
+    wordCountTitle: 'Penghitung Kata',
+    wordCountDesc: 'Hitung kata, karakter, dan waktu baca sambil mengetik.',
     open: 'Buka alat',
     newLabel: 'Baru',
     comingSoon: 'Segera hadir',

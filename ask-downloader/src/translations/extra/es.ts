@@ -94,6 +94,8 @@ export const es: ExtraDict = {
     pwGenDesc: 'Crea contraseñas seguras y aleatorias con un clic.',
     ageCalcTitle: 'Calculadora de edad',
     ageCalcDesc: 'Descubre tu edad exacta en años, meses y días.',
+    wordCountTitle: 'Contador de palabras',
+    wordCountDesc: 'Cuenta palabras, caracteres y tiempo de lectura mientras escribes.',
     open: 'Abrir herramienta',
     newLabel: 'Nuevo',
     comingSoon: 'Próximamente',

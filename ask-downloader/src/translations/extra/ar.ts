@@ -94,6 +94,8 @@ export const ar: ExtraDict = {
     pwGenDesc: 'أنشئ كلمات مرور قوية وعشوائية بنقرة واحدة.',
     ageCalcTitle: 'حاسبة العمر',
     ageCalcDesc: 'اعرف عمرك بدقة بالسنوات والأشهر والأيام.',
+    wordCountTitle: 'عداد الكلمات',
+    wordCountDesc: 'عُدّ الكلمات والأحرف ووقت القراءة أثناء الكتابة.',
     open: 'افتح الأداة',
     newLabel: 'جديد',
     comingSoon: 'قريبًا',

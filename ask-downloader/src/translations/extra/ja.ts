@@ -94,6 +94,8 @@ export const ja: ExtraDict = {
     pwGenDesc: '強力なランダムパスワードをワンクリックで作成。',
     ageCalcTitle: '年齢計算ツール',
     ageCalcDesc: '年・月・日で正確な年齢を調べます。',
+    wordCountTitle: '文字数カウンター',
+    wordCountDesc: '入力しながら単語数・文字数・読む時間を数えます。',
     open: 'ツールを開く',
     newLabel: '新着',
     comingSoon: '近日公開',

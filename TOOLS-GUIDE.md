@@ -52,6 +52,7 @@ or delete it; it only exists so the code can always be found.
 | `ask-downloader/src/config/tools.ts` | List of tool tiles. To launch a new tool, give its tile a `path`. |
 | `ask-downloader/src/pages/BackgroundRemoverPage.tsx` | The `/background-remover` page. |
 | `ask-downloader/src/tools/age-calculator/` | Age Calculator (`/age-calculator`): `lib/age.ts` does the date arithmetic, UI in `components/`, 11 languages in `i18n/`. Page: `src/pages/AgeCalculatorPage.tsx`. |
+| `ask-downloader/src/tools/word-counter/` | Word Counter (`/word-counter`): `lib/count.ts` (counting), `lib/useSettled.ts` (smooth typing on long text), UI split into `WordCounter.tsx`, `Stats.tsx`, `Toolbar.tsx`, `Guide.tsx`; 11 languages in `i18n/`. Page: `src/pages/WordCounterPage.tsx`. |
 | `ask-downloader/src/tools/shared/RelatedTools.tsx` | "More free tools" links to the other live tools (from `config/tools.ts`). Used on the Age Calculator page only; other tool pages can add it with one line. |
 | `bg-remover-tool/` | The Background Remover as a standalone project (where it was built and tested), plus `model/` (ISNet) and `model-hd/` (U2Net) parts and the scripts that made them. |
 | `releases/` | Ready-to-upload deploy ZIPs for Hostinger. |

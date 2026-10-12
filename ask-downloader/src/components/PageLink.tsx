@@ -17,6 +17,7 @@ export const ROUTE_PATHS = {
   'background-remover': '/background-remover',
   'password-generator': '/password-generator',
   'age-calculator': '/age-calculator',
+  'word-counter': '/word-counter',
 } as const;
 
 export type PublicRoute = keyof typeof ROUTE_PATHS;

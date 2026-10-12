@@ -26,6 +26,7 @@ export type RouteType =
   | 'background-remover'
   | 'password-generator'
   | 'age-calculator'
+  | 'word-counter'
   | 'not-found';
 
 export type ContactMessageTopic = 

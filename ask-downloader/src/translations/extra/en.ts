@@ -97,6 +97,8 @@ export const en = {
     pwGenDesc: 'Create strong, random passwords in one click.',
     ageCalcTitle: 'Age Calculator',
     ageCalcDesc: 'Find your exact age in years, months and days.',
+    wordCountTitle: 'Word Counter',
+    wordCountDesc: 'Count words, characters and reading time as you type.',
     open: 'Open tool',
     newLabel: 'New',
     comingSoon: 'Coming soon',

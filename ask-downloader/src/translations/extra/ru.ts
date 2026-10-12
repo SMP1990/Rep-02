@@ -94,6 +94,8 @@ export const ru: ExtraDict = {
     pwGenDesc: 'Надёжные случайные пароли в один клик.',
     ageCalcTitle: 'Калькулятор возраста',
     ageCalcDesc: 'Узнайте точный возраст в годах, месяцах и днях.',
+    wordCountTitle: 'Счётчик слов',
+    wordCountDesc: 'Считайте слова, символы и время чтения при наборе.',
     open: 'Открыть инструмент',
     newLabel: 'Новое',
     comingSoon: 'Скоро',

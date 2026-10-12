@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { Cake, Clock, ImageMinus, KeyRound } from 'lucide-react';
+import { Cake, Clock, FileText, ImageMinus, KeyRound } from 'lucide-react';
 import type { PublicRoute } from '../components/PageLink';
 
 /**
@@ -44,7 +44,13 @@ export const TOOL_TILES: ToolTile[] = [
     titleKey: 'ageCalcTitle',
     descKey: 'ageCalcDesc',
   },
-  { id: 'soon-3', icon: Clock },
+  {
+    id: 'word-counter',
+    icon: FileText,
+    route: 'word-counter',
+    titleKey: 'wordCountTitle',
+    descKey: 'wordCountDesc',
+  },
   { id: 'soon-4', icon: Clock },
   { id: 'soon-5', icon: Clock },
   { id: 'soon-6', icon: Clock },

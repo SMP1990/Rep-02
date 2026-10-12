@@ -94,6 +94,8 @@ export const hi: ExtraDict = {
     pwGenDesc: 'एक क्लिक में मज़बूत, रैंडम पासवर्ड बनाएँ।',
     ageCalcTitle: 'आयु कैलकुलेटर',
     ageCalcDesc: 'अपनी सटीक उम्र साल, महीने और दिनों में जानें।',
+    wordCountTitle: 'वर्ड काउंटर',
+    wordCountDesc: 'लिखते ही शब्द, अक्षर और पढ़ने का समय गिनें।',
     open: 'टूल खोलें',
     newLabel: 'नया',
     comingSoon: 'जल्द आ रहा है',

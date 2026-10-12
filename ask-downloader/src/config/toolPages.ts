@@ -49,6 +49,15 @@ export const TOOL_PAGE_LIST: ToolPage[] = [
       'Calculate your exact age in years, months and days from your date of birth, and count down to your next birthday. Free, no sign-up; nothing is stored.',
     keywords: 'age calculator, calculate age, age calculator by date of birth, how old am I, exact age, birthday calculator, date of birth calculator',
   },
+  {
+    id: 'word-counter',
+    path: '/word-counter',
+    name: 'Word Counter',
+    seoTitle: 'Word Counter - Count Words & Characters',
+    seoDescription:
+      'Count words, characters, sentences and paragraphs as you type, and see the reading time. Free, works in any language; your text is never stored.',
+    keywords: 'word counter, character counter, count words, word count tool, letter counter, sentence counter, reading time calculator',
+  },
 ];
 
 /** What the admin set for one tool. Empty fields mean "use the default". */

@@ -94,6 +94,8 @@ export const fr: ExtraDict = {
     pwGenDesc: 'Créez des mots de passe forts et aléatoires en un clic.',
     ageCalcTitle: "Calculateur d'âge",
     ageCalcDesc: 'Trouvez votre âge exact en années, mois et jours.',
+    wordCountTitle: 'Compteur de mots',
+    wordCountDesc: 'Comptez mots, caractères et temps de lecture pendant la saisie.',
     open: 'Ouvrir l\'outil',
     newLabel: 'Nouveau',
     comingSoon: 'Bientôt disponible',
