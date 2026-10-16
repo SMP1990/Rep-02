@@ -128,6 +128,34 @@ How to add the next tool (registry, page, route, tile, SEO, FAQ): see
 
 ## 6. Last state
 
+- **Latest (2026-10-16): `releases/ask-downloader-v21-light-fonts.zip`** (live).
+  v8 (DNS Checker) and v9 (Watermark Remover) were built in other sessions and
+  had not been pushed; v20/v21 contain them and everything after. Highlights:
+  - Speed: long cache on hashed `/assets`, Google Fonts preloaded (no render
+    block), non-English translations lazy-loaded (`src/translations/loadLanguage.ts`,
+    entry JS 925 → 486 KB), home page chunks modulepreloaded by the server
+    (`server/preloadHints.ts`, needs `build.manifest`).
+  - v21: the Arabic/Urdu/Hindi Google fonts (~443 KB) load only when `<html lang>`
+    or the saved interface language is ur/ar/hi (`src/loadFonts.ts`; index.html
+    preloads the Latin fonts only). Measured live, new visitor, mobile home:
+    ~1,005 KB → ~558 KB. Biggest part now: JS 356 KB.
+  - Images: `/thumb/<w>/<file>` gives a sharp WebP copy of `/uploads/<file>`
+    (`server/imageResize.ts`, `src/utils/imageSize.ts`). On Hostinger, LiteSpeed
+    serves real files under `/uploads/` itself, so query strings there never
+    reach Node: use non-existent paths for Node-side image work.
+  - Security: `server.cjs`, worker `.cjs` files and `/.vite/` are not served (404).
+  - New tool: Grade Calculator - Swift Score at `/grade-calculator-swift-score`
+    (`src/tools/grade-calculator/`, tool id `grade-calculator`).
+  - Password Generator: the typed length box works (`LengthInput.tsx`).
+  - Phones only (desktop checked identical): hero heading in a gradient box with
+    a "More info" fold, tools as a 4×2 icon grid (`ToolsIconGrid.tsx`) so the
+    downloader and all tools fit the first screen, slimmer header (theme in the
+    menu), reworked menu drawer (theme at the top, one scroll, language and
+    downloader lists folded, its words in 11 languages).
+  - Owner rule: no change that could break the live site, even for speed.
+  Ask the owner which ZIP is live before building on it.
+- Older history follows.
+
 - Last delivered ZIP: `releases/ask-downloader-v7-image-compressor.zip`
   (Image Compressor added on top of v6 = Word Counter). v5 = `ask-downloader-age-calculator-v5.zip`
   (Age Calculator; everything from `ask-downloader-tools.zip` still in it).
