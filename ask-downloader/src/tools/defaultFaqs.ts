@@ -9,6 +9,9 @@ import { en as passwordGenerator } from './password-generator/i18n/en';
 import { en as ageCalculator } from './age-calculator/i18n/en';
 import { en as wordCounter } from './word-counter/i18n/en';
 import { en as imageCompressor } from './image-compressor/i18n/en';
+import { en as dnsChecker } from './dns-checker/i18n/en';
+import { en as watermarkRemover } from './watermark-remover/i18n/en';
+import { en as gradeCalculator } from './grade-calculator/i18n/en';
 
 export interface FaqPair {
   question: string;
@@ -31,6 +34,9 @@ const ENGLISH: Record<string, object> = {
   'age-calculator': ageCalculator,
   'word-counter': wordCounter,
   'image-compressor': imageCompressor,
+  'dns-checker': dnsChecker,
+  'watermark-remover': watermarkRemover,
+  'grade-calculator': gradeCalculator,
 };
 
 export const defaultToolFaqs = (toolId: string): FaqPair[] => faqsOf(ENGLISH[toolId] || {});

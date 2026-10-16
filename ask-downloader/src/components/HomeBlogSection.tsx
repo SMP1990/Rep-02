@@ -9,6 +9,7 @@ import { normalizeBlogLanguage } from '../config/blogLanguages.ts';
 import { blogLanguageInfo } from '../config/blogLanguages.ts';
 import { applyBrand } from '../config/brand.ts';
 import { RouteLink, PostLink, STRETCHED_LINK } from './PageLink';
+import { sizedImage } from '../utils/imageSize.ts';
 import { 
   Activity, 
   Calendar, 
@@ -205,7 +206,7 @@ export const HomeBlogSection: React.FC = () => {
               {/* Compact Thumbnail */}
               <div className="relative w-14 sm:w-16 h-14 sm:h-16 rounded-lg sm:rounded-xl overflow-hidden shrink-0 bg-slate-100 dark:bg-slate-800">
                 <img
-                  src={getPostImage(post, idx)}
+                  src={sizedImage(getPostImage(post, idx), 64)}
                   alt={post.coverImageAlt || post.title}
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                   loading="lazy"
@@ -271,7 +272,7 @@ export const HomeBlogSection: React.FC = () => {
           >
             {/* Cover Image */}
             <img
-              src={getPostImage(featuredPost, 3)}
+              src={sizedImage(getPostImage(featuredPost, 3), 400)}
               alt={featuredPost.title}
               className="absolute inset-0 w-full h-full object-cover group-hover:scale-104 transition-transform duration-500 ease-out"
               loading="lazy"
@@ -326,7 +327,7 @@ export const HomeBlogSection: React.FC = () => {
               {/* Thumbnail */}
               <div className="relative w-16 sm:w-18 h-15 sm:h-16 rounded-lg sm:rounded-xl overflow-hidden shrink-0 bg-slate-100 dark:bg-slate-800">
                 <img
-                  src={getPostImage(post, idx + 4)}
+                  src={sizedImage(getPostImage(post, idx + 4), 64)}
                   alt={post.coverImageAlt || post.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   loading="lazy"

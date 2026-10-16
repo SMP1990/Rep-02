@@ -5,6 +5,7 @@ import { fill } from '../utils/i18n.ts';
 import { TOOL_TILES, type ToolTile } from '../config/tools.ts';
 import { PageLink, ROUTE_PATHS } from './PageLink';
 import { useAdmin } from '../context/AdminContext.tsx';
+import { ToolsIconGrid } from './ToolsIconGrid.tsx';
 
 /**
  * "Free Online Tools" — the tool tiles above "Trending Stories" on the home
@@ -16,6 +17,10 @@ import { useAdmin } from '../context/AdminContext.tsx';
  * arrows, so the tiles don't push the rest of the page down. From tablets up
  * the page wrappers use `display: contents`, so all tiles sit in one 4-column
  * grid. Same DOM for both: no tile is rendered twice.
+ *
+ * Below sm (small phones) only the badge of the heading shows and the cards
+ * give way to ToolsIconGrid, so the downloader and every tool fit on the
+ * first screen. The cards keep their layout from sm up.
  */
 const PER_PAGE = 4;
 const PAGES: ToolTile[][] = [];
@@ -57,10 +62,12 @@ export const ToolsSection: React.FC = () => {
           {words.newLabel}
         </span>
       </div>
-      <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white mb-1 group-hover:text-[#6d46b8] dark:group-hover:text-[#d1b9f7] transition-colors">
+      {/* Phones: just the name (extra bold) and "Open tool"; the description
+          shows from sm up, exactly as before. */}
+      <h3 className="text-sm sm:text-base font-bold max-sm:font-extrabold text-slate-900 dark:text-white mb-1 group-hover:text-[#6d46b8] dark:group-hover:text-[#d1b9f7] transition-colors">
         {words[tool.titleKey!]}
       </h3>
-      <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-3">
+      <p className="max-sm:hidden text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-3">
         {words[tool.descKey!]}
       </p>
       <span className="mt-auto pt-3 sm:pt-4 inline-flex items-center gap-1.5 text-xs font-bold text-[#6d46b8] dark:text-[#d1b9f7]">
@@ -86,19 +93,20 @@ export const ToolsSection: React.FC = () => {
   );
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <div className="text-center mb-6 sm:mb-8">
-        <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#6d46b8] dark:text-[#d1b9f7] bg-[#f1e9fb] dark:bg-[#261b3b] px-3 py-1 rounded-full mb-3">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-6 sm:py-6">
+      <div className="text-center mb-2.5 sm:mb-8">
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#6d46b8] dark:text-[#d1b9f7] bg-[#f1e9fb] dark:bg-[#261b3b] px-3 py-1 rounded-full mb-3 max-sm:mb-0">
           <Wand2 className="w-3 h-3" aria-hidden="true" />
           {words.badge}
         </span>
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">{words.title}</h2>
-        <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-2 max-w-xl mx-auto">{words.subtitle}</p>
+        <h2 className="max-sm:sr-only text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">{words.title}</h2>
+        <p className="max-sm:hidden text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-2 max-w-xl mx-auto">{words.subtitle}</p>
       </div>
+      <ToolsIconGrid words={words} onOpen={setCurrentRoute} />
       <div
         ref={scroller}
         onScroll={onScroll}
-        className="flex overflow-x-auto snap-x snap-mandatory py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:grid md:grid-cols-4 md:gap-5 md:overflow-visible md:py-0"
+        className="max-sm:hidden flex overflow-x-auto snap-x snap-mandatory py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:grid md:grid-cols-4 md:gap-5 md:overflow-visible md:py-0"
       >
         {PAGES.map((tiles, i) => (
           <ul
@@ -115,7 +123,7 @@ export const ToolsSection: React.FC = () => {
 
       {/* Phone-only pager: swipe hint, arrows and dots. */}
       {PAGES.length > 1 && (
-        <div className="md:hidden mt-4 flex flex-col items-center gap-3">
+        <div className="max-sm:hidden md:hidden mt-4 flex flex-col items-center gap-3">
           {page === 0 && (
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#6d46b8] dark:text-[#d1b9f7] bg-[#f1e9fb] dark:bg-[#261b3b] px-3 py-1 rounded-full">
               <ChevronsRight aria-hidden="true" className={`w-4 h-4 tools-nudge ${rtl ? 'rotate-180' : ''}`} />

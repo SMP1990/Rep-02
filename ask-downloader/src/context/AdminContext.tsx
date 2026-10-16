@@ -239,6 +239,15 @@ export function parseCurrentLocation(
   if (rawPath === '/word-counter') {
     return { route: 'word-counter', slug: null, language: null };
   }
+  if (rawPath === '/grade-calculator-swift-score') {
+    return { route: 'grade-calculator', slug: null, language: null };
+  }
+  if (rawPath === '/watermark-remover') {
+    return { route: 'watermark-remover', slug: null, language: null };
+  }
+  if (rawPath === '/dns-checker') {
+    return { route: 'dns-checker', slug: null, language: null };
+  }
   if (rawPath === '/image-compressor') {
     return { route: 'image-compressor', slug: null, language: null };
   }
@@ -923,6 +932,12 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           window.history.pushState(null, '', '/age-calculator');
         } else if (route === 'word-counter') {
           window.history.pushState(null, '', '/word-counter');
+        } else if (route === 'grade-calculator') {
+          window.history.pushState(null, '', '/grade-calculator-swift-score');
+        } else if (route === 'watermark-remover') {
+          window.history.pushState(null, '', '/watermark-remover');
+        } else if (route === 'dns-checker') {
+          window.history.pushState(null, '', '/dns-checker');
         } else if (route === 'image-compressor') {
           window.history.pushState(null, '', '/image-compressor');
         }

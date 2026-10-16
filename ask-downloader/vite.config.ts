@@ -76,6 +76,9 @@ export default defineConfig(() => {
       },
     },
     build: {
+      // dist/.vite/manifest.json lets the server name the home page's
+      // files in the HTML (server/preloadHints.ts).
+      manifest: true,
       rollupOptions: {
         output: {
           // Split large, rarely-changing vendor libraries into their own

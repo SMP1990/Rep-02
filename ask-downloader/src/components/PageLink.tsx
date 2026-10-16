@@ -18,7 +18,10 @@ export const ROUTE_PATHS = {
   'password-generator': '/password-generator',
   'age-calculator': '/age-calculator',
   'word-counter': '/word-counter',
+  'grade-calculator': '/grade-calculator-swift-score',
   'image-compressor': '/image-compressor',
+  'dns-checker': '/dns-checker',
+  'watermark-remover': '/watermark-remover',
 } as const;
 
 export type PublicRoute = keyof typeof ROUTE_PATHS;

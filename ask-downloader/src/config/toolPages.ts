@@ -50,6 +50,15 @@ export const TOOL_PAGE_LIST: ToolPage[] = [
     keywords: 'age calculator, calculate age, age calculator by date of birth, how old am I, exact age, birthday calculator, date of birth calculator',
   },
   {
+    id: 'grade-calculator',
+    path: '/grade-calculator-swift-score',
+    name: 'Grade Calculator - Swift Score',
+    seoTitle: 'Grade Calculator - Swift Score',
+    seoDescription:
+      'Enter the number of questions and wrong answers to get the score, percentage and letter grade instantly, with a full grading chart. Free for teachers and students.',
+    keywords: 'grade calculator, test grade calculator, ez grader, easy grader, score calculator, percentage grade calculator, letter grade calculator, teacher grading tool',
+  },
+  {
     id: 'word-counter',
     path: '/word-counter',
     name: 'Word Counter',
@@ -66,6 +75,24 @@ export const TOOL_PAGE_LIST: ToolPage[] = [
     seoDescription:
       'Compress JPG, PNG and WebP images up to 90% without visible quality loss. Resize, convert to WebP, set a max size. Free; photos never leave your device.',
     keywords: 'image compressor, compress image, reduce image size, compress jpg, compress png, webp converter, photo compressor, image size reducer',
+  },
+  {
+    id: 'watermark-remover',
+    path: '/watermark-remover',
+    name: 'Watermark Remover',
+    seoTitle: 'Watermark Remover - Photos, PDF, Word & Video',
+    seoDescription:
+      'Remove watermarks from your own photos with AI, and from PDF, Word (DOCX) and video files. Free, no sign-up, no limits; PDF and Word files never leave your device.',
+    keywords: 'watermark remover, remove watermark from photo, remove watermark from pdf, remove watermark from word, remove logo from video, ai watermark remover, free watermark remover',
+  },
+  {
+    id: 'dns-checker',
+    path: '/dns-checker',
+    name: 'DNS Checker',
+    seoTitle: 'DNS Checker - Check DNS Propagation Worldwide',
+    seoDescription:
+      'Check A, AAAA, CNAME, MX, NS, TXT, SOA and CAA records on 16 public DNS servers worldwide and compare them with the true answer from the domain\'s own name servers. Free.',
+    keywords: 'dns checker, dns propagation checker, dns lookup, check dns records, mx lookup, txt record lookup, nameserver lookup, whats my dns',
   },
 ];
 

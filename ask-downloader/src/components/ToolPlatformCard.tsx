@@ -381,9 +381,9 @@ export const ToolPlatformCard: React.FC<ToolPlatformCardProps> = ({
       className={`flex flex-col bg-white dark:bg-[#181224] rounded-2xl border ${cardBorder} dark:shadow-black/40 overflow-hidden transition-all duration-300`}
     >
       {/* Tool Header with subtle shimmer background */}
-      <div className={`${headerGradient} p-4 sm:p-5 text-white flex items-center justify-between relative overflow-hidden`}>
-        <div className="flex items-center gap-3 relative z-10">
-          <div className="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-xs flex items-center justify-center text-white ring-1 ring-white/25 shadow-inner">
+      <div className={`${headerGradient} p-3 sm:p-5 text-white flex items-center justify-between relative overflow-hidden`}>
+        <div className="flex items-center gap-3 max-sm:gap-2.5 relative z-10">
+          <div className="w-10 h-10 max-sm:w-9 max-sm:h-9 rounded-xl bg-white/15 backdrop-blur-xs flex items-center justify-center text-white ring-1 ring-white/25 shadow-inner">
             {isUniversal ? (
               <Sparkles className="w-5 h-5" />
             ) : isFb ? (
@@ -408,7 +408,7 @@ export const ToolPlatformCard: React.FC<ToolPlatformCardProps> = ({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold tracking-tight">
+              <h2 className="text-lg max-sm:text-base font-bold tracking-tight">
                 {isUniversal
                   ? t.tools?.universal || 'All Platforms'
                   : isFb 
@@ -433,7 +433,7 @@ export const ToolPlatformCard: React.FC<ToolPlatformCardProps> = ({
                 {isUniversal ? t.ui.allInOne : isFb ? 'FB HD' : isIg ? 'IG Reels' : isTt ? 'TikTok' : isTw ? 'Twitter / X' : isPin ? 'Pinterest' : isRd ? 'Reddit' : isTh ? 'Threads' : isDm ? 'DM HD' : 'Pro HD'}
               </span>
             </div>
-            <p className="text-xs text-white/90">
+            <p className="text-xs max-sm:text-[11px] max-sm:leading-snug text-white/90">
               {isUniversal
                 ? t.tools?.universalSubtitle || 'Paste any social video link for auto-detection'
                 : isFb 
@@ -685,8 +685,8 @@ export const ToolPlatformCard: React.FC<ToolPlatformCardProps> = ({
         </AnimatePresence>
       </div>
 
-      {/* Footer Badges */}
-      <div className="bg-slate-50 dark:bg-[#130c20] border-t border-slate-100 dark:border-[#281b3f] px-5 py-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+      {/* Footer Badges (hidden on phones to keep the home page short) */}
+      <div className="max-sm:hidden bg-slate-50 dark:bg-[#130c20] border-t border-slate-100 dark:border-[#281b3f] px-5 py-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
         <span className="flex items-center gap-1.5">
           <ShieldCheck className={`w-3.5 h-3.5 ${isFb ? 'text-blue-600 dark:text-blue-400' : isIg ? 'text-rose-600 dark:text-rose-400' : isTt ? 'text-teal-700 dark:text-teal-400' : isTw ? 'text-sky-700 dark:text-sky-400' : isPin ? 'text-red-600 dark:text-red-400' : 'text-orange-700 dark:text-orange-400'}`} />
           <span>{heroField(heroText, 'noticeText', t.tools?.noticeText)}</span>

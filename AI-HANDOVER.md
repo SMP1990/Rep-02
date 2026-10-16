@@ -5,7 +5,7 @@ without the old chat. Read it fully, then `ask-downloader/CLAUDE.md` (owner
 rules and site details) and `TOOLS-GUIDE.md` (tools map), before changing
 anything.
 
-Last updated: 2026-10-11.
+Last updated: 2026-10-16.
 
 ## 1. Where the work is
 

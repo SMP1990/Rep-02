@@ -4,6 +4,7 @@ import { BlogPost, BlogCategory } from '../types/admin';
 import { useLanguage } from '../context/LanguageContext';
 import { getLocalizedCategory } from '../translations/blogPostsTranslations';
 import { blogLanguageInfo } from '../config/blogLanguages.ts';
+import { sizedImage } from '../utils/imageSize.ts';
 import { 
   Search,
   X,
@@ -213,7 +214,7 @@ export const BlogSearchResults: React.FC<BlogSearchResultsProps> = ({
               {/* Cover Image Thumbnail */}
               <div className="w-14 h-12 sm:w-16 sm:h-14 rounded-lg overflow-hidden shrink-0 bg-[#e7ddf3] dark:bg-[#150e24]">
                 <img
-                  src={post.coverImage}
+                  src={sizedImage(post.coverImage, 64)}
                   alt={post.coverImageAlt || post.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                 />

@@ -38,6 +38,7 @@ import {
   MessageSquare,
   AtSign,
   Tv,
+  ChevronDown,
 } from 'lucide-react';
 
 export const PublicHomePage: React.FC = () => {
@@ -86,6 +87,8 @@ export const PublicHomePage: React.FC = () => {
     'Dailymotion',
   ];
   const [platformIndex, setPlatformIndex] = useState(0);
+  // Phones: the hero's text and platform buttons start folded (see the hero).
+  const [heroMoreOpen, setHeroMoreOpen] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -250,7 +253,7 @@ export const PublicHomePage: React.FC = () => {
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="relative z-10 pt-8 sm:pt-12 pb-4 sm:pb-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full text-center"
+        className="relative z-10 pt-4 sm:pt-12 pb-1 sm:pb-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full text-center"
       >
         <div className="max-w-3xl mx-auto space-y-4">
           <motion.div 
@@ -262,12 +265,16 @@ export const PublicHomePage: React.FC = () => {
             <Sparkles className="w-4 h-4 text-[#e6799f] animate-spin" style={{ animationDuration: '8s' }} />
             <span>{heroField(hero, 'trustBadge', t.hero?.badge)}</span>
           </motion.div>
+        </div>
 
-          <motion.h1 
+        {/* The heading sits in a box as wide as the downloader card below it,
+            in the same colours as that card's "All Platforms" header. */}
+        <div className="max-w-6xl mx-auto mt-3 sm:mt-4 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 px-3 py-3 sm:px-8 sm:py-7 shadow-lg shadow-purple-500/20">
+          <motion.h1
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="font-heading text-xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight text-[#2e2440] dark:text-[#f4eefb] leading-[1.25] flex flex-wrap items-center justify-center gap-x-2"
+            className="font-heading text-lg sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-[1.25] flex flex-wrap items-center justify-center gap-x-2"
           >
             {/* The heading comes from Content Editor. "{platform}" marks where
                 the rotating platform name goes; without it the heading is
@@ -282,7 +289,7 @@ export const PublicHomePage: React.FC = () => {
                   animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
                   exit={{ opacity: 0, y: -15, scale: 0.94, filter: 'blur(4px)' }}
                   transition={{ duration: 0.3, ease: 'easeInOut' }}
-                  className="inline-block bg-gradient-to-r from-[#4b2e83] via-[#6d46b8] to-[#e6799f] bg-clip-text text-transparent"
+                  className="inline-block text-white"
                 >
                   {platforms[platformIndex]}
                 </motion.span>
@@ -290,12 +297,28 @@ export const PublicHomePage: React.FC = () => {
             </span>
             )}
             {heroHeadingAfter && <span>{heroHeadingAfter}</span>}
-            <span className="w-full block mt-2 text-base sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-[#4b2e83] via-[#6d46b8] to-[#e6799f] bg-clip-text text-transparent animate-gradient-shift">
+            <span className="w-full block mt-1 sm:mt-2 text-sm sm:text-xl md:text-2xl font-bold text-white/90">
               {t.hero?.titleHighlight || 'Videos in 1080p Full HD'}
             </span>
           </motion.h1>
+        </div>
 
-          <motion.p 
+        {/* Phones only: the text and platform buttons below fold away behind
+            this button, so the downloader comes right after the heading.
+            From sm up the button is hidden and everything shows as before. */}
+        <button
+          type="button"
+          onClick={() => setHeroMoreOpen((v) => !v)}
+          aria-expanded={heroMoreOpen}
+          aria-controls="hero-more"
+          className="sm:hidden mt-2.5 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold text-[#6d46b8] dark:text-[#d1b9f7] bg-[#f1e9fb] dark:bg-[#261b3b] border border-[#a78bda]/30 active:scale-95 transition-all"
+        >
+          {heroMoreOpen ? t.ui?.heroLess : t.ui?.heroMore}
+          <ChevronDown className={`w-3.5 h-3.5 transition-transform ${heroMoreOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
+        </button>
+
+        <div id="hero-more" className={`${heroMoreOpen ? '' : 'hidden'} sm:block max-w-3xl mx-auto mt-4`}>
+          <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.5 }}
@@ -312,7 +335,7 @@ export const PublicHomePage: React.FC = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35, duration: 0.4 }}
-          className="pt-4 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2"
+          className={`${heroMoreOpen ? 'flex' : 'hidden'} sm:flex pt-4 flex-wrap items-center justify-center gap-1.5 sm:gap-2`}
         >
             <motion.button
               whileHover={{ scale: 1.04, y: -2 }}
@@ -434,7 +457,7 @@ export const PublicHomePage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4, duration: 0.5 }}
         id="section-social-tools" 
-        className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full pt-4 pb-12"
+        className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full pt-3 pb-2 sm:pt-4 sm:pb-12"
       >
         <DualToolSection
           onDownloadQuality={handleDownloadQuality}
@@ -464,7 +487,7 @@ export const PublicHomePage: React.FC = () => {
         viewport={{ once: true, margin: '-60px' }}
         transition={{ duration: 0.6 }}
         id="section-tools" data-gsap-scope
-        className="relative z-10 py-6 max-w-7xl mx-auto w-full"
+        className="relative z-10 pt-0 pb-6 sm:py-6 max-w-7xl mx-auto w-full"
       >
         <ToolsSection />
       </motion.section>

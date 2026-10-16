@@ -4,6 +4,7 @@ import { PostLink, STRETCHED_LINK } from './PageLink';
 import { getLocalizedCategory } from '../translations/blogPostsTranslations';
 import { Link2 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext.tsx';
+import { sizedImage } from '../utils/imageSize.ts';
 
 /** Shown when a post has no cover image. */
 const FALLBACK =
@@ -34,7 +35,7 @@ export const RelatedPosts: React.FC<Props> = ({ posts, heading, dir, lang }) => 
           <article key={p.id} className="relative group rounded-2xl overflow-hidden border border-[#eae3ee] dark:border-white/10 bg-[#faf7fc] dark:bg-[#201538] hover:shadow-md transition-shadow">
             <div className="h-32 bg-[#f1e9fb] dark:bg-[#2a1b4d] overflow-hidden">
               <img
-                src={p.coverImage || FALLBACK}
+                src={sizedImage(p.coverImage || FALLBACK, 240)}
                 alt={p.coverImageAlt || p.title}
                 loading="lazy"
                 decoding="async"

@@ -23,7 +23,7 @@ let sharpModule: any | null | undefined;
 
 /** sharp is an optional dependency: if the host cannot install it, uploads
  * still work — the original file is stored instead of a WebP. */
-async function getSharp(): Promise<any | null> {
+export async function getSharp(): Promise<any | null> {
   if (sharpModule !== undefined) return sharpModule;
   try {
     const mod: any = await import('sharp');

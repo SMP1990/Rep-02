@@ -23,6 +23,8 @@ import * as users from './server/adminUsers.ts';
 import { sendMail, mailStatus, isDisposableEmail } from './server/mailer.ts';
 import { touchVisitor, recordVisitorDownload, visitorReport } from './server/visitors.ts';
 import { saveImage, deleteImage, uploadsDir, imageProcessingAvailable } from './server/uploads.ts';
+import { resizedUpload } from './server/imageResize.ts';
+import { homePreloadTags } from './server/preloadHints.ts';
 import { handleMediaUpload, forgetMediaFile, uploadHeaders, readMediaFiles } from './server/mediaUpload.ts';
 import { INITIAL_BLOG_CATEGORIES, INITIAL_SITE_SETTINGS, INITIAL_LANDING_CONTENT, INITIAL_SITE_PAGES } from './src/data/mockAdminData.ts';
 import { INITIAL_BLOG_POSTS } from './src/data/blogSeed.ts';
@@ -38,6 +40,8 @@ import { LEGAL_TEXT_DATE } from './src/config/legal.ts';
 import { syncPageTranslations, readTranslations, translationsForEditor, saveTranslationEdits } from './server/pageTranslations.ts';
 import { gaId, GA_CSP, gaHeadTags, gaInitScript } from './server/analytics.ts';
 import { registerBgRoutes, prefetchBgModels } from './server/bgRoutes.ts';
+import { registerDnsRoutes } from './server/dns/routes.ts';
+import { registerWmRoutes, prefetchWmModel } from './server/wmRoutes.ts';
 import { TOOL_PAGE_LIST, cleanToolsContent, type ToolsContent } from './src/config/toolPages.ts';
 import { addRedirect, findRedirect, clearRedirectFrom, listRedirects, deleteRedirect, normalizePath, normalizeTarget, isProtectedPath, setOwnHost } from './server/redirects.ts';
 
@@ -66,6 +70,9 @@ app.use(express.urlencoded({ extended: true }));
  * headers it had. TOOL_ASSET_HOSTS can point the tools elsewhere for testing.
  */
 const TOOL_PAGES = new Set(['/background-remover']);
+// Pages that show the visitor's own files as previews (blob: URLs) but need
+// nothing else; reached with a full page load (tools.ts fullLoad).
+const BLOB_PAGES = new Set(['/watermark-remover']);
 const TOOL_ASSET_HOSTS =
   String(process.env.TOOL_ASSET_HOSTS || '').trim() ||
   'https://cdn.jsdelivr.net https://unpkg.com https://raw.githubusercontent.com';
@@ -80,6 +87,7 @@ app.use((req: Request, res: Response, next: Function) => {
   const toolPage = TOOL_PAGES.has(req.path);
   const toolWorker = /^\/assets\/worker-[\w-]+\.js$/.test(req.path);
   const tool = toolPage || toolWorker;
+  const blobPage = BLOB_PAGES.has(req.path);
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');
   res.setHeader('X-XSS-Protection', '1; mode=block');
@@ -97,8 +105,8 @@ app.use((req: Request, res: Response, next: Function) => {
       `script-src 'self'${tool ? ` ${TOOL_ASSET_HOSTS} 'wasm-unsafe-eval' blob:` : ''}${ga ? ' ' + GA_CSP.script : ''}`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
-      `img-src 'self' data: https:${tool ? ' blob:' : ''}`,
-      "media-src 'self' https:",
+      `img-src 'self' data: https:${tool || blobPage ? ' blob:' : ''}`,
+      `media-src 'self' https:${blobPage ? ' blob:' : ''}`,
       `connect-src 'self'${tool ? ' ' + TOOL_ASSET_HOSTS : ''}${ga ? ' ' + GA_CSP.connect : ''}`,
       ...(tool ? ["worker-src 'self' blob:"] : []),
       "frame-src https://www.youtube-nocookie.com",
@@ -511,7 +519,8 @@ const MAX_REQUESTS_PER_WINDOW = 180;
 // Endpoints that carry their own protection and must not be starved by the
 // shared counter: the file transfer itself and the tiny stats ping
 // (capped separately at 60 per IP per hour).
-const RATE_LIMIT_EXEMPT = ['/api/video/download-proxy', '/api/video/ytdlp-stream', '/api/stats/download'];
+// The watermark video upload sends a big file in many 8 MB pieces.
+const RATE_LIMIT_EXEMPT = ['/api/video/download-proxy', '/api/video/ytdlp-stream', '/api/stats/download', '/api/tools/watermark/video'];
 
 function rateLimiter(req: Request, res: Response, next: Function): any {
   if (RATE_LIMIT_EXEMPT.some((p) => req.path.startsWith(p))) return next();
@@ -558,7 +567,7 @@ function maintenanceOn(): boolean {
 }
 
 /** Routes an admin still needs while the site is paused. */
-const MAINTENANCE_ALLOWED = ['/api/admin/', '/api/health', '/uploads/', '/assets/', '/admin'];
+const MAINTENANCE_ALLOWED = ['/api/admin/', '/api/health', '/uploads/', '/thumb/', '/assets/', '/admin'];
 
 app.use((req: Request, res: Response, next: Function): any => {
   if (!maintenanceOn()) return next();
@@ -606,6 +615,8 @@ app.use('/api/', rateLimiter);
 
 // Background Remover on the server (server/bgRemover.ts).
 registerBgRoutes(app);
+registerDnsRoutes(app);
+registerWmRoutes(app);
 
 /**
  * Health check endpoint
@@ -1718,6 +1729,8 @@ app.use((err: any, _req: Request, res: Response, next: Function): any => {
 // Uploaded images, served read-only with long-lived caching.
 // nosniff (and "download" for Office files / ZIPs) keeps any uploaded file
 // from being treated as a web page.
+// /thumb/480/<file> gives a smaller WebP copy of /uploads/<file> (see server/imageResize.ts).
+app.use('/thumb', resizedUpload);
 app.use('/uploads', express.static(uploadsDir(), { maxAge: '30d', index: false, setHeaders: uploadHeaders }));
 
 /**
@@ -2915,7 +2928,23 @@ async function startServer() {
     // index: false so our own handler below controls how index.html is
     // served (with per-route meta tags injected) instead of the static
     // middleware sending the raw file untouched.
-    app.use(express.static(distPath, { index: false }));
+    // dist/ also holds the server's own code (server.cjs, the worker
+    // files). Never hand those to a browser — it would publish the backend.
+    app.use((req: Request, res: Response, next: Function): any => {
+      if (/\.(cjs|mjs|map)$/i.test(req.path) && !req.path.startsWith('/assets/')) return res.status(404).end();
+      if (req.path.startsWith('/.vite/')) return res.status(404).end(); // build manifest
+      next();
+    });
+    // Files in /assets/ carry a content hash in their name, so a new build
+    // always gets new names: browsers and the CDN may keep them for a year.
+    // Icons/manifest keep a short cache so a changed logo still shows up.
+    app.use(express.static(distPath, {
+      index: false,
+      setHeaders: (res, filePath) => {
+        const isHashedAsset = filePath.includes(`${path.sep}assets${path.sep}`);
+        res.setHeader('Cache-Control', isHashedAsset ? 'public, max-age=31536000, immutable' : 'public, max-age=86400');
+      },
+    }));
 
     const indexHtmlPath = path.join(distPath, 'index.html');
     const indexHtmlTemplate = fs.readFileSync(indexHtmlPath, 'utf-8');
@@ -3003,6 +3032,11 @@ async function startServer() {
         `    <meta name="robots" content="${meta.noindex ? 'noindex, nofollow' : 'index, follow'}" />` +
         (verifyTags ? `\n${verifyTags}` : '');
       html = html.replace('<meta property="og:type" content="website" />', `<meta property="og:type" content="website" />\n    ${extraTags}`);
+      // Home page: fetch its code together with the main script.
+      if (req.path === '/') {
+        const preload = homePreloadTags(distPath);
+        if (preload) html = html.replace('</head>', `${preload}  </head>`);
+      }
       const gaTags = gaHeadTags(req.path);
       if (gaTags) html = html.replace('</head>', `${gaTags}  </head>`);
 
@@ -3014,6 +3048,7 @@ async function startServer() {
 
   app.listen(PORT, '0.0.0.0', () => {
     prefetchBgModels();
+    prefetchWmModel();
     console.log(`ASK Downloader Server listening on http://0.0.0.0:${PORT}`);
     findFfmpeg().then((p) => console.log(`[startup] ffmpeg: ${p || 'NOT runnable'}`));
     getYtdlp().then(() => console.log(`[startup] yt-dlp: ${ytdlpStatus().note}`));

@@ -1,16 +1,7 @@
-import React, { createContext, useContext, useState, useEffect, useSyncExternalStore, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useSyncExternalStore, useMemo, useRef } from 'react';
 import { applyBrand, getBrandName, subscribeBrand } from '../config/brand.ts';
-import { hiTranslation } from '../translations/hi.ts';
-import { jaTranslation } from '../translations/ja.ts';
-import { urTranslation } from '../translations/ur.ts';
-import { esTranslation } from '../translations/es.ts';
-import { arTranslation } from '../translations/ar.ts';
-import { ptTranslation } from '../translations/pt.ts';
-import { idTranslation } from '../translations/id.ts';
-import { frTranslation } from '../translations/fr.ts';
-import { ruTranslation } from '../translations/ru.ts';
-import { deTranslation } from '../translations/de.ts';
-import { LEGAL_PAGE_TRANSLATIONS } from '../translations/legalPages.ts';
+// Only English is built in; other languages download when chosen.
+import { getLanguagePack, isLanguageReady, loadLanguage } from '../translations/loadLanguage.ts';
 import { EXTRA_TRANSLATIONS } from '../translations/extra/index.ts';
 
 export type Language =
@@ -486,19 +477,6 @@ export const enTranslation = {
   }
 };
 
-const translations: Record<Language, any> = {
-  en: enTranslation,
-  es: esTranslation,
-  ar: arTranslation,
-  pt: ptTranslation,
-  id: idTranslation,
-  fr: frTranslation,
-  ru: ruTranslation,
-  de: deTranslation,
-  hi: hiTranslation,
-  ja: jaTranslation,
-  ur: urTranslation,
-};
 
 export interface LanguageContextType {
   language: Language;
@@ -535,9 +513,25 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
    */
   const [contentLanguage, setContentLanguage] = useState<string | null>(null);
 
+  // A visitor who chose Urdu last time needs the Urdu file before the first
+  // paint — rendering English for a moment and then flipping would flicker.
+  const [ready, setReady] = useState(() => isLanguageReady(language));
+  useEffect(() => {
+    if (ready) return;
+    loadLanguage(language).catch(() => {}).finally(() => setReady(true));
+  }, []);
+
+  // The newest click wins if two languages are still downloading.
+  const requestedLang = useRef(language);
   const setLanguage = (lang: Language) => {
-    setLanguageState(lang);
-    localStorage.setItem('fdownloader_lang', lang);
+    requestedLang.current = lang;
+    const apply = () => {
+      if (requestedLang.current !== lang) return;
+      setLanguageState(lang);
+      localStorage.setItem('fdownloader_lang', lang);
+    };
+    if (isLanguageReady(lang)) return apply();
+    loadLanguage(lang).then(apply, () => {});
   };
 
   useEffect(() => {
@@ -546,38 +540,39 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     document.documentElement.lang = contentLanguage || language;
   }, [language, contentLanguage]);
 
-  const currentDict = translations[language] || translations['en'];
+  const pack = getLanguagePack(language);
+  const currentDict = pack?.dict || enTranslation;
 
   // The About/Contact/Privacy/Terms/Legal copy for the ten non-English
   // languages lives in its own module, so adding a language means adding one
   // entry there rather than editing ten large dictionary files.
-  const pageDict = LEGAL_PAGE_TRANSLATIONS[language] || {};
+  const pageDict = pack?.pageDict || {};
 
   // Deep-merge English defaults with current language dictionary so missing keys never render empty
   const mergedDict = {
-    ...translations['en'],
+    ...enTranslation,
     ...currentDict,
-    header: { ...translations['en'].header, ...(currentDict?.header || {}) },
-    hero: { ...translations['en'].hero, ...(currentDict?.hero || {}) },
-    tools: { ...translations['en'].tools, ...(currentDict?.tools || {}) },
-    input: { ...translations['en'].input, ...(currentDict?.input || {}) },
-    videoResult: { ...translations['en'].videoResult, ...(currentDict?.videoResult || {}) },
-    howTo: { ...translations['en'].howTo, ...(currentDict?.howTo || {}) },
-    features: { ...translations['en'].features, ...(currentDict?.features || {}) },
-    homeBlog: { ...translations['en'].homeBlog, ...(currentDict?.homeBlog || {}) },
-    faq: { ...translations['en'].faq, ...(currentDict?.faq || {}) },
-    footer: { ...translations['en'].footer, ...(currentDict?.footer || {}) },
-    blogLanguages: { ...translations['en'].blogLanguages, ...(currentDict?.blogLanguages || {}) },
-    blog: { ...translations['en'].blog, ...(currentDict?.blog || {}) },
-    blogPost: { ...translations['en'].blogPost, ...(currentDict?.blogPost || {}) },
-    contact: { ...translations['en'].contact, ...(currentDict?.contact || {}), ...(pageDict.contact || {}) },
-    speedMeter: { ...translations['en'].speedMeter, ...(currentDict?.speedMeter || {}) },
-    legalCommon: { ...translations['en'].legalCommon, ...(pageDict.legalCommon || {}) },
-    privacyPage: { ...translations['en'].privacyPage, ...(pageDict.privacyPage || {}) },
-    termsPage: { ...translations['en'].termsPage, ...(pageDict.termsPage || {}) },
-    legalPage: { ...translations['en'].legalPage, ...(pageDict.legalPage || {}) },
-    aboutPage: { ...translations['en'].aboutPage, ...(pageDict.aboutPage || {}) },
-    notFound: { ...translations['en'].notFound, ...(pageDict.notFound || {}) },
+    header: { ...enTranslation.header, ...(currentDict?.header || {}) },
+    hero: { ...enTranslation.hero, ...(currentDict?.hero || {}) },
+    tools: { ...enTranslation.tools, ...(currentDict?.tools || {}) },
+    input: { ...enTranslation.input, ...(currentDict?.input || {}) },
+    videoResult: { ...enTranslation.videoResult, ...(currentDict?.videoResult || {}) },
+    howTo: { ...enTranslation.howTo, ...(currentDict?.howTo || {}) },
+    features: { ...enTranslation.features, ...(currentDict?.features || {}) },
+    homeBlog: { ...enTranslation.homeBlog, ...(currentDict?.homeBlog || {}) },
+    faq: { ...enTranslation.faq, ...(currentDict?.faq || {}) },
+    footer: { ...enTranslation.footer, ...(currentDict?.footer || {}) },
+    blogLanguages: { ...enTranslation.blogLanguages, ...(currentDict?.blogLanguages || {}) },
+    blog: { ...enTranslation.blog, ...(currentDict?.blog || {}) },
+    blogPost: { ...enTranslation.blogPost, ...(currentDict?.blogPost || {}) },
+    contact: { ...enTranslation.contact, ...(currentDict?.contact || {}), ...(pageDict.contact || {}) },
+    speedMeter: { ...enTranslation.speedMeter, ...(currentDict?.speedMeter || {}) },
+    legalCommon: { ...enTranslation.legalCommon, ...(pageDict.legalCommon || {}) },
+    privacyPage: { ...enTranslation.privacyPage, ...(pageDict.privacyPage || {}) },
+    termsPage: { ...enTranslation.termsPage, ...(pageDict.termsPage || {}) },
+    legalPage: { ...enTranslation.legalPage, ...(pageDict.legalPage || {}) },
+    aboutPage: { ...enTranslation.aboutPage, ...(pageDict.aboutPage || {}) },
+    notFound: { ...enTranslation.notFound, ...(pageDict.notFound || {}) },
   };
 
   // Every `{brand}` in the dictionary becomes the admin's saved site name.
@@ -592,7 +587,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     (mergedDict as any)[section] = { ...extraEn[section], ...((mergedDict as any)[section] || {}), ...(extraCur[section] || {}) };
   }
 
-  const brandedDict = useMemo(() => applyBrand(mergedDict, brand), [language, brand]);
+  const brandedDict = useMemo(() => applyBrand(mergedDict, brand), [language, brand, ready]);
 
   // Robust hybrid translation object/function supporting both t.features.f1Title and t('features.f1Title')
   const t = (keyOrPath: string): string => {
@@ -610,6 +605,8 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   // Attach all section objects to t so object property access (t.faq.q1, t.blog.title) works instantly
   Object.assign(t, brandedDict);
+
+  if (!ready) return null;
 
   return (
     <LanguageContext.Provider value={{ language, currentLang: language, setLanguage, currentLangInfo, setContentLanguage, brand, t }}>

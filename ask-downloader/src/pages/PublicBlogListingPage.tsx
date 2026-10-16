@@ -12,6 +12,7 @@ import { BLOG_LANGUAGES, blogLanguageInfo, normalizeBlogLanguage, type BlogLangu
 import { applyBrand } from '../config/brand.ts';
 import { PageLink, PostLink, STRETCHED_LINK } from '../components/PageLink';
 import { LanguageFilterSelect } from '../components/LanguageFilterSelect.tsx';
+import { sizedImage } from '../utils/imageSize.ts';
 import { 
   Search,
   Calendar,
@@ -359,7 +360,7 @@ export const PublicBlogListingPage: React.FC<PublicBlogListingPageProps> = ({ la
                 {/* Image */}
                 <div className="relative h-48 w-full bg-[#f1e9fb] dark:bg-[#261b3b] overflow-hidden">
                   <img
-                    src={post.coverImage || BLOG_COVER_FALLBACK}
+                    src={sizedImage(post.coverImage || BLOG_COVER_FALLBACK, 400)}
                     alt={post.coverImageAlt || post.title}
                     loading="lazy"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

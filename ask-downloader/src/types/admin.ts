@@ -27,7 +27,10 @@ export type RouteType =
   | 'password-generator'
   | 'age-calculator'
   | 'word-counter'
+  | 'grade-calculator'
   | 'image-compressor'
+  | 'dns-checker'
+  | 'watermark-remover'
   | 'not-found';
 
 export type ContactMessageTopic = 

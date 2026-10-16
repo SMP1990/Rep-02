@@ -1,5 +1,6 @@
-import { en } from './en.ts'; import { ur } from './ur.ts'; import { ar } from './ar.ts'; import { hi } from './hi.ts';
-import { es } from './es.ts'; import { pt } from './pt.ts'; import { fr } from './fr.ts'; import { de } from './de.ts';
-import { id } from './id.ts'; import { ru } from './ru.ts'; import { ja } from './ja.ts';
+import { en } from './en.ts';
 export type { ExtraDict } from './en.ts';
-export const EXTRA_TRANSLATIONS: Record<string, typeof en> = { en, ur, ar, hi, es, pt, fr, de, id, ru, ja };
+/** English is always here. The other ten languages are added by
+ * loadLanguage() (src/translations/loadLanguage.ts) the first time they are
+ * used, so a visitor only downloads the language they actually read. */
+export const EXTRA_TRANSLATIONS: Record<string, typeof en> = { en };

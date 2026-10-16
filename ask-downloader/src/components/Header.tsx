@@ -26,11 +26,14 @@ import {
   DownloadCloud,
   ShieldCheck,
   Lock,
-  ArrowRight 
+  ArrowRight,
+  Globe,
+  SunMoon,
 } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext.tsx';
 import { useLanguage, LANGUAGES } from '../context/LanguageContext.tsx';
 import { FlagIcon } from './FlagIcon.tsx';
+import { fill } from '../utils/i18n.ts';
 import type { BlogLanguage } from '../config/blogLanguages.ts';
 import { SocialPlatform } from '../types.ts';
 import { ThemeToggle } from './ThemeToggle.tsx';
@@ -77,7 +80,10 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
 
   // Mobile off-canvas drawer state
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(true); // default open in mobile for convenience
+  // Closed at first, so the menu opens short and tidy; one tap shows the platforms.
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
+  // The menu's language list stays folded behind the current language.
+  const [drawerLangOpen, setDrawerLangOpen] = useState(false);
 
   // Language dropdown state
   const [langMenuOpen, setLangMenuOpen] = useState(false);
@@ -317,10 +323,11 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
               )}
 
               <div className="min-w-0">
-                <div className="flex items-center gap-1.5 sm:gap-2">
+                <div className="flex items-center gap-1.5 sm:gap-2 max-sm:min-w-0">
                   {/* Name comes from Settings. The last word keeps the
-                      gradient so the look stays the same for any name. */}
-                  <span className="font-heading font-extrabold text-lg sm:text-2xl tracking-tight text-[#2e2440] dark:text-[#f4eefb] whitespace-nowrap">
+                      gradient so the look stays the same for any name.
+                      Phones: ends in "…" if a very long name is ever saved. */}
+                  <span className="font-heading font-extrabold text-base sm:text-2xl tracking-tight text-[#2e2440] dark:text-[#f4eefb] whitespace-nowrap max-sm:min-w-0 max-sm:truncate">
                     {brandLead}
                     {brandTail && (
                       <span className="bg-gradient-to-r from-[#6d46b8] to-[#e6799f] bg-clip-text text-transparent">{brandTail}</span>
@@ -497,19 +504,13 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
 
           {/* RIGHT CONTROLS: THEME TOGGLE, LANGUAGE SWITCHER, ADMIN PORTAL LINK, HAMBURGER */}
           <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-            {/* Global Theme Toggle: Compact icon on mobile, Dual-pill on tablet/desktop */}
+            {/* Theme Toggle: dual pill from sm up. Phones switch the theme in the
+                menu drawer ("Theme mode"), which keeps the bar clear for the name. */}
             <div className="hidden sm:block shrink-0">
               <ThemeToggle 
                 variant="pill" 
                 id="header-nav-theme-toggle-desktop" 
                 className="scale-95" 
-              />
-            </div>
-            <div className="sm:hidden shrink-0">
-              <ThemeToggle 
-                variant="icon" 
-                id="header-nav-theme-toggle-mobile" 
-                className="w-9 h-9" 
               />
             </div>
 
@@ -526,7 +527,7 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                 <span className="w-5 h-3.5 rounded-[2px] overflow-hidden ring-1 ring-black/10 dark:ring-white/15 shrink-0">
                   <FlagIcon code={language as BlogLanguage} className="w-full h-full block" />
                 </span>
-                <span className="uppercase text-[11px] sm:text-xs">{language}</span>
+                <span className="max-sm:sr-only uppercase text-[11px] sm:text-xs">{language}</span>
                 <ChevronDown className={`w-3 h-3 text-[#726c85] dark:text-[#b5a9cd] transition-transform duration-150 ${langMenuOpen ? 'rotate-180' : ''}`} />
               </button>
 
@@ -640,25 +641,23 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                 <div className="pointer-events-none absolute top-1/2 -left-16 w-44 h-44 rounded-full bg-[#4b2e83]/15 dark:bg-[#4b2e83]/25 blur-3xl" />
 
                 {/* Drawer Top Header */}
-                <div className="relative p-4 sm:p-5 border-b border-[#eae3ee] dark:border-[#2e1d4d] flex items-center justify-between bg-white/80 dark:bg-[#160f22]/80 backdrop-blur-sm">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#4b2e83] via-[#6d46b8] to-[#e6799f] p-0.5 flex items-center justify-center shadow-xs">
+                <div className="relative p-4 sm:p-5 border-b border-[#eae3ee] dark:border-[#2e1d4d] bg-white/80 dark:bg-[#160f22]/80 backdrop-blur-sm space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-tr from-[#4b2e83] via-[#6d46b8] to-[#e6799f] p-0.5 flex items-center justify-center shadow-xs">
                       <div className="w-full h-full bg-[#341d5b] rounded-[10px] flex items-center justify-center text-white">
                         <Sparkles className="w-4 h-4 text-[#f0a8bf]" />
                       </div>
                     </div>
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-heading font-extrabold text-lg text-[#2e2440] dark:text-[#f4eefb]">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="font-heading font-extrabold text-base text-[#2e2440] dark:text-[#f4eefb] whitespace-nowrap truncate">
                           {/* Same name and split as the desktop logo — it used to
                               be the old brand, hardcoded. */}
                           {brandLead}<span className="text-[#6d46b8] dark:text-[#a78bda]">{brandTail}</span>
                         </span>
-                        <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-[#f1e9fb] dark:bg-[#261b3b] text-[#6d46b8] dark:text-[#d1b9f7] border border-[#a78bda]/30">
-                          Fast
-                        </span>
                       </div>
-                      <span className="block text-[11px] font-medium text-[#726c85] dark:text-[#a78bda]">
+                      <span className="block text-[11px] font-medium text-[#726c85] dark:text-[#a78bda] truncate">
                         {isAuthored(siteSettings?.siteTagline, INITIAL_SITE_SETTINGS.siteTagline) ? siteSettings.siteTagline : t.header?.subtitle}
                       </span>
                     </div>
@@ -669,11 +668,21 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                     whileHover={{ scale: 1.08, rotate: 90 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="w-10 h-10 rounded-xl text-[#726c85] dark:text-[#b5a9cd] hover:text-[#2e2440] dark:hover:text-white bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center transition-colors cursor-pointer"
+                    className="w-10 h-10 shrink-0 rounded-xl text-[#726c85] dark:text-[#b5a9cd] hover:text-[#2e2440] dark:hover:text-white bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center transition-colors cursor-pointer"
                     aria-label={t.ui.closeMenu}
                   >
                     <X className="w-5 h-5" />
                   </motion.button>
+                </div>
+
+                {/* Theme, at the top where it is easy to find */}
+                <div className="flex items-center justify-between gap-3 rounded-xl bg-slate-50 dark:bg-[#1b1428] border border-[#eae3ee] dark:border-[#2e1d4d] px-3 py-2">
+                  <span className="flex items-center gap-2 text-sm font-bold text-[#2e2440] dark:text-[#f4eefb]">
+                    <SunMoon className="w-4 h-4 text-[#6d46b8] dark:text-[#d1b9f7]" aria-hidden="true" />
+                    {t.ui.themeMode}
+                  </span>
+                  <ThemeToggle variant="pill" id="mobile-drawer-theme-toggle" />
+                </div>
                 </div>
 
                 {/* Drawer Scrollable Content */}
@@ -723,7 +732,7 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                     className="border-t border-[#eae3ee] dark:border-[#2e1d4d]/60 pt-2 space-y-1.5"
                   >
                     <div className="text-[10px] font-bold uppercase tracking-wider text-[#726c85] dark:text-[#887c9f] px-1 mb-1">
-                      Navigation
+                      {t.ui.menuNavigation}
                     </div>
 
                     {/* 1. HOME */}
@@ -762,7 +771,7 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                         </div>
                         <div className="flex items-center gap-1.5">
                           <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-[#6d46b8] text-white">
-                            {downloaderOptions.length} Tools
+                            {fill(t.ui.menuToolCount, { n: downloaderOptions.length })}
                           </span>
                           <motion.span animate={{ rotate: mobileDropdownOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
                             <ChevronDown className="w-4 h-4 text-[#726c85] dark:text-[#b5a9cd]" />
@@ -780,7 +789,7 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                             transition={{ duration: 0.25, ease: 'easeInOut' }}
                             className="overflow-hidden"
                           >
-                            <div className="px-2.5 pb-2.5 pt-1 space-y-1.5 border-t border-[#eae3ee]/70 dark:border-[#2e1d4d]/70 max-h-64 overflow-y-auto">
+                            <div className="px-2.5 pb-2.5 pt-1 space-y-1.5 border-t border-[#eae3ee]/70 dark:border-[#2e1d4d]/70">
                               {downloaderOptions.map((opt) => {
                                 const Icon = opt.icon;
                                 const isCurrentActive = isHomeActive && activeSocialPlatform === opt.platform;
@@ -810,7 +819,7 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                                       </div>
                                     </div>
                                     <span className="text-[10px] font-bold text-[#6d46b8] dark:text-[#a78bda] whitespace-nowrap">
-                                      Load →
+                                      {t.ui.menuOpen} <ArrowRight className="inline w-3 h-3 rtl:rotate-180" aria-hidden="true" />
                                     </span>
                                   </button>
                                 );
@@ -877,45 +886,78 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                       <ArrowRight className="w-4 h-4 text-[#8b849c]" />
                     </MotionRouteLink>
                   </motion.div>
+
+                  {/* Language: the current one on a single row; the full list opens below it */}
+                  <motion.div
+                    variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
+                    className="border-t border-[#eae3ee] dark:border-[#2e1d4d]/60 pt-3"
+                  >
+                    <div className="rounded-xl border border-[#eae3ee] dark:border-[#2e1d4d] overflow-hidden bg-slate-50/50 dark:bg-[#1b1428]/60">
+                      <button
+                        type="button"
+                        id="mobile-drawer-language-toggle"
+                        onClick={() => setDrawerLangOpen((v) => !v)}
+                        aria-expanded={drawerLangOpen}
+                        className="w-full flex items-center justify-between gap-3 p-3 text-sm font-bold text-[#2e2440] dark:text-[#f4eefb] cursor-pointer"
+                      >
+                        <span className="flex items-center gap-3">
+                          <span className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-[#726c85] dark:text-[#b5a9cd]">
+                            <Globe className="w-4 h-4" aria-hidden="true" />
+                          </span>
+                          {t.header?.languageSelect || 'Select Language'}
+                        </span>
+                        <span className="flex items-center gap-1.5 min-w-0 text-xs text-[#6d46b8] dark:text-[#d1b9f7]">
+                          <span className="w-5 h-3.5 rounded-[2px] overflow-hidden ring-1 ring-black/10 dark:ring-white/15 shrink-0">
+                            <FlagIcon code={language as BlogLanguage} className="w-full h-full block" />
+                          </span>
+                          <span className="truncate max-w-[6rem]">{LANGUAGES.find((l) => l.code === language)?.nativeName}</span>
+                          <motion.span animate={{ rotate: drawerLangOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                            <ChevronDown className="w-4 h-4 text-[#726c85] dark:text-[#b5a9cd]" aria-hidden="true" />
+                          </motion.span>
+                        </span>
+                      </button>
+                      <AnimatePresence initial={false}>
+                        {drawerLangOpen && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.25, ease: 'easeInOut' }}
+                            className="overflow-hidden"
+                          >
+                            {/* Two columns, not three: native names like "Bahasa
+                                Indonesia" have nowhere to go in a third of a phone. */}
+                            <div className="grid grid-cols-2 gap-1.5 px-2.5 pb-2.5 pt-1 border-t border-[#eae3ee]/70 dark:border-[#2e1d4d]/70">
+                              {LANGUAGES.map((langItem) => (
+                                <button
+                                  key={langItem.code}
+                                  type="button"
+                                  onClick={() => {
+                                    setLanguage(langItem.code);
+                                    setDrawerLangOpen(false);
+                                  }}
+                                  className={`px-2 py-1.5 rounded-lg text-xs font-bold flex items-center justify-start gap-1.5 min-w-0 transition-all cursor-pointer ${
+                                    language === langItem.code
+                                      ? 'bg-[#6d46b8] text-white shadow-xs'
+                                      : 'bg-white dark:bg-[#201538] text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700'
+                                  }`}
+                                >
+                                  <span className="w-5 h-3.5 rounded-[2px] overflow-hidden ring-1 ring-black/10 dark:ring-white/15 shrink-0">
+                                    <FlagIcon code={langItem.code as BlogLanguage} className="w-full h-full block" />
+                                  </span>
+                                  <span className="truncate">{langItem.nativeName}</span>
+                                </button>
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </motion.div>
                 </motion.div>
 
                 {/* Drawer Footer Actions */}
-                <div className="relative p-4 sm:p-5 border-t border-[#eae3ee] dark:border-[#2e1d4d] bg-slate-50/80 dark:bg-[#160f22] space-y-3">
-                  {/* Language Selection Chips in Drawer */}
-                  <div>
-                    <span className="block text-xs font-semibold text-[#726c85] dark:text-[#b5a9cd] mb-1.5">
-                      {t.header?.languageSelect || 'Select Language'}
-                    </span>
-                    {/* Two columns, not three: native names like "Bahasa
-                        Indonesia" have nowhere to go in a third of a phone. */}
-                    <div className="grid grid-cols-2 gap-1.5 max-h-52 overflow-y-auto pe-0.5">
-                      {LANGUAGES.map((langItem) => (
-                        <button
-                          key={langItem.code}
-                          type="button"
-                          onClick={() => setLanguage(langItem.code)}
-                          className={`px-2 py-1.5 rounded-lg text-xs font-bold flex items-center justify-start gap-1.5 min-w-0 transition-all cursor-pointer ${
-                            language === langItem.code
-                              ? 'bg-[#6d46b8] text-white shadow-xs'
-                              : 'bg-white dark:bg-[#201538] text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700'
-                          }`}
-                        >
-                          <span className="w-5 h-3.5 rounded-[2px] overflow-hidden ring-1 ring-black/10 dark:ring-white/15 shrink-0">
-                            <FlagIcon code={langItem.code as BlogLanguage} className="w-full h-full block" />
-                          </span>
-                          <span className="truncate">{langItem.nativeName}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-1">
-                    <span className="text-xs font-semibold text-[#726c85] dark:text-[#b5a9cd]">
-                      {t.ui.themeMode}
-                    </span>
-                    <ThemeToggle variant="pill" id="mobile-drawer-theme-toggle" />
-                  </div>
-
+                <div className="relative px-4 py-3 sm:px-5 border-t border-[#eae3ee] dark:border-[#2e1d4d] bg-slate-50/80 dark:bg-[#160f22] space-y-3">
                   {isAuthenticated && (
                     <motion.button
                       whileHover={{ scale: 1.02 }}

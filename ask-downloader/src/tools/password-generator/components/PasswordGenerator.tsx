@@ -8,7 +8,6 @@ import {
   crackSeconds,
   entropyBits,
   generate,
-  MAX_LENGTH,
   MIN_LENGTH,
   strength,
   type Options,
@@ -16,6 +15,7 @@ import {
   type Strength,
 } from '../lib/generate';
 import { copyText } from '../lib/clipboard';
+import LengthInput from './LengthInput';
 
 const SLIDER_MAX = 64; // the number box goes up to MAX_LENGTH
 const BULK_SIZES = [5, 10];
@@ -175,17 +175,7 @@ export default function PasswordGenerator({ t }: { t: Strings }) {
           <label htmlFor="pw-length" className="font-bold text-slate-900 dark:text-white">
             {t.length}
           </label>
-          <input
-            type="number"
-            inputMode="numeric"
-            min={MIN_LENGTH}
-            max={MAX_LENGTH}
-            value={o.length}
-            aria-label={t.length}
-            onChange={(e) => set('length', Number(e.target.value) || MIN_LENGTH)}
-            onBlur={(e) => set('length', Math.min(MAX_LENGTH, Math.max(MIN_LENGTH, Number(e.target.value) || MIN_LENGTH)))}
-            className="w-20 rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-center font-mono font-bold text-slate-900 dark:border-slate-700 dark:bg-[#120d1f] dark:text-white"
-          />
+          <LengthInput value={o.length} onChange={(n) => set('length', n)} label={t.length} />
         </div>
         <input
           id="pw-length"

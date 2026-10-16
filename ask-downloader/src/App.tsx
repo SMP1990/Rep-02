@@ -33,7 +33,10 @@ const AboutUsPage = lazy(() => import('./pages/AboutUsPage').then((m) => ({ defa
 const BackgroundRemoverPage = lazy(() => import('./pages/BackgroundRemoverPage').then((m) => ({ default: m.BackgroundRemoverPage })));
 const PasswordGeneratorPage = lazy(() => import('./pages/PasswordGeneratorPage').then((m) => ({ default: m.PasswordGeneratorPage })));
 const AgeCalculatorPage = lazy(() => import('./pages/AgeCalculatorPage').then((m) => ({ default: m.AgeCalculatorPage })));
+const WatermarkRemoverPage = lazy(() => import('./pages/WatermarkRemoverPage').then((m) => ({ default: m.WatermarkRemoverPage })));
+const DnsCheckerPage = lazy(() => import('./pages/DnsCheckerPage').then((m) => ({ default: m.DnsCheckerPage })));
 const WordCounterPage = lazy(() => import('./pages/WordCounterPage').then((m) => ({ default: m.WordCounterPage })));
+const GradeCalculatorPage = lazy(() => import('./pages/GradeCalculatorPage').then((m) => ({ default: m.GradeCalculatorPage })));
 const ImageCompressorPage = lazy(() => import('./pages/ImageCompressorPage').then((m) => ({ default: m.ImageCompressorPage })));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));
 
@@ -146,10 +149,34 @@ const AppContent: React.FC = () => {
     );
   }
 
+  if (currentRoute === 'watermark-remover') {
+    return (
+      <div className="min-h-screen bg-[#f6f0f4] dark:bg-[#0e0a17] font-sans antialiased text-[#2e2440] dark:text-[#f1e9fb]">
+        <WatermarkRemoverPage />
+      </div>
+    );
+  }
+
+  if (currentRoute === 'dns-checker') {
+    return (
+      <div className="min-h-screen bg-[#f6f0f4] dark:bg-[#0e0a17] font-sans antialiased text-[#2e2440] dark:text-[#f1e9fb]">
+        <DnsCheckerPage />
+      </div>
+    );
+  }
+
   if (currentRoute === 'word-counter') {
     return (
       <div className="min-h-screen bg-[#f6f0f4] dark:bg-[#0e0a17] font-sans antialiased text-[#2e2440] dark:text-[#f1e9fb]">
         <WordCounterPage />
+      </div>
+    );
+  }
+
+  if (currentRoute === 'grade-calculator') {
+    return (
+      <div className="min-h-screen bg-[#f6f0f4] dark:bg-[#0e0a17] font-sans antialiased text-[#2e2440] dark:text-[#f1e9fb]">
+        <GradeCalculatorPage />
       </div>
     );
   }
