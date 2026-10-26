@@ -5,7 +5,14 @@ without the old chat. Read it fully, then `ask-downloader/CLAUDE.md` (owner
 rules and site details) and `TOOLS-GUIDE.md` (tools map), before changing
 anything.
 
-Last updated: 2026-10-16.
+Last updated: 2026-10-27.
+
+**Where the owner keeps it on his PC (since 2026-10-27):** `F:\ask-downloader` (a full git clone of `SMP1990/Rep-02`,
+already on branch `claude/upbeat-archimedes-266v06`). Open Claude Code in that folder, then say: "AI-HANDOVER.md parho
+aur batao kahan par hain". On 2026-10-27 the file `ask-downloader-v21-light-fonts.zip` from his Downloads folder was
+compared with this branch: the zip is byte-for-byte the same as `releases/ask-downloader-v21-light-fonts.zip`, and its
+source is identical to `ask-downloader/` (only the `dist/` build output is not in git). So GitHub and the zip were equal
+and nothing newer existed on the PC. Whether v21 is the version live on Hostinger is still to be confirmed with the owner.
 
 ## 1. Where the work is
 
