@@ -28,6 +28,7 @@ export function cleanMediaUrl(rawUrl: string): string {
   return rawUrl
     .replace(/\\\//g, '/')
     .replace(/\\u0026/g, '&')
+    .replace(/\\u002F/gi, '/')
     .replace(/&amp;/g, '&')
     .replace(/\\"/g, '"')
     .replace(/\\/g, '');

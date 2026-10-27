@@ -5,14 +5,15 @@ without the old chat. Read it fully, then `ask-downloader/CLAUDE.md` (owner
 rules and site details) and `TOOLS-GUIDE.md` (tools map), before changing
 anything.
 
-Last updated: 2026-10-27.
+Last updated: 2026-10-27 (v22).
 
 **Where the owner keeps it on his PC (since 2026-10-27):** `F:\ask-downloader` (a full git clone of `SMP1990/Rep-02`,
 already on branch `claude/upbeat-archimedes-266v06`). Open Claude Code in that folder, then say: "AI-HANDOVER.md parho
 aur batao kahan par hain". On 2026-10-27 the file `ask-downloader-v21-light-fonts.zip` from his Downloads folder was
 compared with this branch: the zip is byte-for-byte the same as `releases/ask-downloader-v21-light-fonts.zip`, and its
 source is identical to `ask-downloader/` (only the `dist/` build output is not in git). So GitHub and the zip were equal
-and nothing newer existed on the PC. Whether v21 is the version live on Hostinger is still to be confirmed with the owner.
+and nothing newer existed on the PC. Confirmed on 2026-10-27 over SSH: the build live on Hostinger was v21 (16 Oct).
+The owner then deployed **v22** the same day (see section 6).
 
 ## 1. Where the work is
 
@@ -48,7 +49,8 @@ protected on GitHub (no delete, no force-push).
 - Every visible word in **11 languages**: en, ur, ar, hi, es, pt, fr, de, id, ru, ja
   (ur and ar are right-to-left).
 - Honest reviews; say clearly what is not verified.
-- Deploy is **ZIP upload only** (no SSH). Deliver a complete project ZIP in
+- Deploy is **ZIP upload in hPanel** (Deployments → Settings and redeploy → Upload new files). SSH exists now (see
+  "Server access" below) but is for **looking only**, not for deploying. Deliver a complete project ZIP in
   `releases/` and give the owner a download link:
   `https://github.com/SMP1990/Rep-02/raw/<commit>/releases/<zip-name>.zip`
 - The deploy ZIP must stay small: no heavy files, no `node_modules`, no `.map`.
@@ -134,6 +136,32 @@ How to add the next tool (registry, page, route, tile, SEO, FAQ): see
   start Vite with `--host 127.0.0.1` so the browser can reach it.
 
 ## 6. Last state
+
+- **Latest (2026-10-27): `releases/ask-downloader-v22-tiktok-link-fix.zip`** (live, deployed by the owner via hPanel).
+  Only change vs v21: `cleanMediaUrl()` in `ask-downloader/server/extractorCommon.ts` now turns `/` into `/`.
+  Before, some TikTok videos returned a broken download link (`https:u002Fu002F...`) because the page JSON escapes slashes
+  as `/` and the old code stripped the backslash. Verified: server diff vs live v21 = this one file only; after
+  deploy Facebook, Instagram and TikTok links still work. Note: after the deploy the two test TikTok links used the
+  yt-dlp route (`/api/video/ytdlp-stream/...`), so the live proof of the fix itself is indirect.
+- **Live check on 2026-10-27 (real links, `POST /api/video/info`):** Facebook OK, Instagram post + reel OK, TikTok OK.
+  Not checked yet: Twitter/X, Pinterest, Reddit, Threads, Dailymotion. Small cosmetic gaps seen: some Facebook videos show a stock
+  photo thumbnail; Instagram title is just "#ViralReel" and duration "--:--" when real metadata is missing.
+- **Speed:** Google PageSpeed score could not be obtained (API quota, website hung, local Lighthouse got 403 from the host).
+  Measured by hand: home HTML 1.3 KB (page is built by JS), ~400 KB brotli JS+CSS, immutable caching. Owner: "speed later".
+  Next idea: split the 188 KB `index` chunk, but get a real PageSpeed score first.
+- **Audit the owner pasted (CORS, SSL, word counter, 5 MB image, speed, mobile)** was checked against code and live site:
+  mostly wrong or outdated. Only real weakness: extractors can break when Instagram/TikTok/Facebook change.
+
+### Server access (SSH) — added 2026-10-27
+- hPanel → Websites → social.al-marifat.org → Advanced → **SSH Access** is Active. Port **65002**, user `u770730940`.
+  A dedicated key pair was made on the owner's PC (`~/.ssh/ask_hostinger`, public key added in hPanel). Never put a
+  password or private key in chat, git or this file.
+- Use it to **read only** (logs, files). The server has no `node` in the SSH shell. Hostinger itself runs
+  `npm install` + build, copies to `hbuilds/versions/<id>`, switches `hbuilds/current` and restarts, so keep deploying by ZIP.
+- Live code: `~/domains/social.al-marifat.org/hbuilds/current/nodejs`. Data (survives redeploys): `.fdownloader-data`.
+  Deploy logs: `hbuilds/logs/<id>/`. The home folder also holds the owner's WordPress site and `backup-*.sql`: do not touch.
+
+### Earlier state
 
 - **Latest (2026-10-16): `releases/ask-downloader-v21-light-fonts.zip`** (live).
   v8 (DNS Checker) and v9 (Watermark Remover) were built in other sessions and
