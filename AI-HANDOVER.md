@@ -5,7 +5,7 @@ without the old chat. Read it fully, then `ask-downloader/CLAUDE.md` (owner
 rules and site details) and `TOOLS-GUIDE.md` (tools map), before changing
 anything.
 
-Last updated: 2026-10-27 (v22).
+Last updated: 2026-10-28 (v23).
 
 **Where the owner keeps it on his PC (since 2026-10-27):** `F:\ask-downloader` (a full git clone of `SMP1990/Rep-02`,
 already on branch `claude/upbeat-archimedes-266v06`). Open Claude Code in that folder, then say: "AI-HANDOVER.md parho
@@ -137,7 +137,12 @@ How to add the next tool (registry, page, route, tile, SEO, FAQ): see
 
 ## 6. Last state
 
-- **Latest (2026-10-27): `releases/ask-downloader-v22-tiktok-link-fix.zip`** (live, deployed by the owner via hPanel).
+- **Latest (2026-10-28): `releases/ask-downloader-v23-header-flags-fonts.zip`** (built, NOT yet confirmed deployed by the owner).
+  Changes vs v22: About Us link removed from the header (desktop + mobile); English shows USA + UK flags together in the
+  language picker (`LangFlag` in `FlagIcon.tsx`); header "Fast & Safe" badge removed and the line under the logo is now
+  "Fast, Free & Safe" (`t.ui.fastFreeSafe`, 11 languages, ignores the admin tagline); bigger fonts in the downloader card
+  (`ToolPlatformCard.tsx`). Checked: lint, build, no clipping in 11 languages at 360/768/1024/1280 px. The v22 entry below is the previous release.
+- Previous (2026-10-27): `releases/ask-downloader-v22-tiktok-link-fix.zip`** (live, deployed by the owner via hPanel).
   Only change vs v21: `cleanMediaUrl()` in `ask-downloader/server/extractorCommon.ts` now turns `/` into `/`.
   Before, some TikTok videos returned a broken download link (`https:u002Fu002F...`) because the page JSON escapes slashes
   as `/` and the old code stripped the backslash. Verified: server diff vs live v21 = this one file only; after
