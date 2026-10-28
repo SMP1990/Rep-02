@@ -31,7 +31,7 @@ import {
 } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext.tsx';
 import { useLanguage, LANGUAGES } from '../context/LanguageContext.tsx';
-import { FlagIcon } from './FlagIcon.tsx';
+import { LangFlag } from './FlagIcon.tsx';
 import { fill } from '../utils/i18n.ts';
 import type { BlogLanguage } from '../config/blogLanguages.ts';
 import { SocialPlatform } from '../types.ts';
@@ -510,9 +510,7 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                 aria-expanded={langMenuOpen}
                 className="flex items-center gap-1 px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold text-[#5e5473] dark:text-[#b5a9cd] bg-white dark:bg-[#1f1630] border border-[#eae3ee] dark:border-[#2e1d4d] hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95 transition-all cursor-pointer shadow-2xs"
               >
-                <span className="w-5 h-3.5 rounded-[2px] overflow-hidden ring-1 ring-black/10 dark:ring-white/15 shrink-0">
-                  <FlagIcon code={language as BlogLanguage} className="w-full h-full block" />
-                </span>
+                <LangFlag code={language as BlogLanguage} />
                 <span className="max-sm:sr-only uppercase text-[11px] sm:text-xs">{language}</span>
                 <ChevronDown className={`w-3 h-3 text-[#726c85] dark:text-[#b5a9cd] transition-transform duration-150 ${langMenuOpen ? 'rotate-180' : ''}`} />
               </button>
@@ -536,9 +534,7 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                       }`}
                     >
                       <span className="flex items-center gap-2 min-w-0">
-                        <span className="w-5 h-3.5 rounded-[2px] overflow-hidden ring-1 ring-black/10 dark:ring-white/15 shrink-0">
-                          <FlagIcon code={langItem.code as BlogLanguage} className="w-full h-full block" />
-                        </span>
+                        <LangFlag code={langItem.code as BlogLanguage} />
                         <span className="truncate">{langItem.nativeName}</span>
                       </span>
                       {language === langItem.code && (
@@ -875,9 +871,7 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                           {t.header?.languageSelect || 'Select Language'}
                         </span>
                         <span className="flex items-center gap-1.5 min-w-0 text-xs text-[#6d46b8] dark:text-[#d1b9f7]">
-                          <span className="w-5 h-3.5 rounded-[2px] overflow-hidden ring-1 ring-black/10 dark:ring-white/15 shrink-0">
-                            <FlagIcon code={language as BlogLanguage} className="w-full h-full block" />
-                          </span>
+                          <LangFlag code={language as BlogLanguage} />
                           <span className="truncate max-w-[6rem]">{LANGUAGES.find((l) => l.code === language)?.nativeName}</span>
                           <motion.span animate={{ rotate: drawerLangOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
                             <ChevronDown className="w-4 h-4 text-[#726c85] dark:text-[#b5a9cd]" aria-hidden="true" />
@@ -910,9 +904,7 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                                       : 'bg-white dark:bg-[#201538] text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700'
                                   }`}
                                 >
-                                  <span className="w-5 h-3.5 rounded-[2px] overflow-hidden ring-1 ring-black/10 dark:ring-white/15 shrink-0">
-                                    <FlagIcon code={langItem.code as BlogLanguage} className="w-full h-full block" />
-                                  </span>
+                                  <LangFlag code={langItem.code as BlogLanguage} />
                                   <span className="truncate">{langItem.nativeName}</span>
                                 </button>
                               ))}

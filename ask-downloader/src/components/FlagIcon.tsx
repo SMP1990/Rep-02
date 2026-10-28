@@ -156,3 +156,50 @@ export const FlagIcon: React.FC<FlagIconProps> = ({ code, title, className = '' 
     {FLAGS[code] ?? FLAGS.en}
   </svg>
 );
+
+/** United States — 13 stripes and a canton of stars, same 3:2 box as the rest. */
+const UsaFlag = () => {
+  const h = 40 / 13;
+  const stars: React.ReactNode[] = [];
+  for (let row = 0; row < 5; row++) {
+    const count = row % 2 === 0 ? 5 : 4;
+    for (let i = 0; i < count; i++) {
+      const x = row % 2 === 0 ? 2.4 + i * 4.6 : 4.7 + i * 4.6;
+      stars.push(<g key={`${row}-${i}`}><Star cx={x} cy={2.4 + row * 3.9} r={1.9} /></g>);
+    }
+  }
+  return (
+    <svg viewBox="0 0 60 40" aria-hidden="true" className="w-full h-full block" preserveAspectRatio="none">
+      <rect width="60" height="40" fill="#fff" />
+      {Array.from({ length: 7 }).map((_, i) => (
+        <rect key={i} y={i * 2 * h} width="60" height={h} fill="#B22234" />
+      ))}
+      <rect width="24" height={7 * h} fill="#3C3B6E" />
+      {stars}
+    </svg>
+  );
+};
+
+const chip =
+  'w-5 h-3.5 rounded-[2px] overflow-hidden ring-1 ring-black/10 dark:ring-white/15 shrink-0';
+
+/** One flag chip per language; English shows the USA and UK flags together. */
+export const LangFlag: React.FC<{ code: BlogLanguage }> = ({ code }) => {
+  if (code === 'en') {
+    return (
+      <span className="inline-flex items-center gap-0.5 shrink-0">
+        <span className={chip}>
+          <UsaFlag />
+        </span>
+        <span className={chip}>
+          <FlagIcon code="en" className="w-full h-full block" />
+        </span>
+      </span>
+    );
+  }
+  return (
+    <span className={chip}>
+      <FlagIcon code={code} className="w-full h-full block" />
+    </span>
+  );
+};
