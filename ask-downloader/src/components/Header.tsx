@@ -11,7 +11,6 @@ import {
   Home,
   BookOpen,
   Mail,
-  Info,
   Video,
   ChevronDown,
   X,
@@ -285,7 +284,6 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
   const isHomeActive = currentRoute === 'home';
   const isBlogActive = currentRoute === 'public-blog' || currentRoute === 'public-blog-post';
   const isContactActive = currentRoute === 'contact';
-  const isAboutActive = currentRoute === 'about-us';
   const isDownloaderActive = isHomeActive && (activeSocialPlatform !== undefined);
 
   return (
@@ -477,18 +475,6 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
             </RouteLink>
 
             {/* 4. CONTACT US */}
-            <RouteLink route="about-us" onBeforeNavigate={closeMenus}
-              id="nav-link-about"
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold transition-all duration-150 cursor-pointer ${
-                isAboutActive
-                  ? 'text-[#4b2e83] dark:text-[#f4eefb] bg-[#f1e9fb] dark:bg-[#261b3b] shadow-2xs'
-                  : 'text-[#5e5473] dark:text-[#b5a9cd] hover:text-[#2e2440] dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/60'
-              }`}
-            >
-              <Info className={`w-4 h-4 ${isAboutActive ? 'text-[#6d46b8] dark:text-[#d1b9f7]' : 'text-[#8b849c]'}`} />
-              <span>{t.header?.about || 'About Us'}</span>
-            </RouteLink>
-
             <RouteLink route="contact" onBeforeNavigate={closeMenus}
               id="nav-link-contact"
               className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold transition-all duration-150 cursor-pointer ${
@@ -850,24 +836,6 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                     </MotionRouteLink>
 
                     {/* 4. CONTACT US */}
-                    <MotionRouteLink route="about-us" onBeforeNavigate={closeMenus}
-                      whileTap={{ scale: 0.98 }}
-                      id="mobile-nav-about"
-                      className={`w-full flex items-center justify-between p-3 rounded-xl text-sm font-bold transition-all cursor-pointer ${
-                        isAboutActive
-                          ? 'bg-[#f1e9fb] dark:bg-[#261b3b] text-[#4b2e83] dark:text-[#f4eefb] shadow-2xs'
-                          : 'text-[#2e2440] dark:text-[#f4eefb] hover:bg-slate-100/80 dark:hover:bg-slate-800/60'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-lg ${isAboutActive ? 'bg-white dark:bg-[#341d5b] text-[#6d46b8]' : 'bg-slate-100 dark:bg-slate-800 text-[#726c85] dark:text-[#b5a9cd]'}`}>
-                          <Info className="w-4 h-4" />
-                        </div>
-                        <span>{t.header?.about || 'About Us'}</span>
-                      </div>
-                      <ArrowRight className="w-4 h-4 text-[#8b849c]" />
-                    </MotionRouteLink>
-
                     <MotionRouteLink route="contact" onBeforeNavigate={closeMenus}
                       whileTap={{ scale: 0.98 }}
                       id="mobile-nav-contact"
