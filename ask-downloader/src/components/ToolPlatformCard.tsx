@@ -382,7 +382,7 @@ export const ToolPlatformCard: React.FC<ToolPlatformCardProps> = ({
     >
       {/* Tool Header with subtle shimmer background */}
       <div className={`${headerGradient} p-3 sm:p-5 text-white flex items-center justify-between relative overflow-hidden`}>
-        <div className="flex items-center gap-3 max-sm:gap-2.5 relative z-10">
+        <div className="flex items-center gap-3 max-sm:gap-2.5 relative z-10 min-w-0">
           <div className="w-10 h-10 max-sm:w-9 max-sm:h-9 rounded-xl bg-white/15 backdrop-blur-xs flex items-center justify-center text-white ring-1 ring-white/25 shadow-inner">
             {isUniversal ? (
               <Sparkles className="w-5 h-5" />
@@ -406,9 +406,9 @@ export const ToolPlatformCard: React.FC<ToolPlatformCardProps> = ({
               <Video className="w-5 h-5" />
             )}
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg max-sm:text-base font-bold tracking-tight">
+          <div className="min-w-0">
+            <div className="flex items-center gap-x-2 gap-y-1 flex-wrap">
+              <h2 className="text-[22px] max-sm:text-lg leading-tight font-bold tracking-tight">
                 {isUniversal
                   ? t.tools?.universal || 'All Platforms'
                   : isFb 
@@ -429,11 +429,11 @@ export const ToolPlatformCard: React.FC<ToolPlatformCardProps> = ({
                   ? t.tools?.dailymotion || 'Dailymotion'
                   : t.ui.allPlatforms}
               </h2>
-              <span className="px-2 py-0.5 bg-white/20 text-white font-extrabold text-[10px] rounded uppercase tracking-wider backdrop-blur-xs">
+              <span className="px-2 py-0.5 bg-white/20 text-white font-extrabold text-xs max-sm:text-[11px] rounded uppercase tracking-wider backdrop-blur-xs">
                 {isUniversal ? t.ui.allInOne : isFb ? 'FB HD' : isIg ? 'IG Reels' : isTt ? 'TikTok' : isTw ? 'Twitter / X' : isPin ? 'Pinterest' : isRd ? 'Reddit' : isTh ? 'Threads' : isDm ? 'DM HD' : 'Pro HD'}
               </span>
             </div>
-            <p className="text-xs max-sm:text-[11px] max-sm:leading-snug text-white/90">
+            <p className="text-sm max-sm:text-[13px] leading-snug text-white/90">
               {isUniversal
                 ? t.tools?.universalSubtitle || 'Paste any social video link for auto-detection'
                 : isFb 
@@ -456,7 +456,7 @@ export const ToolPlatformCard: React.FC<ToolPlatformCardProps> = ({
             </p>
           </div>
         </div>
-        <span className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-semibold bg-white/20 px-3 py-1 rounded-full text-white backdrop-blur-xs">
+        <span className="hidden sm:inline-flex items-center gap-1.5 text-sm font-semibold bg-white/20 px-3.5 py-1.5 rounded-full text-white backdrop-blur-xs ms-3 shrink-0 whitespace-nowrap">
           {isFb ? (
             <>
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" /> {t.ui.hd1080}
@@ -538,7 +538,7 @@ export const ToolPlatformCard: React.FC<ToolPlatformCardProps> = ({
                   ? t.tools?.dailymotionPlaceholder || 'Paste Dailymotion video URL (dailymotion.com/video/... or dai.ly/...)'
                   : t.input?.placeholder
               }
-              className={`w-full pl-4 pr-24 py-3.5 text-sm bg-slate-50 dark:bg-[#1f1730] border border-slate-300 dark:border-[#352554] rounded-xl focus:outline-hidden focus:ring-2 ${accentFocusRing} focus:bg-white dark:focus:bg-[#181224] dark:focus:bg-[#181224] dark:focus:bg-[#181224] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 transition-all shadow-inner`}
+              className={`w-full pl-4 pr-28 py-4 text-base bg-slate-50 dark:bg-[#1f1730] border border-slate-300 dark:border-[#352554] rounded-xl focus:outline-hidden focus:ring-2 ${accentFocusRing} focus:bg-white dark:focus:bg-[#181224] dark:focus:bg-[#181224] dark:focus:bg-[#181224] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 transition-all shadow-inner`}
               disabled={status === 'fetching' || status === 'validating'}
             />
 
@@ -561,10 +561,10 @@ export const ToolPlatformCard: React.FC<ToolPlatformCardProps> = ({
                 whileTap={{ scale: 0.95 }}
                 type="button"
                 onClick={handlePaste}
-                className={`px-2.5 py-1.5 text-xs font-semibold bg-white dark:bg-[#2a1e42] ${pasteTextColor} border border-slate-200 dark:border-[#422e66] rounded-lg transition-colors shadow-2xs flex items-center gap-1 cursor-pointer`}
+                className={`px-3 py-2 text-sm font-semibold bg-white dark:bg-[#2a1e42] ${pasteTextColor} border border-slate-200 dark:border-[#422e66] rounded-lg transition-colors shadow-2xs flex items-center gap-1 cursor-pointer`}
                 title={t.ui.paste}
               >
-                <ClipboardPaste className="w-3.5 h-3.5" />
+                <ClipboardPaste className="w-4 h-4" />
                 <span className="hidden sm:inline">{t.input?.paste || 'Paste'}</span>
               </motion.button>
             </div>
@@ -604,7 +604,7 @@ export const ToolPlatformCard: React.FC<ToolPlatformCardProps> = ({
             type="submit"
             id={`btn-extract-${platform}`}
             disabled={!url.trim() || status === 'fetching' || status === 'validating'}
-            className={`w-full py-3.5 px-5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 transition-all cursor-pointer ${submitButtonGradient} disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none focus:outline-hidden focus:ring-2 focus:ring-offset-2`}
+            className={`w-full py-4 px-5 rounded-xl font-bold text-base text-white flex items-center justify-center gap-2 transition-all cursor-pointer ${submitButtonGradient} disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none focus:outline-hidden focus:ring-2 focus:ring-offset-2`}
           >
             {status === 'fetching' || status === 'validating' ? (
               <>
@@ -686,12 +686,12 @@ export const ToolPlatformCard: React.FC<ToolPlatformCardProps> = ({
       </div>
 
       {/* Footer Badges (hidden on phones to keep the home page short) */}
-      <div className="max-sm:hidden bg-slate-50 dark:bg-[#130c20] border-t border-slate-100 dark:border-[#281b3f] px-5 py-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-        <span className="flex items-center gap-1.5">
-          <ShieldCheck className={`w-3.5 h-3.5 ${isFb ? 'text-blue-600 dark:text-blue-400' : isIg ? 'text-rose-600 dark:text-rose-400' : isTt ? 'text-teal-700 dark:text-teal-400' : isTw ? 'text-sky-700 dark:text-sky-400' : isPin ? 'text-red-600 dark:text-red-400' : 'text-orange-700 dark:text-orange-400'}`} />
+      <div className="max-sm:hidden bg-slate-50 dark:bg-[#130c20] border-t border-slate-100 dark:border-[#281b3f] px-5 py-3.5 flex items-center justify-between flex-wrap gap-x-4 gap-y-1.5 text-sm text-slate-500 dark:text-slate-400">
+        <span className="flex items-center gap-1.5 min-w-0">
+          <ShieldCheck className={`w-4 h-4 shrink-0 ${isFb ? 'text-blue-600 dark:text-blue-400' : isIg ? 'text-rose-600 dark:text-rose-400' : isTt ? 'text-teal-700 dark:text-teal-400' : isTw ? 'text-sky-700 dark:text-sky-400' : isPin ? 'text-red-600 dark:text-red-400' : 'text-orange-700 dark:text-orange-400'}`} />
           <span>{heroField(heroText, 'noticeText', t.tools?.noticeText)}</span>
         </span>
-        <span className={`font-mono text-[11px] ${isFb ? 'text-blue-600 dark:text-blue-400' : isIg ? 'text-rose-600 dark:text-rose-400' : isTt ? 'text-teal-700 dark:text-teal-400' : isTw ? 'text-sky-700 dark:text-sky-400' : isPin ? 'text-red-600 dark:text-red-400' : 'text-orange-700 dark:text-orange-400'} font-semibold`}>
+        <span className={`font-mono text-sm ${isFb ? 'text-blue-600 dark:text-blue-400' : isIg ? 'text-rose-600 dark:text-rose-400' : isTt ? 'text-teal-700 dark:text-teal-400' : isTw ? 'text-sky-700 dark:text-sky-400' : isPin ? 'text-red-600 dark:text-red-400' : 'text-orange-700 dark:text-orange-400'} font-semibold`}>
           MP4 / MP3
         </span>
       </div>
