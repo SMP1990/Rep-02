@@ -273,7 +273,7 @@ export const ToolPlatformCard: React.FC<ToolPlatformCardProps> = ({
 
   // Card theme classes
   const headerGradient = isUniversal
-    ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600'
+    ? 'bg-[#341d5b] dark:bg-gradient-to-r dark:from-indigo-600 dark:via-purple-600 dark:to-pink-600'
     : isFb
     ? 'bg-gradient-to-r from-blue-600 via-blue-600 to-indigo-700'
     : isIg
@@ -293,7 +293,7 @@ export const ToolPlatformCard: React.FC<ToolPlatformCardProps> = ({
     : 'bg-gradient-to-r from-sky-700 via-blue-600 to-indigo-700';
 
   const cardBorder = isUniversal
-    ? 'border-indigo-200/90 dark:border-indigo-900/60 shadow-xl shadow-indigo-500/5'
+    ? 'border-[#341d5b]/25 dark:border-indigo-900/60 shadow-xl shadow-[#341d5b]/5 dark:shadow-indigo-500/5'
     : isFb
     ? 'border-blue-200/90 dark:border-blue-900/60 shadow-xl shadow-blue-500/5'
     : isIg
@@ -313,7 +313,7 @@ export const ToolPlatformCard: React.FC<ToolPlatformCardProps> = ({
     : 'border-sky-200/90 dark:border-sky-900/60 shadow-xl shadow-sky-500/5';
 
   const submitButtonGradient = isUniversal
-    ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:opacity-95 shadow-md shadow-indigo-500/25 focus:ring-indigo-500'
+    ? 'bg-[#341d5b] dark:bg-gradient-to-r dark:from-indigo-600 dark:via-purple-600 dark:to-pink-600 hover:opacity-95 shadow-md shadow-[#341d5b]/25 dark:shadow-indigo-500/25 focus:ring-[#341d5b] dark:focus:ring-indigo-500'
     : isFb
     ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md shadow-blue-600/25 focus:ring-blue-500'
     : isIg
@@ -333,7 +333,7 @@ export const ToolPlatformCard: React.FC<ToolPlatformCardProps> = ({
     : 'bg-gradient-to-r from-sky-700 via-blue-600 to-indigo-700 hover:opacity-95 shadow-md shadow-sky-600/25 focus:ring-sky-500';
 
   const accentFocusRing = isUniversal
-    ? 'focus:ring-indigo-500 dark:focus:ring-indigo-400'
+    ? 'focus:ring-[#341d5b] dark:focus:ring-indigo-400'
     : isFb
     ? 'focus:ring-blue-500 dark:focus:ring-blue-400'
     : isIg
@@ -353,7 +353,7 @@ export const ToolPlatformCard: React.FC<ToolPlatformCardProps> = ({
     : 'focus:ring-sky-500 dark:focus:ring-sky-400';
 
   const pasteTextColor = isUniversal
-    ? 'text-indigo-600 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/60'
+    ? 'text-[#341d5b] dark:text-indigo-300 hover:bg-[#341d5b]/10 dark:hover:bg-indigo-950/60'
     : isFb
     ? 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/60'
     : isIg
