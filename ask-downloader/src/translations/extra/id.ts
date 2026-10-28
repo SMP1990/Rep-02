@@ -53,7 +53,7 @@ export const id: ExtraDict = {
     wentWrongMsg: 'Maaf — halaman ini mengalami kesalahan tak terduga. Memuat ulang biasanya memperbaikinya.',
     backHome: 'Kembali ke Beranda',
     socialMedia: 'Media Sosial', notifLargeTitle: 'Unduhan Video Besar Selesai! 🎬', notifTitle: 'Unduhan Selesai! 🎉', notifBody: '"{title}" {quality} selesai diunduh {size}. Tersimpan di perangkat Anda.', tabLarge: 'Video Besar Terunduh!', tabDone: 'Unduhan Selesai!', streamClosed: 'Koneksi terputus secara tak terduga sebelum selesai.',
-    minRead: '{n} menit baca', fastSafe: 'Cepat & Aman', mainNav: 'Navigasi Utama', closeMenu: 'Tutup menu', noWatermark: 'Tanpa Watermark', openAdmin: 'Buka Dasbor Admin',
+    minRead: '{n} menit baca', fastSafe: 'Cepat & Aman', fastFreeSafe: 'Cepat, Gratis & Aman', mainNav: 'Navigasi Utama', closeMenu: 'Tutup menu', noWatermark: 'Tanpa Watermark', openAdmin: 'Buka Dasbor Admin',
     themeToggle: 'Ganti tema', lightTheme: 'Tema terang', darkTheme: 'Tema gelap', switchLight: 'Beralih ke tema terang', switchDark: 'Beralih ke tema gelap',
     standardContrast: 'Kontras Standar', defaultMode: 'Mode Bawaan', nightMode: 'Mode Malam Ramah Mata', darkOptimized: 'Dioptimalkan untuk Gelap',
     hd1080: '1080p HD Siap', fastMp4Mp3: 'MP4 & MP3 Cepat', threadsHd: 'Threads HD MP4', fastMp4: 'MP4 Cepat', allInOne: 'Serba Ada', hdReels: 'Reels HD Siap', noWatermarkHd: 'HD Tanpa Watermark', fullHdPin: 'Video Pin Full HD', audioHd: 'Audio & Video HD', dmHd: 'Dailymotion HD Siap',

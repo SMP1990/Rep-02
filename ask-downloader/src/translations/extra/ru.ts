@@ -53,7 +53,7 @@ export const ru: ExtraDict = {
     wentWrongMsg: 'Извините — на странице произошла непредвиденная ошибка. Обычно помогает перезагрузка.',
     backHome: 'На главную',
     socialMedia: 'соцсетей', notifLargeTitle: 'Загрузка большого видео завершена! 🎬', notifTitle: 'Загрузка завершена! 🎉', notifBody: '«{title}» {quality} загружено {size}. Сохранено на устройстве.', tabLarge: 'Большое видео загружено!', tabDone: 'Загрузка завершена!', streamClosed: 'Соединение неожиданно прервалось до завершения.',
-    minRead: '{n} мин чтения', fastSafe: 'Быстро и безопасно', mainNav: 'Основная навигация', closeMenu: 'Закрыть меню', noWatermark: 'Без водяного знака', openAdmin: 'Открыть панель администратора',
+    minRead: '{n} мин чтения', fastSafe: 'Быстро и безопасно', fastFreeSafe: 'Быстро, бесплатно и безопасно', mainNav: 'Основная навигация', closeMenu: 'Закрыть меню', noWatermark: 'Без водяного знака', openAdmin: 'Открыть панель администратора',
     themeToggle: 'Сменить тему', lightTheme: 'Светлая тема', darkTheme: 'Тёмная тема', switchLight: 'Включить светлую тему', switchDark: 'Включить тёмную тему',
     standardContrast: 'Стандартный контраст', defaultMode: 'Режим по умолчанию', nightMode: 'Щадящий ночной режим', darkOptimized: 'Оптимизировано для тёмной темы',
     hd1080: 'Готово в 1080p HD', fastMp4Mp3: 'Быстрые MP4 и MP3', threadsHd: 'Threads в HD MP4', fastMp4: 'Быстрый MP4', allInOne: 'Всё в одном', hdReels: 'Reels в HD', noWatermarkHd: 'HD без водяного знака', fullHdPin: 'Видео Pin в Full HD', audioHd: 'Аудио и HD-видео', dmHd: 'Dailymotion в HD',

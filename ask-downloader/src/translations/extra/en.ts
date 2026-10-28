@@ -56,7 +56,7 @@ export const en = {
     wentWrongMsg: 'Sorry about that — this page ran into an unexpected error. Reloading usually fixes it.',
     backHome: 'Back to Home',
     socialMedia: 'Social Media', notifLargeTitle: 'Large Video Download Complete! 🎬', notifTitle: 'Download Finished! 🎉', notifBody: '"{title}" {quality} has finished downloading {size}. Saved to your device.', tabLarge: 'Large Video Downloaded!', tabDone: 'Download Complete!', streamClosed: 'The stream connection closed unexpectedly before completing.',
-    minRead: '{n} min read', fastSafe: 'Fast & Safe', mainNav: 'Main Navigation', closeMenu: 'Close menu', noWatermark: 'No Watermark', openAdmin: 'Open Admin Dashboard',
+    minRead: '{n} min read', fastSafe: 'Fast & Safe', fastFreeSafe: 'Fast, Free & Safe', mainNav: 'Main Navigation', closeMenu: 'Close menu', noWatermark: 'No Watermark', openAdmin: 'Open Admin Dashboard',
     themeToggle: 'Theme toggle', lightTheme: 'Light theme', darkTheme: 'Dark theme', switchLight: 'Switch to light theme', switchDark: 'Switch to dark theme',
     standardContrast: 'Standard Contrast', defaultMode: 'Default Mode', nightMode: 'Eye-Safe Night Mode', darkOptimized: 'Dark Optimized',
     hd1080: '1080p HD Ready', fastMp4Mp3: 'Fast MP4 & MP3', threadsHd: 'Threads HD MP4', fastMp4: 'Fast MP4', allInOne: 'All-in-One', hdReels: 'HD Reels Ready', noWatermarkHd: 'No Watermark HD', fullHdPin: 'Full HD Pin Video', audioHd: 'Audio & HD Video', dmHd: 'Dailymotion HD Ready',

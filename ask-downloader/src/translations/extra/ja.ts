@@ -53,7 +53,7 @@ export const ja: ExtraDict = {
     wentWrongMsg: '申し訳ありません。このページで予期しないエラーが発生しました。再読み込みで直ることがほとんどです。',
     backHome: 'ホームに戻る',
     socialMedia: 'SNS', notifLargeTitle: '大きな動画のダウンロード完了！🎬', notifTitle: 'ダウンロード完了！🎉', notifBody: '「{title}」{quality} のダウンロードが完了しました {size}。端末に保存されました。', tabLarge: '大きな動画をダウンロードしました！', tabDone: 'ダウンロード完了！', streamClosed: '完了前に接続が予期せず切断されました。',
-    minRead: '{n}分で読めます', fastSafe: '高速・安全', mainNav: 'メインナビゲーション', closeMenu: 'メニューを閉じる', noWatermark: 'ウォーターマークなし', openAdmin: '管理ダッシュボードを開く',
+    minRead: '{n}分で読めます', fastSafe: '高速・安全', fastFreeSafe: '高速・無料・安全', mainNav: 'メインナビゲーション', closeMenu: 'メニューを閉じる', noWatermark: 'ウォーターマークなし', openAdmin: '管理ダッシュボードを開く',
     themeToggle: 'テーマ切り替え', lightTheme: 'ライトテーマ', darkTheme: 'ダークテーマ', switchLight: 'ライトテーマに切り替え', switchDark: 'ダークテーマに切り替え',
     standardContrast: '標準コントラスト', defaultMode: 'デフォルトモード', nightMode: '目に優しいナイトモード', darkOptimized: 'ダーク最適化',
     hd1080: '1080p HD対応', fastMp4Mp3: '高速MP4・MP3', threadsHd: 'Threads HD MP4', fastMp4: '高速MP4', allInOne: 'オールインワン', hdReels: 'HDリール対応', noWatermarkHd: 'ウォーターマークなしHD', fullHdPin: 'フルHDピン動画', audioHd: '音声＆HD動画', dmHd: 'Dailymotion HD対応',

@@ -53,7 +53,7 @@ export const hi: ExtraDict = {
     wentWrongMsg: 'क्षमा करें — इस पेज में अप्रत्याशित त्रुटि आई। दोबारा लोड करने से आमतौर पर ठीक हो जाता है।',
     backHome: 'होम पर वापस जाएँ',
     socialMedia: 'सोशल मीडिया', notifLargeTitle: 'बड़ा वीडियो डाउनलोड पूरा! 🎬', notifTitle: 'डाउनलोड पूरा! 🎉', notifBody: '"{title}" {quality} डाउनलोड पूरा हुआ {size}। आपके डिवाइस में सहेजा गया।', tabLarge: 'बड़ा वीडियो डाउनलोड हुआ!', tabDone: 'डाउनलोड पूरा!', streamClosed: 'कनेक्शन पूरा होने से पहले अचानक बंद हो गया।',
-    minRead: '{n} मिनट पढ़ें', fastSafe: 'तेज़ और सुरक्षित', mainNav: 'मुख्य नेविगेशन', closeMenu: 'मेनू बंद करें', noWatermark: 'बिना वॉटरमार्क', openAdmin: 'एडमिन डैशबोर्ड खोलें',
+    minRead: '{n} मिनट पढ़ें', fastSafe: 'तेज़ और सुरक्षित', fastFreeSafe: 'तेज़, मुफ़्त और सुरक्षित', mainNav: 'मुख्य नेविगेशन', closeMenu: 'मेनू बंद करें', noWatermark: 'बिना वॉटरमार्क', openAdmin: 'एडमिन डैशबोर्ड खोलें',
     themeToggle: 'थीम बदलें', lightTheme: 'लाइट थीम', darkTheme: 'डार्क थीम', switchLight: 'लाइट थीम पर जाएँ', switchDark: 'डार्क थीम पर जाएँ',
     standardContrast: 'मानक कंट्रास्ट', defaultMode: 'डिफ़ॉल्ट मोड', nightMode: 'आँखों के लिए आरामदायक नाइट मोड', darkOptimized: 'डार्क के लिए अनुकूलित',
     hd1080: '1080p HD तैयार', fastMp4Mp3: 'तेज़ MP4 और MP3', threadsHd: 'Threads HD MP4', fastMp4: 'तेज़ MP4', allInOne: 'ऑल-इन-वन', hdReels: 'HD रील्स तैयार', noWatermarkHd: 'बिना वॉटरमार्क HD', fullHdPin: 'फ़ुल HD पिन वीडियो', audioHd: 'ऑडियो और HD वीडियो', dmHd: 'Dailymotion HD तैयार',

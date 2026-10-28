@@ -53,7 +53,7 @@ export const ur: ExtraDict = {
     wentWrongMsg: 'معذرت — اس صفحے میں غیر متوقع خرابی آ گئی۔ دوبارہ لوڈ کرنے سے عموماً ٹھیک ہو جاتا ہے۔',
     backHome: 'ہوم پیج پر واپس جائیں',
     socialMedia: 'سوشل میڈیا', notifLargeTitle: 'بڑی ویڈیو کا ڈاؤنلوڈ مکمل! 🎬', notifTitle: 'ڈاؤنلوڈ مکمل! 🎉', notifBody: '"{title}" {quality} کا ڈاؤنلوڈ مکمل ہو گیا {size}۔ آپ کے آلے میں محفوظ ہو گئی۔', tabLarge: 'بڑی ویڈیو ڈاؤنلوڈ ہو گئی!', tabDone: 'ڈاؤنلوڈ مکمل!', streamClosed: 'کنکشن مکمل ہونے سے پہلے اچانک بند ہو گیا۔',
-    minRead: '{n} منٹ مطالعہ', fastSafe: 'تیز اور محفوظ', mainNav: 'مرکزی نیویگیشن', closeMenu: 'مینو بند کریں', noWatermark: 'بغیر واٹر مارک', openAdmin: 'ایڈمن ڈیش بورڈ کھولیں',
+    minRead: '{n} منٹ مطالعہ', fastSafe: 'تیز اور محفوظ', fastFreeSafe: 'تیز، مفت اور محفوظ', mainNav: 'مرکزی نیویگیشن', closeMenu: 'مینو بند کریں', noWatermark: 'بغیر واٹر مارک', openAdmin: 'ایڈمن ڈیش بورڈ کھولیں',
     themeToggle: 'تھیم تبدیل کریں', lightTheme: 'روشن تھیم', darkTheme: 'گہری تھیم', switchLight: 'روشن تھیم پر جائیں', switchDark: 'گہری تھیم پر جائیں',
     standardContrast: 'معیاری کنٹراسٹ', defaultMode: 'ڈیفالٹ موڈ', nightMode: 'آنکھوں کے لیے آرام دہ نائٹ موڈ', darkOptimized: 'ڈارک کے لیے موزوں',
     hd1080: '1080p ایچ ڈی تیار', fastMp4Mp3: 'تیز MP4 اور MP3', threadsHd: 'تھریڈز ایچ ڈی MP4', fastMp4: 'تیز MP4', allInOne: 'آل اِن ون', hdReels: 'ایچ ڈی ریلز تیار', noWatermarkHd: 'بغیر واٹر مارک ایچ ڈی', fullHdPin: 'فل ایچ ڈی پن ویڈیو', audioHd: 'آڈیو اور ایچ ڈی ویڈیو', dmHd: 'ڈیلی موشن ایچ ڈی تیار',

@@ -53,7 +53,7 @@ export const fr: ExtraDict = {
     wentWrongMsg: 'Désolé — cette page a rencontré une erreur inattendue. Recharger la page règle généralement le problème.',
     backHome: 'Retour à l’accueil',
     socialMedia: 'réseaux sociaux', notifLargeTitle: 'Téléchargement de la grande vidéo terminé ! 🎬', notifTitle: 'Téléchargement terminé ! 🎉', notifBody: '« {title} » {quality} est téléchargé {size}. Enregistré sur votre appareil.', tabLarge: 'Grande vidéo téléchargée !', tabDone: 'Téléchargement terminé !', streamClosed: 'La connexion s’est fermée de façon inattendue avant la fin.',
-    minRead: '{n} min de lecture', fastSafe: 'Rapide et sûr', mainNav: 'Navigation principale', closeMenu: 'Fermer le menu', noWatermark: 'Sans filigrane', openAdmin: 'Ouvrir le tableau de bord',
+    minRead: '{n} min de lecture', fastSafe: 'Rapide et sûr', fastFreeSafe: 'Rapide, gratuit et sûr', mainNav: 'Navigation principale', closeMenu: 'Fermer le menu', noWatermark: 'Sans filigrane', openAdmin: 'Ouvrir le tableau de bord',
     themeToggle: 'Changer de thème', lightTheme: 'Thème clair', darkTheme: 'Thème sombre', switchLight: 'Passer au thème clair', switchDark: 'Passer au thème sombre',
     standardContrast: 'Contraste standard', defaultMode: 'Mode par défaut', nightMode: 'Mode nuit reposant', darkOptimized: 'Optimisé pour le sombre',
     hd1080: '1080p HD prêt', fastMp4Mp3: 'MP4 et MP3 rapides', threadsHd: 'Threads en HD MP4', fastMp4: 'MP4 rapide', allInOne: 'Tout-en-un', hdReels: 'Reels en HD', noWatermarkHd: 'HD sans filigrane', fullHdPin: 'Vidéo Pin en Full HD', audioHd: 'Audio et vidéo HD', dmHd: 'Dailymotion en HD',

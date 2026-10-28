@@ -53,7 +53,7 @@ export const ar: ExtraDict = {
     wentWrongMsg: 'عذرًا — حدث خطأ غير متوقع في هذه الصفحة. إعادة التحميل تحل المشكلة عادةً.',
     backHome: 'العودة إلى الرئيسية',
     socialMedia: 'وسائل التواصل', notifLargeTitle: 'اكتمل تنزيل الفيديو الكبير! 🎬', notifTitle: 'اكتمل التنزيل! 🎉', notifBody: 'اكتمل تنزيل "{title}" {quality} {size}. تم الحفظ على جهازك.', tabLarge: 'تم تنزيل الفيديو الكبير!', tabDone: 'اكتمل التنزيل!', streamClosed: 'انقطع الاتصال بشكل غير متوقع قبل الاكتمال.',
-    minRead: 'قراءة {n} دقائق', fastSafe: 'سريع وآمن', mainNav: 'التنقل الرئيسي', closeMenu: 'إغلاق القائمة', noWatermark: 'بدون علامة مائية', openAdmin: 'فتح لوحة التحكم',
+    minRead: 'قراءة {n} دقائق', fastSafe: 'سريع وآمن', fastFreeSafe: 'سريع ومجاني وآمن', mainNav: 'التنقل الرئيسي', closeMenu: 'إغلاق القائمة', noWatermark: 'بدون علامة مائية', openAdmin: 'فتح لوحة التحكم',
     themeToggle: 'تبديل المظهر', lightTheme: 'المظهر الفاتح', darkTheme: 'المظهر الداكن', switchLight: 'التبديل إلى المظهر الفاتح', switchDark: 'التبديل إلى المظهر الداكن',
     standardContrast: 'تباين قياسي', defaultMode: 'الوضع الافتراضي', nightMode: 'وضع ليلي مريح للعين', darkOptimized: 'محسّن للوضع الداكن',
     hd1080: 'جاهز بدقة 1080p', fastMp4Mp3: 'MP4 و MP3 بسرعة', threadsHd: 'Threads بدقة HD MP4', fastMp4: 'MP4 سريع', allInOne: 'الكل في واحد', hdReels: 'ريلز عالية الدقة', noWatermarkHd: 'دقة عالية بدون علامة مائية', fullHdPin: 'فيديو Pin بدقة Full HD', audioHd: 'صوت وفيديو عالي الدقة', dmHd: 'Dailymotion عالي الدقة',

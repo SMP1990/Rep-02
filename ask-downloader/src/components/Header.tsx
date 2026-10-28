@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { isAuthored } from '../utils/cmsField';
-import { INITIAL_SITE_SETTINGS } from '../data/mockAdminData';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { RouteLink } from './PageLink';
@@ -23,7 +21,6 @@ import {
   AtSign,
   Tv,
   DownloadCloud,
-  ShieldCheck,
   Lock,
   ArrowRight,
   Globe,
@@ -331,12 +328,9 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                       <span className="bg-gradient-to-r from-[#6d46b8] to-[#e6799f] bg-clip-text text-transparent">{brandTail}</span>
                     )}
                   </span>
-                  <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#f1e9fb] dark:bg-[#261b3b] text-[#6d46b8] dark:text-[#d1b9f7] border border-[#a78bda]/30 whitespace-nowrap">
-                    <ShieldCheck className="w-3 h-3 text-[#6d46b8] dark:text-[#d1b9f7]" /> {t.ui.fastSafe}
-                  </span>
                 </div>
                 <p className="text-[11px] text-[#726c85] dark:text-[#b5a9cd] hidden md:block font-medium truncate">
-                  {isAuthored(siteSettings?.siteTagline, INITIAL_SITE_SETTINGS.siteTagline) ? siteSettings.siteTagline : t.header?.subtitle}
+                  {t.ui.fastFreeSafe}
                 </p>
               </div>
             </RouteLink>
@@ -640,7 +634,7 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                         </span>
                       </div>
                       <span className="block text-[11px] font-medium text-[#726c85] dark:text-[#a78bda] truncate">
-                        {isAuthored(siteSettings?.siteTagline, INITIAL_SITE_SETTINGS.siteTagline) ? siteSettings.siteTagline : t.header?.subtitle}
+                        {t.ui.fastFreeSafe}
                       </span>
                     </div>
                   </div>
