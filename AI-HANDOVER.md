@@ -5,7 +5,7 @@ without the old chat. Read it fully, then `ask-downloader/CLAUDE.md` (owner
 rules and site details) and `TOOLS-GUIDE.md` (tools map), before changing
 anything.
 
-Last updated: 2026-10-28 (v24).
+Last updated: 2026-10-28 (v25).
 
 **Where the owner keeps it on his PC (since 2026-10-27):** `F:\ask-downloader` (a full git clone of `SMP1990/Rep-02`,
 already on branch `claude/upbeat-archimedes-266v06`). Open Claude Code in that folder, then say: "AI-HANDOVER.md parho
@@ -137,7 +137,8 @@ How to add the next tool (registry, page, route, tile, SEO, FAQ): see
 
 ## 6. Last state
 
-- **Latest (2026-10-28): `releases/ask-downloader-v24-solid-color-tabs.zip`** (built, NOT yet confirmed deployed). v23 was deployed by the owner.
+- **Latest (2026-10-28): `releases/ask-downloader-v25-first-load-flags-scrollbar.zip`** (built, NOT yet confirmed deployed). Changes vs v24: the first-load card (platform `universal`, no tab active) uses solid `#341d5b` in light mode (header, button, border, Paste text, focus ring; dark mode unchanged); page scrollbar in light mode is 12px, `#341d5b` thumb on a light-purple track (`index.css`, rules on `html` and `html body` because Chromium reads the viewport scrollbar from either); the English card in "Browse blogs by language" shows the USA and UK flags together (`BlogLanguagesSection.tsx`, `UsaFlag` exported from `FlagIcon.tsx`). Checked: lint, build, computed styles and scrollbar width on desktop; mobile/Urdu not checked. The blog language dropdown (`LanguageFilterSelect`) still shows the UK flag only (not asked).
+- Previous (v24, built, not confirmed deployed): `releases/ask-downloader-v24-solid-color-tabs.zip`** (v23 was deployed by the owner).
   Changes vs v23: home social tabs bigger (text 12/14px, icon 16px) and the active tab icon is white (`PublicHomePage.tsx`);
   in LIGHT mode every public gradient became solid `#341d5b` (58 places: header, footer, tool tiles, blog, contact, About, 404,
   tool pages and tool buttons). Dark mode keeps the old gradients through `dark:` classes. Not changed on purpose: admin pages,
