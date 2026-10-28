@@ -49,7 +49,7 @@ export const ScrollToTopButton: React.FC = () => {
           whileHover={{ scale: 1.08, y: -2 }}
           whileTap={{ scale: 0.92 }}
           transition={{ duration: 0.2 }}
-          className="fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-gradient-to-tr from-[#4b2e83] via-[#6d46b8] to-[#e6799f] text-white shadow-lg shadow-[#6d46b8]/30 flex items-center justify-center cursor-pointer"
+          className="fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#341d5b] dark:bg-gradient-to-tr dark:from-[#4b2e83] dark:via-[#6d46b8] dark:to-[#e6799f] text-white shadow-lg shadow-[#6d46b8]/30 flex items-center justify-center cursor-pointer"
         >
           <ArrowUp className="w-5 h-5 sm:w-5.5 sm:h-5.5" strokeWidth={2.5} />
         </motion.button>

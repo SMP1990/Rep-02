@@ -10,7 +10,7 @@ import MaskPainter, { type PainterHandle } from './MaskPainter';
 const ACCEPT = 'image/jpeg,image/png,image/webp,image/bmp,image/gif,image/avif';
 const BTN = 'inline-flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-sm font-bold transition active:scale-95 disabled:opacity-50';
 const SOFT = `${BTN} bg-[#f1e9fb] text-[#4b2e83] hover:bg-[#e6d8f7] dark:bg-[#261b3b] dark:text-[#d1b9f7]`;
-const MAIN = `${BTN} bg-gradient-to-r from-[#4b2e83] to-[#6d46b8] px-5 py-3 text-white shadow-lg shadow-[#6d46b8]/30 hover:brightness-110`;
+const MAIN = `${BTN} bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#4b2e83] dark:to-[#6d46b8] px-5 py-3 text-white shadow-lg shadow-[#6d46b8]/30 hover:brightness-110`;
 
 type Photo = { name: string; type: string; work: HTMLCanvasElement; original: HTMLCanvasElement; scaled: boolean };
 

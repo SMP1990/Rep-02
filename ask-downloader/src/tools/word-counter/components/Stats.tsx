@@ -31,7 +31,7 @@ export default function Stats({ t, lang, counts }: { t: Strings; lang: string; c
   return (
     <div className="rounded-3xl bg-white/90 p-3 sm:p-5 shadow-xl shadow-[#6d46b8]/10 dark:bg-[#17112a]">
       <h2 className="sr-only">{t.statsTitle}</h2>
-      <div className="mb-2 sm:mb-3 flex items-baseline justify-between gap-3 rounded-2xl bg-gradient-to-r from-[#4b2e83] to-[#6d46b8] px-4 py-2 sm:py-3 text-white lg:block">
+      <div className="mb-2 sm:mb-3 flex items-baseline justify-between gap-3 rounded-2xl bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#4b2e83] dark:to-[#6d46b8] px-4 py-2 sm:py-3 text-white lg:block">
         <div className="text-xs font-semibold opacity-90">{t.words}</div>
         <div className="text-2xl sm:text-4xl font-extrabold tabular-nums">{n.format(counts.words)}</div>
       </div>

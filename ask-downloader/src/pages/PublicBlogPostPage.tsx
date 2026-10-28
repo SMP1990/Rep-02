@@ -967,7 +967,7 @@ export const PublicBlogPostPage: React.FC = () => {
               )}
 
               {/* Inline Promotional Tool Callout (matching reference banner aesthetic) */}
-              <div className="mt-10 p-6 rounded-2xl bg-gradient-to-r from-[#4b2e83] via-[#6d46b8] to-[#9e5488] text-white shadow-md flex flex-col sm:flex-row items-center justify-between gap-5">
+              <div className="mt-10 p-6 rounded-2xl bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#4b2e83] dark:via-[#6d46b8] dark:to-[#9e5488] text-white shadow-md flex flex-col sm:flex-row items-center justify-between gap-5">
                 <div className="space-y-1 text-center sm:text-left">
                   <div className="flex items-center justify-center sm:justify-start gap-2 text-xs font-extrabold uppercase tracking-wider text-[#f0a8bf]">
                     <Sparkles className="w-4 h-4" />
@@ -998,7 +998,7 @@ export const PublicBlogPostPage: React.FC = () => {
                       className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-4 border-white dark:border-[#2e2440] shadow-md"
                     />
                   ) : (
-                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-[#4b2e83] to-[#6d46b8] text-white flex items-center justify-center font-bold text-2xl shadow-md">
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#341d5b] dark:bg-gradient-to-br dark:from-[#4b2e83] dark:to-[#6d46b8] text-white flex items-center justify-center font-bold text-2xl shadow-md">
                       {displayAuthorName.charAt(0)}
                     </div>
                   )}
@@ -1076,7 +1076,7 @@ export const PublicBlogPostPage: React.FC = () => {
                     {approvedComments.map((comment) => (
                       <div key={comment.id} className="py-5 first:pt-2 flex gap-4">
                         {/* Avatar */}
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#6d46b8] to-[#e6799f] text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-xs">
+                        <div className="w-10 h-10 rounded-full bg-[#341d5b] dark:bg-gradient-to-tr dark:from-[#6d46b8] dark:to-[#e6799f] text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-xs">
                           {comment.authorName.charAt(0).toUpperCase()}
                         </div>
 
@@ -1204,7 +1204,7 @@ export const PublicBlogPostPage: React.FC = () => {
                     <button
                       type="submit"
                       disabled={commentSubmitting}
-                      className="w-full sm:w-auto px-8 py-3 text-xs font-extrabold uppercase tracking-wider text-white bg-gradient-to-r from-[#4b2e83] via-[#6d46b8] to-[#9e5488] hover:opacity-95 rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+                      className="w-full sm:w-auto px-8 py-3 text-xs font-extrabold uppercase tracking-wider text-white bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#4b2e83] dark:via-[#6d46b8] dark:to-[#9e5488] hover:opacity-95 rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
                     >
                       <Send className={`w-3.5 h-3.5 ${isRtl ? 'rotate-180' : ''}`} />
                       <span>{commentSubmitting ? (t.blogPost?.submitting || 'Submitting...') : (t.blogPost?.submitComment || 'Submit Comment')}</span>
@@ -1296,7 +1296,7 @@ export const PublicBlogPostPage: React.FC = () => {
             </div>
 
             {/* WIDGET 1: Top Feature Promo Widget (matching top blue/purple banner in screenshot) */}
-            <div className="bg-gradient-to-br from-[#4b2e83] to-[#6d46b8] text-white rounded-[22px] p-6 shadow-md border border-white/10 text-center relative overflow-hidden">
+            <div className="bg-[#341d5b] dark:bg-gradient-to-br dark:from-[#4b2e83] dark:to-[#6d46b8] text-white rounded-[22px] p-6 shadow-md border border-white/10 text-center relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
               <span className="inline-block px-3 py-0.5 rounded-full bg-amber-400 text-[#4b2e83] text-[10px] font-black uppercase tracking-wider mb-2">
                 {t.blogPost?.suiteBadge || '#1 Social Downloader'}
@@ -1418,7 +1418,7 @@ export const PublicBlogPostPage: React.FC = () => {
             )}
 
             {/* WIDGET 4: NEWSLETTER WIDGET */}
-            <div id="sidebar-newsletter-widget" className="bg-gradient-to-br from-[#4b2e83] via-[#6d46b8] to-[#9e5488] text-white rounded-[22px] p-6 shadow-md border border-white/15">
+            <div id="sidebar-newsletter-widget" className="bg-[#341d5b] dark:bg-gradient-to-br dark:from-[#4b2e83] dark:via-[#6d46b8] dark:to-[#9e5488] text-white rounded-[22px] p-6 shadow-md border border-white/15">
               <div className="flex items-center gap-2 mb-2">
                 <Mail className="w-4 h-4 text-[#f0a8bf]" />
                 <h3 className="font-heading font-extrabold text-sm uppercase tracking-wider text-white">
@@ -1497,7 +1497,7 @@ export const PublicBlogPostPage: React.FC = () => {
                       href={siteSettings.socialInstagram}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-10 h-10 rounded-xl bg-[#f6f0f4] dark:bg-[#201538] hover:bg-gradient-to-tr hover:from-amber-500 hover:to-pink-500 hover:text-white text-[#726c85] dark:text-[#c4bed3] flex items-center justify-center transition-all cursor-pointer"
+                      className="w-10 h-10 rounded-xl bg-[#f6f0f4] dark:bg-[#201538] hover:bg-[#341d5b] dark:hover:bg-gradient-to-tr hover:text-white text-[#726c85] dark:text-[#c4bed3] flex items-center justify-center transition-all cursor-pointer"
                       title="Instagram"
                     >
                       <Instagram className="w-4 h-4" />

@@ -137,7 +137,7 @@ export default function VideoPanel({ t }: { t: Strings }) {
         {phase.kind === 'done' ? (
           <a href={videoFileUrl(phase.id)} className={`${BTN} bg-emerald-600 text-white hover:bg-emerald-700`}><Download className="h-5 w-5" aria-hidden="true" />{t.download}</a>
         ) : (
-          <button type="button" onClick={run} disabled={busy || !boxes.length} className={`${BTN} bg-gradient-to-r from-[#4b2e83] to-[#6d46b8] text-white shadow-lg shadow-[#6d46b8]/30 hover:brightness-110`}>
+          <button type="button" onClick={run} disabled={busy || !boxes.length} className={`${BTN} bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#4b2e83] dark:to-[#6d46b8] text-white shadow-lg shadow-[#6d46b8]/30 hover:brightness-110`}>
             {busy ? <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" /> : <Wand2 className="h-5 w-5" aria-hidden="true" />}
             {t.remove}
           </button>
@@ -163,7 +163,7 @@ function Progress({ text, p }: { text: string; p: number }) {
     <div>
       <p className="text-[#4b2e83] dark:text-[#d1b9f7]">{text}</p>
       <div className="mt-1.5 h-2.5 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
-        <div className="h-full rounded-full bg-gradient-to-r from-[#6d46b8] to-[#e6799f] transition-all" style={{ width: `${Math.round(p * 100)}%` }} />
+        <div className="h-full rounded-full bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#6d46b8] dark:to-[#e6799f] transition-all" style={{ width: `${Math.round(p * 100)}%` }} />
       </div>
     </div>
   );

@@ -58,7 +58,7 @@ export const AgeCalculatorPage: React.FC = () => {
       <main className="flex-1 w-full py-10 sm:py-14">
         <div className="max-w-3xl mx-auto px-4 text-center mb-8 sm:mb-10">
           <h1 className="font-heading text-3xl sm:text-5xl font-extrabold tracking-tight">
-            <span className="bg-gradient-to-r from-[#4b2e83] via-[#6d46b8] to-[#e6799f] bg-clip-text text-transparent dark:from-[#d1b9f7] dark:via-[#a78bda] dark:to-[#e6799f]">
+            <span className="text-[#341d5b] dark:bg-gradient-to-r dark:to-[#e6799f] bg-clip-text dark:text-transparent dark:from-[#d1b9f7] dark:via-[#a78bda] dark:to-[#e6799f]">
               {words.title}
             </span>
           </h1>

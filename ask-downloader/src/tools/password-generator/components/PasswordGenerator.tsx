@@ -129,7 +129,7 @@ export default function PasswordGenerator({ t }: { t: Strings }) {
               type="button"
               onClick={() => copy(password, 'main')}
               disabled={!password}
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#4b2e83] to-[#6d46b8] px-5 py-3 text-sm font-bold text-white shadow-md shadow-[#6d46b8]/25 transition-all hover:brightness-110 active:scale-95 disabled:opacity-50"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#4b2e83] dark:to-[#6d46b8] px-5 py-3 text-sm font-bold text-white shadow-md shadow-[#6d46b8]/25 transition-all hover:brightness-110 active:scale-95 disabled:opacity-50"
             >
               {copied === 'main' ? <Check className="h-4 w-4" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}
               {copied === 'main' ? t.copied : t.copy}

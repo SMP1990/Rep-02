@@ -60,7 +60,7 @@ export default function FileRow({ t, lang, item, onDownload, onCompare, onRemove
           <button type="button" onClick={onCompare} className={iconBtn} aria-label={t.compare} title={t.compare}>
             <Columns2 className="h-4 w-4" aria-hidden="true" />
           </button>
-          <button type="button" onClick={onDownload} className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#4b2e83] to-[#6d46b8] px-3 py-2 text-xs font-bold text-white shadow-md shadow-[#6d46b8]/25 hover:brightness-110 active:scale-95">
+          <button type="button" onClick={onDownload} className="inline-flex items-center gap-1.5 rounded-xl bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#4b2e83] dark:to-[#6d46b8] px-3 py-2 text-xs font-bold text-white shadow-md shadow-[#6d46b8]/25 hover:brightness-110 active:scale-95">
             <Download className="h-4 w-4" aria-hidden="true" />
             <span className="hidden sm:inline">{t.download}</span>
           </button>

@@ -49,7 +49,7 @@ export const NotFoundPage: React.FC<{ variant?: 'page' | 'post' }> = ({ variant 
           <div className="relative mx-auto w-fit">
             <p
               aria-hidden="true"
-              className="font-heading font-extrabold leading-none tracking-tight text-[88px] sm:text-[128px] bg-gradient-to-br from-[#4b2e83] via-[#6d46b8] to-[#e6799f] bg-clip-text text-transparent select-none"
+              className="font-heading font-extrabold leading-none tracking-tight text-[88px] sm:text-[128px] text-[#341d5b] dark:bg-gradient-to-br dark:from-[#4b2e83] dark:via-[#6d46b8] dark:to-[#e6799f] bg-clip-text dark:text-transparent select-none"
             >
               404
             </p>
@@ -72,7 +72,7 @@ export const NotFoundPage: React.FC<{ variant?: 'page' | 'post' }> = ({ variant 
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
             <RouteLink
               route="home"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-[#4b2e83] via-[#6d46b8] to-[#e6799f] shadow-md shadow-[#6d46b8]/20 hover:opacity-95 transition-opacity"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#4b2e83] dark:via-[#6d46b8] dark:to-[#e6799f] shadow-md shadow-[#6d46b8]/20 hover:opacity-95 transition-opacity"
             >
               <Home className="w-4 h-4" />
               {nf.homeBtn}

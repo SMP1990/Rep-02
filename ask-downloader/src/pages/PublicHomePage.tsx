@@ -224,7 +224,7 @@ export const PublicHomePage: React.FC = () => {
       />
       {/* Dynamic Ambient Floating Gradient Orbs */}
       {/* GSAP: scroll progress + cursor spotlight */}
-      <div data-gsap="progress" className="fixed top-0 left-0 right-0 h-[3px] z-[60] origin-left bg-gradient-to-r from-[#4b2e83] via-[#6d46b8] to-[#e6799f] pointer-events-none" style={{ transform: 'scaleX(0)' }} />
+      <div data-gsap="progress" className="fixed top-0 left-0 right-0 h-[3px] z-[60] origin-left bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#4b2e83] dark:via-[#6d46b8] dark:to-[#e6799f] pointer-events-none" style={{ transform: 'scaleX(0)' }} />
       <div data-gsap="spotlight" className="pointer-events-none fixed top-0 left-0 z-0 w-[520px] h-[520px] -ml-[260px] -mt-[260px] rounded-full opacity-0 bg-[radial-gradient(circle,rgba(109,70,184,0.14)_0%,transparent_65%)] dark:bg-[radial-gradient(circle,rgba(167,139,218,0.16)_0%,transparent_65%)]" />
 
       <div className="pointer-events-none absolute inset-0 overflow-hidden z-0">
@@ -269,7 +269,7 @@ export const PublicHomePage: React.FC = () => {
 
         {/* The heading sits in a box as wide as the downloader card below it,
             in the same colours as that card's "All Platforms" header. */}
-        <div className="max-w-6xl mx-auto mt-3 sm:mt-4 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 px-3 py-3 sm:px-8 sm:py-7 shadow-lg shadow-purple-500/20">
+        <div className="max-w-6xl mx-auto mt-3 sm:mt-4 rounded-2xl bg-[#341d5b] dark:bg-gradient-to-r dark:from-indigo-600 dark:via-purple-600 dark:to-pink-600 px-3 py-3 sm:px-8 sm:py-7 shadow-lg shadow-purple-500/20">
           <motion.h1
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}

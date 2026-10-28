@@ -310,7 +310,7 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                   className="h-9 sm:h-11 w-auto max-w-[150px] object-contain shrink-0 group-hover:scale-105 transition-transform duration-200"
                 />
               ) : (
-                <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-tr from-[#4b2e83] via-[#6d46b8] to-[#e6799f] p-0.5 shadow-sm group-hover:scale-105 transition-transform duration-200 shrink-0">
+                <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-[#341d5b] dark:bg-gradient-to-tr dark:from-[#4b2e83] dark:via-[#6d46b8] dark:to-[#e6799f] p-0.5 shadow-sm group-hover:scale-105 transition-transform duration-200 shrink-0">
                   <div className="w-full h-full bg-[#341d5b] rounded-[10px] flex items-center justify-center text-white">
                     <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-[#f0a8bf] group-hover:rotate-12 transition-transform duration-300" />
                   </div>
@@ -325,7 +325,7 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                   <span className="font-heading font-extrabold text-base sm:text-2xl tracking-tight text-[#2e2440] dark:text-[#f4eefb] whitespace-nowrap max-sm:min-w-0 max-sm:truncate">
                     {brandLead}
                     {brandTail && (
-                      <span className="bg-gradient-to-r from-[#6d46b8] to-[#e6799f] bg-clip-text text-transparent">{brandTail}</span>
+                      <span className="text-[#341d5b] dark:bg-gradient-to-r dark:from-[#6d46b8] dark:to-[#e6799f] bg-clip-text dark:text-transparent">{brandTail}</span>
                     )}
                   </span>
                 </div>
@@ -563,7 +563,7 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
               whileTap={{ scale: 0.9 }}
               className={`lg:hidden shrink-0 w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border transition-colors duration-200 flex items-center justify-center cursor-pointer shadow-xs focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#6d46b8] ${
                 mobileMenuOpen
-                  ? 'bg-gradient-to-tr from-[#4b2e83] to-[#e6799f] border-transparent text-white'
+                  ? 'bg-[#341d5b] dark:bg-gradient-to-tr dark:from-[#4b2e83] dark:to-[#e6799f] border-transparent text-white'
                   : 'bg-[#f6f0f4] dark:bg-[#201538] border-[#d8cce4] dark:border-[#432d6d] text-[#4b2e83] dark:text-[#f4eefb] hover:bg-[#efe4fb] dark:hover:bg-[#2e1f4d]'
               }`}
             >
@@ -620,7 +620,7 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                 <div className="relative p-4 sm:p-5 border-b border-[#eae3ee] dark:border-[#2e1d4d] bg-white/80 dark:bg-[#160f22]/80 backdrop-blur-sm space-y-3">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2 min-w-0">
-                    <div className="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-tr from-[#4b2e83] via-[#6d46b8] to-[#e6799f] p-0.5 flex items-center justify-center shadow-xs">
+                    <div className="w-9 h-9 shrink-0 rounded-xl bg-[#341d5b] dark:bg-gradient-to-tr dark:from-[#4b2e83] dark:via-[#6d46b8] dark:to-[#e6799f] p-0.5 flex items-center justify-center shadow-xs">
                       <div className="w-full h-full bg-[#341d5b] rounded-[10px] flex items-center justify-center text-white">
                         <Sparkles className="w-4 h-4 text-[#f0a8bf]" />
                       </div>
@@ -920,7 +920,7 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                         setMobileMenuOpen(false);
                         setCurrentRoute('dashboard');
                       }}
-                      className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#4b2e83] to-[#6d46b8] hover:opacity-95 shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#4b2e83] dark:to-[#6d46b8] hover:opacity-95 shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <Lock className="w-3.5 h-3.5 text-[#f0a8bf]" />
                       <span>{t.header.adminDashboard}</span>

@@ -23,7 +23,7 @@ export const ToolsIconGrid: React.FC<{
             onNavigate={() => (tool.fullLoad ? window.location.assign(href) : onOpen(tool.route!))}
             className="group flex flex-col items-center gap-1 rounded-xl p-1 text-center active:scale-95 transition-transform"
           >
-            <span className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#6d46b8] to-[#e6799f] text-white flex items-center justify-center shadow-md shadow-[#6d46b8]/25">
+            <span className="w-11 h-11 rounded-2xl bg-[#341d5b] dark:bg-gradient-to-br dark:from-[#6d46b8] dark:to-[#e6799f] text-white flex items-center justify-center shadow-md shadow-[#6d46b8]/25">
               <Icon className="w-5 h-5" aria-hidden="true" />
             </span>
             <span className="text-[11px] font-extrabold leading-tight text-slate-900 dark:text-white line-clamp-3">

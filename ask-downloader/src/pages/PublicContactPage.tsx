@@ -472,7 +472,7 @@ export const PublicContactPage: React.FC = () => {
 
                   <DownloaderLink platform="facebook"
                     id="back-to-downloader-btn"
-                    className="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#4b2e83] to-[#6d46b8] hover:opacity-95 transition-opacity cursor-pointer flex items-center gap-1.5 shadow-xs"
+                    className="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#4b2e83] dark:to-[#6d46b8] hover:opacity-95 transition-opacity cursor-pointer flex items-center gap-1.5 shadow-xs"
                   >
                     <span>{c.useDownloader}</span>
                     <ArrowRight className={`w-3.5 h-3.5 ${isRtl ? 'rotate-180' : ''}`} />
@@ -633,7 +633,7 @@ export const PublicContactPage: React.FC = () => {
                     type="submit"
                     id="contact-submit-button"
                     disabled={isSubmitting}
-                    className="w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-[#4b2e83] via-[#6d46b8] to-[#e6799f] hover:opacity-95 shadow-md shadow-[#6d46b8]/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm text-white bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#4b2e83] dark:via-[#6d46b8] dark:to-[#e6799f] hover:opacity-95 shadow-md shadow-[#6d46b8]/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     <Send className={`w-4 h-4 ${isRtl ? 'rotate-180' : ''}`} />
                     <span>{isSubmitting ? c.sending : c.sendMessage}</span>
@@ -668,7 +668,7 @@ export const PublicContactPage: React.FC = () => {
             </div>
 
             {/* Quick Downloader Shortcut CTA */}
-            <div className="p-6 rounded-3xl bg-gradient-to-br from-[#3d246e] to-[#201538] text-white shadow-md relative overflow-hidden">
+            <div className="p-6 rounded-3xl bg-[#341d5b] dark:bg-gradient-to-br dark:from-[#3d246e] dark:to-[#201538] text-white shadow-md relative overflow-hidden">
               <div className="relative z-10 space-y-3">
                 <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-white/15 text-[#f0a8bf]">
                   {c.ctaBadge}

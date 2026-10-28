@@ -139,7 +139,7 @@ export default function GradeCalculator({ t, lang }: { t: Strings; lang: string 
           <button
             type="button"
             onClick={addWrong}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#4b2e83] to-[#6d46b8] px-5 py-3 text-base font-bold text-white shadow-md shadow-[#6d46b8]/25 transition-all hover:brightness-110 active:scale-95"
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#4b2e83] dark:to-[#6d46b8] px-5 py-3 text-base font-bold text-white shadow-md shadow-[#6d46b8]/25 transition-all hover:brightness-110 active:scale-95"
           >
             <Plus className="h-5 w-5" aria-hidden="true" />
             {half ? t.addHalf : t.addWrong}
@@ -152,7 +152,7 @@ export default function GradeCalculator({ t, lang }: { t: Strings; lang: string 
 
         {/* The result */}
         <div
-          className="mt-5 rounded-2xl bg-gradient-to-br from-[#4b2e83] via-[#6d46b8] to-[#8b5cc4] px-5 py-6 text-center text-white shadow-lg shadow-[#6d46b8]/25"
+          className="mt-5 rounded-2xl bg-[#341d5b] dark:bg-gradient-to-br dark:from-[#4b2e83] dark:via-[#6d46b8] dark:to-[#8b5cc4] px-5 py-6 text-center text-white shadow-lg shadow-[#6d46b8]/25"
           aria-live="polite"
         >
           <p className="text-3xl font-extrabold tabular-nums sm:text-4xl" dir="ltr">{resultLine}</p>

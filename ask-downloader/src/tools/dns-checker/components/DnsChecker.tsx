@@ -59,7 +59,7 @@ export default function DnsChecker({ t, lang }: { t: Strings; lang: string }) {
           <button
             type="submit"
             disabled={busy}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#4b2e83] to-[#6d46b8] px-6 py-3 font-bold text-white shadow-lg shadow-[#6d46b8]/30 transition hover:brightness-110 active:scale-[0.98] disabled:opacity-70"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#4b2e83] dark:to-[#6d46b8] px-6 py-3 font-bold text-white shadow-lg shadow-[#6d46b8]/30 transition hover:brightness-110 active:scale-[0.98] disabled:opacity-70"
           >
             {busy ? <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" /> : <Search className="h-5 w-5" aria-hidden="true" />}
             {busy ? t.checking : t.check}

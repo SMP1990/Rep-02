@@ -73,7 +73,7 @@ export default function ProgressCard({ t, download, preview, model }: Props) {
         aria-valuemax={100}
       >
         <div
-          className="h-full rounded-full bg-gradient-to-r from-[#4b2e83] via-[#6d46b8] to-[#e6799f] transition-[width] duration-300"
+          className="h-full rounded-full bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#4b2e83] dark:via-[#6d46b8] dark:to-[#e6799f] transition-[width] duration-300"
           style={{ width: `${pct}%` }}
         />
       </div>

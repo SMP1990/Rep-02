@@ -21,7 +21,7 @@ interface Props {
 export default function Toolbar({ t, empty, copied, onPaste, onCopy, onClear }: Props) {
   return (
     <div className="mt-3 flex flex-wrap gap-2">
-      <button type="button" onClick={onPaste} className={`${btn} bg-gradient-to-r from-[#4b2e83] to-[#6d46b8] text-white shadow-md shadow-[#6d46b8]/25 hover:brightness-110`}>
+      <button type="button" onClick={onPaste} className={`${btn} bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#4b2e83] dark:to-[#6d46b8] text-white shadow-md shadow-[#6d46b8]/25 hover:brightness-110`}>
         <ClipboardPaste className="h-4 w-4" aria-hidden="true" />
         {t.paste}
       </button>

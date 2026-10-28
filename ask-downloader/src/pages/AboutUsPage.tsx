@@ -65,7 +65,7 @@ export const AboutUsPage: React.FC = () => {
           </div>
           <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
             {aboutHeading ? `${aboutHeading} ` : ''}
-            <span className="bg-gradient-to-r from-[#6d46b8] to-[#e6799f] bg-clip-text text-transparent">{siteSettings.siteName}</span>
+            <span className="text-[#341d5b] dark:bg-gradient-to-r dark:from-[#6d46b8] dark:to-[#e6799f] bg-clip-text dark:text-transparent">{siteSettings.siteName}</span>
             {headingSuffix ? ` ${headingSuffix}` : ''}
           </h1>
           <p className="text-sm sm:text-base text-[#635373] dark:text-[#b8a9cc] max-w-2xl mx-auto leading-relaxed whitespace-pre-line">
@@ -91,7 +91,7 @@ export const AboutUsPage: React.FC = () => {
           })}
         </div>
 
-        <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#3d246e] to-[#201538] text-white shadow-md text-center space-y-4">
+        <div className="p-6 sm:p-8 rounded-3xl bg-[#341d5b] dark:bg-gradient-to-br dark:from-[#3d246e] dark:to-[#201538] text-white shadow-md text-center space-y-4">
           <h2 className="text-lg sm:text-xl font-bold">{ctaHeading}</h2>
           <p className="text-sm text-white/80 max-w-lg mx-auto">{ctaText}</p>
           <DownloaderLink platform="facebook"

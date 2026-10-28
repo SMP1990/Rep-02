@@ -317,7 +317,7 @@ export const PublicBlogListingPage: React.FC<PublicBlogListingPageProps> = ({ la
               onClick={() => chooseCategory(cat)}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
                 selectedCategory === cat
-                  ? 'bg-gradient-to-r from-[#6d46b8] to-[#e6799f] text-white shadow-md shadow-[#7c4fd1]/20'
+                  ? 'bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#6d46b8] dark:to-[#e6799f] text-white shadow-md shadow-[#7c4fd1]/20'
                   : 'bg-white dark:bg-[#1c152a] text-[#726c85] dark:text-[#b4adc5] hover:text-[#4b2e83] dark:hover:text-white hover:bg-[#f1e9fb] dark:hover:bg-[#261b3b] border border-[#eae3ee] dark:border-[#382b4f]'
               }`}
             >
@@ -443,7 +443,7 @@ export const PublicBlogListingPage: React.FC<PublicBlogListingPageProps> = ({ la
                 aria-current={n === page ? 'page' : undefined}
                 className={`w-9 h-9 text-xs font-bold rounded-xl border cursor-pointer transition-colors ${
                   n === page
-                    ? 'bg-gradient-to-r from-[#6d46b8] to-[#e6799f] text-white border-transparent'
+                    ? 'bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#6d46b8] dark:to-[#e6799f] text-white border-transparent'
                     : 'bg-white dark:bg-[#1c152a] text-[#2e2440] dark:text-slate-200 border-[#e6799f]/30 dark:border-[#382b4f] hover:border-[#6d46b8]'
                 }`}
               >

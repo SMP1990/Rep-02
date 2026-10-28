@@ -55,7 +55,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
           {actionButton && (
             <button
               onClick={actionButton.onClick}
-              className="px-4 py-2 text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-[#6d46b8] to-[#e6799f] hover:from-[#5b3a9e] hover:to-[#d9628c] rounded-xl shadow-md shadow-[#7c4fd1]/20 transition-all transform hover:-translate-y-0.5 cursor-pointer flex items-center gap-2"
+              className="px-4 py-2 text-xs sm:text-sm font-semibold text-white bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#6d46b8] dark:to-[#e6799f] hover:bg-[#2a1649] dark:hover:from-[#5b3a9e] dark:hover:to-[#d9628c] rounded-xl shadow-md shadow-[#7c4fd1]/20 transition-all transform hover:-translate-y-0.5 cursor-pointer flex items-center gap-2"
             >
               {actionButton.icon ? <actionButton.icon className="w-4 h-4" /> : <PlusCircle className="w-4 h-4" />}
               <span>{actionButton.label}</span>

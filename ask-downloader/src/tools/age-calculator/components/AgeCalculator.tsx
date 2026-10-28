@@ -149,7 +149,7 @@ export default function AgeCalculator({ t, lang }: { t: Strings; lang: string })
         <div className="mt-5 flex flex-col gap-2 sm:flex-row">
           <button
             type="submit"
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#4b2e83] to-[#6d46b8] px-5 py-3 text-base font-bold text-white shadow-md shadow-[#6d46b8]/25 transition-all hover:brightness-110 active:scale-95"
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#4b2e83] dark:to-[#6d46b8] px-5 py-3 text-base font-bold text-white shadow-md shadow-[#6d46b8]/25 transition-all hover:brightness-110 active:scale-95"
           >
             <CalendarDays className="h-5 w-5" aria-hidden="true" />
             {t.calculate}

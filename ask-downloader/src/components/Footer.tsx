@@ -81,7 +81,7 @@ export const Footer: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="relative bg-gradient-to-r from-[#3a1d63] via-[#5c339c] to-[#993b77] dark:from-[#261343] dark:via-[#422170] dark:to-[#6e2954] text-white rounded-[28px] sm:rounded-[36px] shadow-2xl shadow-[#5c339c]/25 overflow-hidden border border-white/20 p-6 sm:p-8 md:p-10"
+          className="relative bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#261343] dark:via-[#422170] dark:to-[#6e2954] text-white rounded-[28px] sm:rounded-[36px] shadow-2xl shadow-[#5c339c]/25 overflow-hidden border border-white/20 p-6 sm:p-8 md:p-10"
         >
           <div className="absolute -top-24 -left-24 w-72 h-72 bg-[#e6799f]/20 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-[#a78bda]/25 rounded-full blur-3xl pointer-events-none" />
@@ -172,7 +172,7 @@ export const Footer: React.FC = () => {
             {/* COLUMN 1: BRAND */}
             <div className="lg:col-span-4 space-y-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#4b2e83] via-[#6d46b8] to-[#e6799f] p-0.5 shadow-xs">
+                <div className="w-9 h-9 rounded-xl bg-[#341d5b] dark:bg-gradient-to-tr dark:from-[#4b2e83] dark:via-[#6d46b8] dark:to-[#e6799f] p-0.5 shadow-xs">
                   <div className="w-full h-full bg-[#341d5b] rounded-[10px] flex items-center justify-center text-white">
                     <Sparkles className="w-4.5 h-4.5 text-[#f0a8bf]" />
                   </div>
@@ -408,7 +408,7 @@ export const Footer: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveModal(null)}
-                className="px-5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-[#4b2e83] to-[#6d46b8] hover:from-[#3b2369] hover:to-[#5a369e] text-white shadow-sm transition-all cursor-pointer"
+                className="px-5 py-2 rounded-xl text-xs font-bold bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#4b2e83] dark:to-[#6d46b8] hover:bg-[#2a1649] dark:hover:from-[#3b2369] dark:hover:to-[#5a369e] text-white shadow-sm transition-all cursor-pointer"
               >
                 Close
               </button>

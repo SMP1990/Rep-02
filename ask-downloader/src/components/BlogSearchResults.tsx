@@ -114,7 +114,7 @@ export const BlogSearchResults: React.FC<BlogSearchResultsProps> = ({
             onClick={() => onSelectCategory && onSelectCategory('All')}
             className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer shrink-0 ${
               selectedCategory === 'All'
-                ? 'bg-gradient-to-r from-[#4b2e83] to-[#6d46b8] text-white shadow-xs'
+                ? 'bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#4b2e83] dark:to-[#6d46b8] text-white shadow-xs'
                 : 'bg-white dark:bg-[#201538] text-[#726c85] dark:text-[#c4bed3] hover:text-[#4b2e83] border border-[#eae3ee] dark:border-white/10'
             }`}
           >
@@ -129,7 +129,7 @@ export const BlogSearchResults: React.FC<BlogSearchResultsProps> = ({
                 onClick={() => onSelectCategory && onSelectCategory(cat.name)}
                 className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer shrink-0 ${
                   isSelected
-                    ? 'bg-gradient-to-r from-[#4b2e83] to-[#6d46b8] text-white shadow-xs'
+                    ? 'bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#4b2e83] dark:to-[#6d46b8] text-white shadow-xs'
                     : 'bg-white dark:bg-[#201538] text-[#726c85] dark:text-[#c4bed3] hover:text-[#4b2e83] border border-[#eae3ee] dark:border-white/10'
                 }`}
               >

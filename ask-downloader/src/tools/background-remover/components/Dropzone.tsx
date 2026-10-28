@@ -51,7 +51,7 @@ export default function Dropzone({ t, onFile, onWarmUp }: Props) {
           e.target.value = ''; // same file can be picked again
         }}
       />
-      <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#6d46b8] to-[#e6799f] text-white shadow-lg shadow-[#6d46b8]/25 transition-transform group-hover:scale-105">
+      <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#341d5b] dark:bg-gradient-to-br dark:from-[#6d46b8] dark:to-[#e6799f] text-white shadow-lg shadow-[#6d46b8]/25 transition-transform group-hover:scale-105">
         <ImagePlus className="h-8 w-8" />
       </div>
       <p className="font-heading text-xl sm:text-2xl font-bold text-[#2e2440] dark:text-[#f4eefb]">

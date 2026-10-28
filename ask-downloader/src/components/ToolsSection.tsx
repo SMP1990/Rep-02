@@ -55,7 +55,7 @@ export const ToolsSection: React.FC = () => {
       className="group relative flex flex-col h-full bg-white dark:bg-[#181224] rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-xl hover:-translate-y-1 hover:border-[#a78bda] dark:hover:border-[#6d46b8] transition-all duration-300"
     >
       <div className="flex items-start justify-between gap-2 mb-3 sm:mb-4">
-        <span className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-[#6d46b8] to-[#e6799f] text-white flex items-center justify-center shadow-md shadow-[#6d46b8]/25 group-hover:scale-110 transition-transform duration-300">
+        <span className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#341d5b] dark:bg-gradient-to-br dark:from-[#6d46b8] dark:to-[#e6799f] text-white flex items-center justify-center shadow-md shadow-[#6d46b8]/25 group-hover:scale-110 transition-transform duration-300">
           <Icon className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
         </span>
         <span className="text-[10px] font-extrabold uppercase tracking-wide text-amber-800 bg-amber-100 dark:text-amber-200 dark:bg-amber-900/40 px-2 py-0.5 rounded-full">

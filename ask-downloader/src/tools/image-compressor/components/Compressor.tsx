@@ -88,7 +88,7 @@ export default function Compressor({ t, lang }: { t: Strings; lang: string }) {
                 {t.apply}
               </button>
             )}
-            <button type="button" onClick={zipAll} disabled={done.length < 2 || zipping} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#4b2e83] to-[#6d46b8] px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-[#6d46b8]/25 hover:brightness-110 active:scale-95 disabled:opacity-50">
+            <button type="button" onClick={zipAll} disabled={done.length < 2 || zipping} className="inline-flex items-center gap-2 rounded-xl bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#4b2e83] dark:to-[#6d46b8] px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-[#6d46b8]/25 hover:brightness-110 active:scale-95 disabled:opacity-50">
               <Archive className="h-4 w-4" aria-hidden="true" />
               {t.downloadAll}
             </button>

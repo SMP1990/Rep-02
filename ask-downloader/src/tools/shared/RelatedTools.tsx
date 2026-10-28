@@ -27,7 +27,7 @@ export default function RelatedTools({ current, title }: { current: string; titl
               onNavigate={() => (fullLoad ? window.location.assign(ROUTE_PATHS[route!]) : setCurrentRoute(route!))}
               className="group flex h-full items-center gap-4 rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs transition-all duration-300 hover:-translate-y-0.5 hover:border-[#a78bda] hover:shadow-lg dark:border-slate-800/80 dark:bg-[#181224] dark:hover:border-[#6d46b8]"
             >
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#6d46b8] to-[#e6799f] text-white shadow-md shadow-[#6d46b8]/25">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#341d5b] dark:bg-gradient-to-br dark:from-[#6d46b8] dark:to-[#e6799f] text-white shadow-md shadow-[#6d46b8]/25">
                 <Icon className="h-5 w-5" aria-hidden="true" />
               </span>
               <span className="min-w-0 flex-1">

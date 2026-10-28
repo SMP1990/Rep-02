@@ -67,7 +67,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
             <button
               type="button"
               onClick={this.handleReload}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-[#4b2e83] to-[#6d46b8] hover:from-[#3b2369] hover:to-[#5a369e] text-white shadow-sm transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold bg-[#341d5b] dark:bg-gradient-to-r dark:from-[#4b2e83] dark:to-[#6d46b8] hover:bg-[#2a1649] dark:hover:from-[#3b2369] dark:hover:to-[#5a369e] text-white shadow-sm transition-all cursor-pointer"
             >
               <RefreshCw className="w-4 h-4" />
               {w.backHome}
