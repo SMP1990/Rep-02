@@ -4,7 +4,7 @@ import { ArrowRight, Globe } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext.tsx';
 import { useLanguage } from '../context/LanguageContext.tsx';
 import { fill, langName } from '../utils/i18n.ts';
-import { FlagIcon } from './FlagIcon.tsx';
+import { FlagIcon, UsaFlag } from './FlagIcon.tsx';
 import { BlogLanguageLink } from './PageLink';
 
 // The cards keep their entrance and hover motion as real links.
@@ -81,8 +81,16 @@ export const BlogLanguagesSection: React.FC = () => {
               {/* A flag is 3:2, so it gets a 3:2 chip. Forcing one into the
                   square icon tile the features use crops the hoist side off —
                   Pakistan loses its white band, the UK loses its cross arms. */}
-              <span className="w-16 h-[42px] rounded-lg overflow-hidden ring-1 ring-black/10 dark:ring-white/15 shadow-2xs shrink-0 group-hover:scale-110 group-hover:-rotate-2 transition-transform duration-300">
-                <FlagIcon code={l.code} className="w-full h-full block" />
+              {/* English is spoken in the USA and the UK, so its card shows both flags, same size and style as the single flags. */}
+              <span className="inline-flex items-center gap-2 shrink-0 group-hover:scale-110 group-hover:-rotate-2 transition-transform duration-300">
+                {l.code === 'en' && (
+                  <span className="w-16 h-[42px] rounded-lg overflow-hidden ring-1 ring-black/10 dark:ring-white/15 shadow-2xs shrink-0">
+                    <UsaFlag />
+                  </span>
+                )}
+                <span className="w-16 h-[42px] rounded-lg overflow-hidden ring-1 ring-black/10 dark:ring-white/15 shadow-2xs shrink-0">
+                  <FlagIcon code={l.code} className="w-full h-full block" />
+                </span>
               </span>
               <span className="inline-flex items-baseline gap-1 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 shrink-0">
                 <span className="text-sm font-extrabold text-slate-900 dark:text-white leading-none">

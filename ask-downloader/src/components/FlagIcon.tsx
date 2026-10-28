@@ -158,7 +158,7 @@ export const FlagIcon: React.FC<FlagIconProps> = ({ code, title, className = '' 
 );
 
 /** United States — 13 stripes and a canton of stars, same 3:2 box as the rest. */
-const UsaFlag = () => {
+export const UsaFlag = () => {
   const h = 40 / 13;
   const stars: React.ReactNode[] = [];
   for (let row = 0; row < 5; row++) {
