@@ -273,7 +273,7 @@ export const ToolPlatformCard: React.FC<ToolPlatformCardProps> = ({
 
   // Card theme classes
   const headerGradient = isUniversal
-    ? 'bg-[#341d5b] dark:bg-gradient-to-r dark:from-indigo-600 dark:via-purple-600 dark:to-pink-600'
+    ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600'
     : isFb
     ? 'bg-gradient-to-r from-blue-600 via-blue-600 to-indigo-700'
     : isIg

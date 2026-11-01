@@ -269,7 +269,7 @@ export const PublicHomePage: React.FC = () => {
 
         {/* The heading sits in a box as wide as the downloader card below it,
             in the same colours as that card's "All Platforms" header. */}
-        <div className="max-w-6xl mx-auto mt-3 sm:mt-4 rounded-2xl bg-[#341d5b] dark:bg-gradient-to-r dark:from-indigo-600 dark:via-purple-600 dark:to-pink-600 px-3 py-3 sm:px-8 sm:py-7 shadow-lg shadow-purple-500/20">
+        <div className="max-w-6xl mx-auto mt-3 sm:mt-4 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 px-3 py-3 sm:px-8 sm:py-7 shadow-lg shadow-purple-500/20">
           <motion.h1
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
