@@ -5,7 +5,7 @@ without the old chat. Read it fully, then `ask-downloader/CLAUDE.md` (owner
 rules and site details) and `TOOLS-GUIDE.md` (tools map), before changing
 anything.
 
-Last updated: 2026-10-28 (v25).
+Last updated: 2026-11-01 (v25 is still the latest build; a Trending Sounds plan was added, see `PLAN-TRENDING-SOUNDS.md`).
 
 **Where the owner keeps it on his PC (since 2026-10-27):** `F:\ask-downloader` (a full git clone of `SMP1990/Rep-02`,
 already on branch `claude/upbeat-archimedes-266v06`). Open Claude Code in that folder, then say: "AI-HANDOVER.md parho
@@ -37,6 +37,9 @@ If the session must push to its own new branch, base that branch on
 `claude/upbeat-archimedes-266v06` (never on the default branch), so nothing is
 lost. Branches matching `claude/*` and `backup/*`, and tags `tools-v*`, are
 protected on GitHub (no delete, no force-push).
+
+> **Planned next feature (not built):** daily auto-updated **Trending Sounds** directory with admin panel, full SEO and
+> a free-tier API fallback chain. Full agreed plan, test results and step order (start at Step A): **`PLAN-TRENDING-SOUNDS.md`**.
 
 ## 2. The owner and how to work
 
