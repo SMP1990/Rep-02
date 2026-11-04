@@ -42,6 +42,8 @@ import { gaId, GA_CSP, gaHeadTags, gaInitScript } from './server/analytics.ts';
 import { registerBgRoutes, prefetchBgModels } from './server/bgRoutes.ts';
 import { registerDnsRoutes } from './server/dns/routes.ts';
 import { registerWmRoutes, prefetchWmModel } from './server/wmRoutes.ts';
+import { registerSoundsRoutes } from './server/soundsRoutes.ts';
+import { startSoundsScheduler } from './server/trendingSounds.ts';
 import { TOOL_PAGE_LIST, cleanToolsContent, type ToolsContent } from './src/config/toolPages.ts';
 import { addRedirect, findRedirect, clearRedirectFrom, listRedirects, deleteRedirect, normalizePath, normalizeTarget, isProtectedPath, setOwnHost } from './server/redirects.ts';
 
@@ -2337,6 +2339,9 @@ app.put('/api/admin/media/alt', requirePermission('blog.edit'), (req: Request, r
   return res.json({ success: true, updated });
 });
 
+/** Trending Sounds collector (admin only, step A). */
+registerSoundsRoutes(app, requirePermission('settings.view'), requirePermission('settings.edit'));
+
 /** 301 Redirect Manager (admin). */
 app.get('/api/admin/redirects', requirePermission('settings.view'), (_req: Request, res: Response): any => {
   return res.json({ redirects: listRedirects() });
@@ -3049,6 +3054,7 @@ async function startServer() {
   app.listen(PORT, '0.0.0.0', () => {
     prefetchBgModels();
     prefetchWmModel();
+    startSoundsScheduler();
     console.log(`ASK Downloader Server listening on http://0.0.0.0:${PORT}`);
     findFfmpeg().then((p) => console.log(`[startup] ffmpeg: ${p || 'NOT runnable'}`));
     getYtdlp().then(() => console.log(`[startup] yt-dlp: ${ytdlpStatus().note}`));

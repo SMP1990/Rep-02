@@ -15,6 +15,7 @@ export type RouteType =
   | 'settings' 
   | 'redirects'
   | 'tools-seo'
+  | 'sounds'
   | 'media'
   | 'public-blog' 
   | 'public-blog-language'

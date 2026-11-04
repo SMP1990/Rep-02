@@ -22,6 +22,7 @@ const SettingsPage = lazy(() => import('./pages/SettingsPage').then((m) => ({ de
 const MediaLibraryPage = lazy(() => import('./pages/MediaLibraryPage').then((m) => ({ default: m.MediaLibraryPage })));
 const RedirectsPage = lazy(() => import('./pages/RedirectsPage').then((m) => ({ default: m.RedirectsPage })));
 const ToolsSeoPage = lazy(() => import('./pages/ToolsSeoPage').then((m) => ({ default: m.ToolsSeoPage })));
+const SoundsPage = lazy(() => import('./pages/SoundsPage').then((m) => ({ default: m.SoundsPage })));
 const PublicHomePage = lazy(() => import('./pages/PublicHomePage').then((m) => ({ default: m.PublicHomePage })));
 const PublicContactPage = lazy(() => import('./pages/PublicContactPage').then((m) => ({ default: m.PublicContactPage })));
 const PublicBlogListingPage = lazy(() => import('./pages/PublicBlogListingPage').then((m) => ({ default: m.PublicBlogListingPage })));
@@ -248,6 +249,9 @@ const AppContent: React.FC = () => {
           )}
           {currentRoute === 'tools-seo' && (
             <ToolsSeoPage onOpenMobileMenu={() => setMobileOpen(true)} />
+          )}
+          {currentRoute === 'sounds' && (
+            <SoundsPage onOpenMobileMenu={() => setMobileOpen(true)} />
           )}
           {currentRoute === 'settings' && (
             <SettingsPage onOpenMobileMenu={() => setMobileOpen(true)} />

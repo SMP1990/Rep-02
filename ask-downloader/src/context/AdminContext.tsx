@@ -253,7 +253,7 @@ export function parseCurrentLocation(
   }
 
   // 4. Admin subroutes
-  const adminRoutes: RouteType[] = ['dashboard', 'subscribers', 'downloads', 'visitors', 'admin-users', 'content-editor', 'blog-manager', 'settings', 'messages', 'redirects', 'media', 'tools-seo'];
+  const adminRoutes: RouteType[] = ['dashboard', 'subscribers', 'downloads', 'visitors', 'admin-users', 'content-editor', 'blog-manager', 'settings', 'messages', 'redirects', 'media', 'tools-seo', 'sounds'];
   for (const r of adminRoutes) {
     if (rawPath === `/admin/${r}` || rawHash === r) {
       return { route: isAuth ? r : 'login', slug: null, language: null };
@@ -329,7 +329,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (!data.valid) {
           setIsAuthenticated(false);
           localStorage.removeItem('fdownloader_admin_auth');
-          const adminRoutes: RouteType[] = ['dashboard', 'subscribers', 'downloads', 'visitors', 'admin-users', 'content-editor', 'blog-manager', 'settings', 'messages', 'redirects', 'media', 'tools-seo'];
+          const adminRoutes: RouteType[] = ['dashboard', 'subscribers', 'downloads', 'visitors', 'admin-users', 'content-editor', 'blog-manager', 'settings', 'messages', 'redirects', 'media', 'tools-seo', 'sounds'];
           if (adminRoutes.includes(currentRoute)) {
             setCurrentRouteState('login');
           }
@@ -875,7 +875,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const setCurrentRoute = (route: RouteType) => {
     // An editor with unsaved changes asks first (see utils/unsavedGuard).
     if (route !== currentRoute && !confirmLeave()) return;
-    const adminRoutes: RouteType[] = ['dashboard', 'subscribers', 'downloads', 'visitors', 'admin-users', 'content-editor', 'blog-manager', 'settings', 'messages', 'redirects', 'media', 'tools-seo'];
+    const adminRoutes: RouteType[] = ['dashboard', 'subscribers', 'downloads', 'visitors', 'admin-users', 'content-editor', 'blog-manager', 'settings', 'messages', 'redirects', 'media', 'tools-seo', 'sounds'];
     if (!isAuthenticated && adminRoutes.includes(route)) {
       setCurrentRouteState('login');
       if (typeof window !== 'undefined') {
