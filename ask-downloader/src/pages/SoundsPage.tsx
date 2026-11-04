@@ -59,7 +59,7 @@ export const SoundsPage: React.FC<{ onOpenMobileMenu: () => void }> = ({ onOpenM
   };
   const runNow = async () => {
     const d = await call('POST', '/api/admin/sounds/run');
-    if (d.success) { setStatus(d.status); showToast('Run started (about 40 seconds).', 'info'); }
+    if (d.success) { setStatus(d.status); showToast('Run started (about 1 minute).', 'info'); }
   };
   const saveSettings = async () => {
     const d = await call('POST', '/api/admin/sounds/settings', set);
@@ -87,7 +87,7 @@ export const SoundsPage: React.FC<{ onOpenMobileMenu: () => void }> = ({ onOpenM
 
   return (
     <div className="animate-fade-in">
-      <TopHeader title="Trending Sounds" subtitle="Collects trending TikTok sounds twice a day. Only you can see this." onOpenMobileMenu={onOpenMobileMenu} />
+      <TopHeader title="Trending Sounds" subtitle="Collects trending TikTok sounds four times a day. Only you can see this." onOpenMobileMenu={onOpenMobileMenu} />
 
       {status?.allFailed && (
         <div className="mb-4 p-3 rounded-xl bg-red-50 text-red-700 text-sm border border-red-200">

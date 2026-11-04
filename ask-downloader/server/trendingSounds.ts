@@ -1,7 +1,7 @@
 /**
  * Trending Sounds (collect only, nothing public yet).
- * Twice a day (and at once when the last run is older than 12 h, because the
- * host may restart the Node process) the trending videos of 4 regions are read
+ * Four times a day (and at once when the last run is older than 6 h, because the
+ * host may restart the Node process) the trending videos of 8 regions are read
  * and their sounds saved in the data folder. If a region fails, the run is
  * repeated after 45 minutes. Errors are only logged. Admin: soundsRoutes.ts.
  * Filter rules: soundsFilter.ts. See ../PLAN-TRENDING-SOUNDS.md.
@@ -10,8 +10,8 @@ import { read, write } from './store.ts';
 import { fetchRegion } from './soundsFetch.ts';
 import { DEFAULT_SETTINGS, cleanSettings, judge, type Settings, type Sound, type Status } from './soundsFilter.ts';
 
-export const REGIONS = ['PK', 'BR', 'GB', 'ID'];
-const RUN_EVERY_MS = 12 * 3600 * 1000;
+export const REGIONS = ['PK', 'IN', 'US', 'GB', 'AE', 'SA', 'ID', 'BR'];
+const RUN_EVERY_MS = 6 * 3600 * 1000;
 const RETRY_AFTER_MS = 45 * 60 * 1000;
 const KEEP_DAYS = 60;
 const HIST_DAYS = 14;
@@ -74,7 +74,7 @@ export async function runSoundsJob(): Promise<void> {
           let s = sounds[h.id];
           if (!s) { s = sounds[h.id] = { ...h, regions: [], days: [], firstSeen: today, lastSeen: today, status: 'new', hist: {}, vs: 2 }; log.added++; }
           if (s.vs !== 2) { s.views = h.views; s.hist = {}; s.vs = 2; } // old numbers counted repeated videos twice
-          s.name = h.name || s.name;
+          s.name = h.name || (s.name.startsWith('[object ') ? '' : s.name);
           s.original = h.original;
           if (h.video && h.video.views >= (s.video?.views ?? -1)) s.video = h.video;
           s.views = Math.max(s.views, h.views);
@@ -97,6 +97,7 @@ export async function runSoundsJob(): Promise<void> {
     for (const id of Object.keys(sounds)) {
       const s = sounds[id];
       if (s.lastSeen < cutoff && s.status !== 'approved') { delete sounds[id]; continue; }
+      if (s.name.startsWith('[object ')) s.name = '';
       if (s.vs !== 2) {
         if (s.video) { s.views = s.video.views; s.hist = {}; s.vs = 2; } // not seen again: use its saved top video
         else if (!s.status || s.status === 'new') { delete sounds[id]; continue; } // old unchecked number, nothing was decided about it: it comes back when it trends again

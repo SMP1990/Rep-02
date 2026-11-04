@@ -19,7 +19,7 @@ export type SoundHit = {
 
 type Provider = { name: string; feed: (region: string) => Promise<any[]> };
 
-const clean = (v: unknown, max: number) => String(v ?? '').replace(/[\u0000-\u001f<>]/g, ' ').trim().slice(0, max);
+const clean = (v: unknown, max: number) => (typeof v === 'string' || typeof v === 'number' ? String(v) : '').replace(/[\u0000-\u001f<>]/g, ' ').trim().slice(0, max);
 // "original sound" in the languages of our regions (PT, ID, ES, FR, RU, JA, AR, UR)
 const ORIGINAL = /original|\basli\b|оригинал|オリジナル|اصلی|الأصلي|asli/i;
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
