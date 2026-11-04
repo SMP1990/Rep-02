@@ -61,8 +61,11 @@ async function videos(region: string): Promise<{ list: any[]; source: string }> 
 export async function fetchRegion(region: string): Promise<{ hits: SoundHit[]; source: string }> {
   const { list, source } = await videos(region);
   const byId = new Map<string, SoundHit>();
+  const seenVideo = new Set<string>(); // the feed repeats some videos; count each one once
   for (const v of list) {
     const m = v?.music_info;
+    const vKey = clean(v?.video_id, 30);
+    if (vKey) { if (seenVideo.has(vKey)) continue; seenVideo.add(vKey); }
     const id = clean(m?.id, 40);
     if (!/^\d+$/.test(id)) continue;
     const name = clean(m.title, 150);
@@ -73,7 +76,7 @@ export async function fetchRegion(region: string): Promise<{ hits: SoundHit[]; s
     const plays = Number(v.play_count) || 0;
     const vid = clean(v.video_id, 30), user = clean(v.author?.unique_id, 40);
     if (/^\d+$/.test(vid) && /^[\w.]+$/.test(user) && plays >= (hit.video?.views ?? -1)) hit.video = { id: vid, user, views: plays };
-    hit.views += plays;
+    hit.views = Math.max(hit.views, plays); // views = the most viewed video using the sound
     hit.videos += 1;
     byId.set(id, hit);
   }

@@ -72,7 +72,8 @@ export async function runSoundsJob(): Promise<void> {
         for (const h of hits) {
           log.found++;
           let s = sounds[h.id];
-          if (!s) { s = sounds[h.id] = { ...h, regions: [], days: [], firstSeen: today, lastSeen: today, status: 'new', hist: {} }; log.added++; }
+          if (!s) { s = sounds[h.id] = { ...h, regions: [], days: [], firstSeen: today, lastSeen: today, status: 'new', hist: {}, vs: 2 }; log.added++; }
+          if (s.vs !== 2) { s.views = h.views; s.hist = {}; s.vs = 2; } // old numbers counted repeated videos twice
           s.name = h.name || s.name;
           s.original = h.original;
           if (h.video && h.video.views >= (s.video?.views ?? -1)) s.video = h.video;
@@ -96,6 +97,7 @@ export async function runSoundsJob(): Promise<void> {
     for (const id of Object.keys(sounds)) {
       const s = sounds[id];
       if (s.lastSeen < cutoff && s.status !== 'approved') { delete sounds[id]; continue; }
+      if (s.vs !== 2 && s.video) { s.views = s.video.views; s.hist = {}; s.vs = 2; } // not seen again: use its saved top video
       for (const d of Object.keys(s.hist ?? {})) if (d < histCut) delete s.hist[d];
     }
     write('soundsData', sounds);

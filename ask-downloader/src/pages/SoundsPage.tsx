@@ -125,7 +125,7 @@ export const SoundsPage: React.FC<{ onOpenMobileMenu: () => void }> = ({ onOpenM
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
             <thead><tr className="text-[#726c85] dark:text-[#b5a9cd]">
-              <th className="py-2 pr-3">Sound</th><th className="pr-3">Creator</th><th className="pr-3">Sec</th><th className="pr-3">Views</th>
+              <th className="py-2 pr-3">Sound</th><th className="pr-3">Creator</th><th className="pr-3">Sec</th><th className="pr-3" title="Views of the most viewed trending video that uses this sound (open Video to see the same number)">Top video views</th>
               <th className="pr-3">Regions</th><th className="pr-3">Days</th><th className="pr-3">Score</th><th className="pr-3">Filter</th><th className="pr-3">Check on TikTok</th><th>Review</th>
             </tr></thead>
             <tbody>
