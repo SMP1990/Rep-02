@@ -131,3 +131,14 @@ Suggested first of these (safe, fits the existing tools): hashtag bundles, font/
   "no owner". SFX and own AI voices are the safest; check the share of "original sound" in the Step A data.
 - **Report Content page** (footer link, 11 languages): a form whose reports arrive in admin. The owner/admin reviews and
   removes the file within 24-48 h. **No automatic delete** (a competitor could abuse it). Build it before any sound page goes public (before Step E).
+
+## 12. Owner decision: no extra APIs, no "total videos" number (2026-11-05)
+- The owner decided **not to show the sound's total number of videos** and **not to add RapidAPI / Apify or any other API**.
+  "Top video views" is enough. Step B is **dropped** (research only: `tiktok-scraper7` free plan = 300 calls/month, TikWM's
+  other endpoints sit behind Cloudflare, TikTok's own music API is signed/private and must not be called).
+- The only source stays the free TikWM feed (8 regions, 4 runs a day, retries). The `PROVIDERS` list in
+  `server/soundsFetch.ts` stays ready in case a backup is wanted later. If TikWM ever blocks the server, tell the owner
+  honestly: new sounds stop coming, old data stays. Do not suggest paid or key-based services unless the owner asks.
+- Visitors never trigger API calls: public pages will read saved data only.
+- Next real steps: let v32 collect for a few days, look at the "Days" column (repeat sounds), then Step C/D/E
+  (MP3 pipeline, Sounds Manager, Report Content page, public pages).
