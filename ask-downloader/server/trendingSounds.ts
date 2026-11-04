@@ -1,31 +1,60 @@
 /**
- * Trending Sounds, step A (collect only, nothing public).
+ * Trending Sounds (collect only, nothing public yet).
  * Twice a day (and at once when the last run is older than 12 h, because the
- * host may restart the Node process) the trending videos of 4 regions are
- * read and their sounds are saved in the data folder. Errors are only logged.
- * Admin switch + data view: soundsRoutes.ts. See ../PLAN-TRENDING-SOUNDS.md.
+ * host may restart the Node process) the trending videos of 4 regions are read
+ * and their sounds saved in the data folder. If a region fails, the run is
+ * repeated after 45 minutes. Errors are only logged. Admin: soundsRoutes.ts.
+ * Filter rules: soundsFilter.ts. See ../PLAN-TRENDING-SOUNDS.md.
  */
 import { read, write } from './store.ts';
-import { fetchRegion, type SoundHit } from './soundsFetch.ts';
+import { fetchRegion } from './soundsFetch.ts';
+import { DEFAULT_SETTINGS, cleanSettings, judge, type Settings, type Sound, type Status } from './soundsFilter.ts';
 
 export const REGIONS = ['PK', 'BR', 'GB', 'ID'];
 const RUN_EVERY_MS = 12 * 3600 * 1000;
+const RETRY_AFTER_MS = 45 * 60 * 1000;
 const KEEP_DAYS = 60;
+const HIST_DAYS = 14;
 
-export type Sound = SoundHit & { regions: string[]; days: string[]; firstSeen: string; lastSeen: string };
-type RunLog = { at: string; found: number; added: number; regions: Record<string, string> };
-type State = { enabled: boolean; lastRun: string; log: RunLog[] };
+type RunLog = { at: string; found: number; added: number; failed: number; regions: Record<string, string> };
+type State = { enabled: boolean; lastRun: string; log: RunLog[]; settings: Settings };
 
-const getState = () => read<State>('soundsState', { enabled: false, lastRun: '', log: [] });
+const getState = (): State => {
+  const s = read<State>('soundsState', { enabled: false, lastRun: '', log: [], settings: DEFAULT_SETTINGS });
+  if (!s.settings) s.settings = DEFAULT_SETTINGS;
+  return s;
+};
 const getSounds = () => read<Record<string, Sound>>('soundsData', {});
 let running = false;
 
-export const soundsStatus = () => ({ ...getState(), running, regions: REGIONS, total: Object.keys(getSounds()).length });
-export const soundsList = () => Object.values(getSounds());
+export function soundsStatus() {
+  const st = getState();
+  const last = st.log[0];
+  return { ...st, running, regions: REGIONS, total: Object.keys(getSounds()).length, allFailed: !!last && last.failed >= REGIONS.length };
+}
+
+/** Every sound with the filter's verdict ("reason" empty = qualified) and a score. */
+export function soundsList() {
+  const list = Object.values(getSounds());
+  const verdicts = judge(list, getState().settings);
+  return list.map((s) => ({ ...s, ...verdicts.get(s.id) }));
+}
 
 export function setSoundsEnabled(on: boolean) {
   write('soundsState', { ...getState(), enabled: on });
   if (on) void runSoundsJob();
+}
+
+export function setSoundsSettings(x: unknown) {
+  write('soundsState', { ...getState(), settings: cleanSettings(x, getState().settings) });
+}
+
+export function setSoundStatus(id: string, status: Status): boolean {
+  const s = getSounds()[id];
+  if (!s || !['new', 'approved', 'rejected'].includes(status)) return false;
+  s.status = status;
+  write('soundsData', getSounds());
+  return true;
 }
 
 export async function runSoundsJob(): Promise<void> {
@@ -34,33 +63,44 @@ export async function runSoundsJob(): Promise<void> {
   const now = new Date();
   const today = now.toISOString().slice(0, 10);
   const sounds = getSounds();
-  const log: RunLog = { at: now.toISOString(), found: 0, added: 0, regions: {} };
+  const log: RunLog = { at: now.toISOString(), found: 0, added: 0, failed: 0, regions: {} };
   try {
     for (const region of REGIONS) {
       try {
-        const hits = await fetchRegion(region);
-        log.regions[region] = `ok ${hits.length}`;
+        const { hits, source } = await fetchRegion(region);
+        log.regions[region] = `ok ${hits.length} (${source})`;
         for (const h of hits) {
           log.found++;
           let s = sounds[h.id];
-          if (!s) { s = sounds[h.id] = { ...h, regions: [], days: [], firstSeen: today, lastSeen: today }; log.added++; }
+          if (!s) { s = sounds[h.id] = { ...h, regions: [], days: [], firstSeen: today, lastSeen: today, status: 'new', hist: {} }; log.added++; }
+          s.name = h.name || s.name;
+          s.original = h.original;
           s.views = Math.max(s.views, h.views);
           s.videos = Math.max(s.videos, h.videos);
           s.lastSeen = today;
+          s.status ??= 'new';
+          s.hist ??= {};
+          s.hist[today] = Math.max(s.hist[today] ?? 0, h.views);
           if (!s.regions.includes(region)) s.regions.push(region);
           if (!s.days.includes(today)) s.days.push(today);
         }
       } catch (err: any) {
-        log.regions[region] = `failed: ${String(err?.message || err).slice(0, 80)}`;
+        log.failed++;
+        log.regions[region] = `failed: ${String(err?.message || err).slice(0, 100)}`;
       }
       await new Promise((r) => setTimeout(r, 3000));
     }
     const cutoff = new Date(now.getTime() - KEEP_DAYS * 86400000).toISOString().slice(0, 10);
-    for (const id of Object.keys(sounds)) if (sounds[id].lastSeen < cutoff) delete sounds[id];
+    const histCut = new Date(now.getTime() - HIST_DAYS * 86400000).toISOString().slice(0, 10);
+    for (const id of Object.keys(sounds)) {
+      const s = sounds[id];
+      if (s.lastSeen < cutoff && s.status !== 'approved') { delete sounds[id]; continue; }
+      for (const d of Object.keys(s.hist ?? {})) if (d < histCut) delete s.hist[d];
+    }
     write('soundsData', sounds);
     const st = getState();
     write('soundsState', { ...st, lastRun: log.at, log: [log, ...st.log].slice(0, 40) });
-    console.log(`[sounds] run done: ${log.found} found, ${log.added} new`, log.regions);
+    console.log(`[sounds] run done: ${log.found} found, ${log.added} new, ${log.failed} failed`, log.regions);
   } catch (err) {
     console.warn('[sounds] run failed:', err);
   } finally {
@@ -68,13 +108,14 @@ export async function runSoundsJob(): Promise<void> {
   }
 }
 
-/** Called once at startup: checks every 30 min whether a run is due. */
+/** Called once at startup: checks every 15 min whether a run is due. */
 export function startSoundsScheduler() {
   const tick = () => {
     const st = getState();
-    if (!st.enabled) return;
-    if (!st.lastRun || Date.now() - Date.parse(st.lastRun) > RUN_EVERY_MS) void runSoundsJob();
+    if (!st.enabled || running) return;
+    const age = Date.now() - (st.lastRun ? Date.parse(st.lastRun) : 0);
+    if (age > RUN_EVERY_MS || (st.log[0]?.failed && age > RETRY_AFTER_MS)) void runSoundsJob();
   };
   setTimeout(tick, 60_000).unref();
-  setInterval(tick, 30 * 60_000).unref();
+  setInterval(tick, 15 * 60_000).unref();
 }

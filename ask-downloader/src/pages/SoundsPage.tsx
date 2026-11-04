@@ -4,13 +4,18 @@ import { useAdmin } from '../context/AdminContext';
 
 type Sound = {
   id: string; name: string; creator: string; duration: number; original: boolean; views: number;
-  videos: number; regions: string[]; days: string[]; firstSeen: string; lastSeen: string;
+  regions: string[]; days: string[]; firstSeen: string; status?: string; reason?: string; score?: number;
 };
-type Run = { at: string; found: number; added: number; regions: Record<string, string> };
-type Status = { enabled: boolean; lastRun: string; log: Run[]; running: boolean; total: number };
+type Settings = { minViews: number; minSec: number; maxSec: number; perCreator: number; excludeMusic: boolean };
+type Status = {
+  enabled: boolean; lastRun: string; running: boolean; allFailed: boolean; settings: Settings;
+  log: { regions: Record<string, string> }[];
+};
 
 const card = 'bg-white dark:bg-[#181129] rounded-2xl border border-[#eae3ee] dark:border-white/10 shadow-xs';
 const btn = 'px-4 py-2.5 rounded-xl text-white text-sm font-bold disabled:opacity-50 cursor-pointer bg-[#6d46b8] hover:bg-[#4b2e83]';
+const box = 'w-24 px-2.5 py-1.5 rounded-lg text-sm bg-[#f6f0f4] dark:bg-[#0e0a17] border border-[#eae3ee] dark:border-white/10';
+const mini = 'px-2 py-1 rounded-md text-[11px] font-bold cursor-pointer text-white';
 
 async function call(method: string, url: string, body?: unknown) {
   const r = await fetch(url, {
@@ -27,11 +32,15 @@ export const SoundsPage: React.FC<{ onOpenMobileMenu: () => void }> = ({ onOpenM
   const { showToast } = useAdmin();
   const [status, setStatus] = useState<Status | null>(null);
   const [sounds, setSounds] = useState<Sound[]>([]);
-  const [onlyOriginal, setOnlyOriginal] = useState(false);
+  const [set, setSet] = useState<Settings | null>(null);
+  const [show, setShow] = useState('qualified');
 
   const load = useCallback(async () => {
     const d = await call('GET', '/api/admin/sounds');
-    if (d.status) { setStatus(d.status); setSounds(d.sounds || []); }
+    if (!d.status) return;
+    setStatus(d.status);
+    setSounds(d.sounds || []);
+    setSet((cur) => cur ?? d.status.settings);
   }, []);
   useEffect(() => { void load(); }, [load]);
   useEffect(() => {
@@ -48,19 +57,41 @@ export const SoundsPage: React.FC<{ onOpenMobileMenu: () => void }> = ({ onOpenM
   };
   const runNow = async () => {
     const d = await call('POST', '/api/admin/sounds/run');
-    if (d.success) { setStatus(d.status); showToast('Run started (about 30 seconds).', 'info'); }
+    if (d.success) { setStatus(d.status); showToast('Run started (about 40 seconds).', 'info'); }
+  };
+  const saveSettings = async () => {
+    const d = await call('POST', '/api/admin/sounds/settings', set);
+    if (!d.success) return showToast('Could not save.', 'error');
+    setStatus(d.status); setSounds(d.sounds); setSet(d.status.settings);
+    showToast('Filter saved.', 'success');
+  };
+  const mark = async (id: string, to: string) => {
+    const d = await call('POST', '/api/admin/sounds/status', { id, status: to });
+    if (d.success) setSounds(d.sounds);
   };
 
-  const rows = useMemo(
-    () => sounds.filter((s) => !onlyOriginal || s.original).sort((a, b) => b.views - a.views).slice(0, 300),
-    [sounds, onlyOriginal],
+  const rows = useMemo(() => {
+    const f = (s: Sound) =>
+      show === 'all' ? true : show === 'qualified' ? !s.reason : show === 'approved' ? s.status === 'approved'
+        : show === 'rejected' ? s.status === 'rejected' : !!s.reason && s.status !== 'rejected';
+    return sounds.filter(f).sort((a, b) => (b.score ?? 0) - (a.score ?? 0)).slice(0, 300);
+  }, [sounds, show]);
+  const qualified = sounds.filter((s) => !s.reason).length;
+  const field = (k: keyof Settings, label: string) => (
+    <label className="text-xs flex flex-col gap-1">{label}
+      <input className={box} type="number" value={set ? (set[k] as number) : ''} onChange={(e) => setSet({ ...set!, [k]: Number(e.target.value) })} />
+    </label>
   );
-  const originals = sounds.filter((s) => s.original).length;
-  const repeats = sounds.filter((s) => s.days.length > 1).length;
 
   return (
     <div className="animate-fade-in">
-      <TopHeader title="Trending Sounds" subtitle="Step A: collects trending TikTok sounds twice a day. Only you can see this." onOpenMobileMenu={onOpenMobileMenu} />
+      <TopHeader title="Trending Sounds" subtitle="Collects trending TikTok sounds twice a day. Only you can see this." onOpenMobileMenu={onOpenMobileMenu} />
+
+      {status?.allFailed && (
+        <div className="mb-4 p-3 rounded-xl bg-red-50 text-red-700 text-sm border border-red-200">
+          The last run failed in every region. The system tries again in about 45 minutes. Old data is kept.
+        </div>
+      )}
 
       <div className={`${card} p-5 mb-6`}>
         <div className="flex flex-wrap items-center gap-3">
@@ -68,33 +99,49 @@ export const SoundsPage: React.FC<{ onOpenMobileMenu: () => void }> = ({ onOpenM
           <button onClick={runNow} disabled={!status?.enabled || status?.running} className={btn}>{status?.running ? 'Running…' : 'Run now'}</button>
           <span className="text-sm">Status: <b>{status?.enabled ? 'ON' : 'OFF'}</b> · Last run: {status?.lastRun ? new Date(status.lastRun).toLocaleString() : 'never'}</span>
         </div>
-        <p className="text-xs text-[#726c85] dark:text-[#b5a9cd] mt-3">
-          {sounds.length} sounds saved · {originals} are "original sound" · {repeats} seen on more than one day
-        </p>
-        {status?.log[0] && (
-          <p className="text-xs mt-2">Last run: {Object.entries(status.log[0].regions).map(([r, v]) => `${r} ${v}`).join(' · ')}</p>
-        )}
+        <p className="text-xs text-[#726c85] dark:text-[#b5a9cd] mt-3">{sounds.length} sounds saved · {qualified} pass the filter</p>
+        {status?.log[0] && <p className="text-xs mt-2">Last run: {Object.entries(status.log[0].regions).map(([r, v]) => `${r} ${v}`).join(' · ')}</p>}
       </div>
 
+      {set && (
+        <div className={`${card} p-5 mb-6`}>
+          <h2 className="text-sm font-bold mb-3">Filter (sounds are never deleted by it, only hidden from the list)</h2>
+          <div className="flex flex-wrap items-end gap-3">
+            {field('minViews', 'Min views')}{field('minSec', 'Min seconds')}{field('maxSec', 'Max seconds')}{field('perCreator', 'Per creator')}
+            <label className="text-xs flex items-center gap-2 pb-2 cursor-pointer">
+              <input type="checkbox" checked={set.excludeMusic} onChange={(e) => setSet({ ...set, excludeMusic: e.target.checked })} /> No songs
+            </label>
+            <button onClick={saveSettings} className={btn}>Save</button>
+          </div>
+        </div>
+      )}
+
       <div className={`${card} p-5`}>
-        <label className="text-sm flex items-center gap-2 mb-3 cursor-pointer">
-          <input type="checkbox" checked={onlyOriginal} onChange={(e) => setOnlyOriginal(e.target.checked)} /> Only "original sound"
-        </label>
+        <select className={`${box} w-auto mb-3`} value={show} onChange={(e) => setShow(e.target.value)}>
+          <option value="qualified">Passed the filter</option><option value="approved">Approved</option>
+          <option value="rejected">Rejected</option><option value="out">Filtered out</option><option value="all">All</option>
+        </select>
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
             <thead><tr className="text-[#726c85] dark:text-[#b5a9cd]">
               <th className="py-2 pr-3">Sound</th><th className="pr-3">Creator</th><th className="pr-3">Sec</th><th className="pr-3">Views</th>
-              <th className="pr-3">Regions</th><th className="pr-3">Days</th><th>First seen</th>
+              <th className="pr-3">Regions</th><th className="pr-3">Days</th><th className="pr-3">Score</th><th className="pr-3">Filter</th><th>Review</th>
             </tr></thead>
             <tbody>
               {rows.map((s) => (
                 <tr key={s.id} className="border-t border-[#eae3ee] dark:border-white/10">
-                  <td className="py-2 pr-3 max-w-[260px] truncate" title={s.name}>{s.name}</td>
+                  <td className="py-2 pr-3 max-w-[240px] truncate" title={s.name}>{s.name}</td>
                   <td className="pr-3">{s.creator}</td><td className="pr-3">{s.duration}</td><td className="pr-3">{fmt(s.views)}</td>
-                  <td className="pr-3">{s.regions.join(', ')}</td><td className="pr-3">{s.days.length}</td><td>{s.firstSeen}</td>
+                  <td className="pr-3">{s.regions.join(', ')}</td><td className="pr-3">{s.days.length}</td><td className="pr-3">{s.score}</td>
+                  <td className="pr-3">{s.reason || 'ok'}</td>
+                  <td className="whitespace-nowrap">
+                    {s.status !== 'approved' && <button className={`${mini} bg-green-600 mr-1`} onClick={() => mark(s.id, 'approved')}>Approve</button>}
+                    {s.status !== 'rejected' && <button className={`${mini} bg-red-600`} onClick={() => mark(s.id, 'rejected')}>Reject</button>}
+                    {(s.status === 'approved' || s.status === 'rejected') && <button className={`${mini} bg-gray-500 ml-1`} onClick={() => mark(s.id, 'new')}>Undo</button>}
+                  </td>
                 </tr>
               ))}
-              {!rows.length && <tr><td colSpan={7} className="py-6 text-center text-[#726c85]">No data yet.</td></tr>}
+              {!rows.length && <tr><td colSpan={9} className="py-6 text-center text-[#726c85]">Nothing here.</td></tr>}
             </tbody>
           </table>
         </div>
