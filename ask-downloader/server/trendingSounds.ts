@@ -97,7 +97,10 @@ export async function runSoundsJob(): Promise<void> {
     for (const id of Object.keys(sounds)) {
       const s = sounds[id];
       if (s.lastSeen < cutoff && s.status !== 'approved') { delete sounds[id]; continue; }
-      if (s.vs !== 2 && s.video) { s.views = s.video.views; s.hist = {}; s.vs = 2; } // not seen again: use its saved top video
+      if (s.vs !== 2) {
+        if (s.video) { s.views = s.video.views; s.hist = {}; s.vs = 2; } // not seen again: use its saved top video
+        else if (!s.status || s.status === 'new') { delete sounds[id]; continue; } // old unchecked number, nothing was decided about it: it comes back when it trends again
+      }
       for (const d of Object.keys(s.hist ?? {})) if (d < histCut) delete s.hist[d];
     }
     write('soundsData', sounds);

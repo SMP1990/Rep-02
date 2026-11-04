@@ -6,6 +6,7 @@ type Sound = {
   id: string; name: string; creator: string; duration: number; original: boolean; views: number;
   regions: string[]; days: string[]; firstSeen: string; status?: string; reason?: string; score?: number;
   video?: { id: string; user: string; views: number };
+  vs?: number;
 };
 type Settings = { minViews: number; minSec: number; maxSec: number; perCreator: number; excludeMusic: boolean };
 type Status = {
@@ -132,7 +133,7 @@ export const SoundsPage: React.FC<{ onOpenMobileMenu: () => void }> = ({ onOpenM
               {rows.map((s) => (
                 <tr key={s.id} className="border-t border-[#eae3ee] dark:border-white/10">
                   <td className="py-2 pr-3 max-w-[240px] truncate" title={s.name}>{s.name}</td>
-                  <td className="pr-3">{s.creator}</td><td className="pr-3">{s.duration}</td><td className="pr-3">{fmt(s.views)}</td>
+                  <td className="pr-3">{s.creator}</td><td className="pr-3">{s.duration}</td><td className="pr-3" title={s.vs === 2 ? undefined : "Old number, not verified. It is refreshed when the sound trends again."}>{fmt(s.views)}{s.vs === 2 ? "" : " ?"}</td>
                   <td className="pr-3">{s.regions.join(', ')}</td><td className="pr-3">{s.days.length}</td><td className="pr-3">{s.score}</td>
                   <td className="pr-3">{s.reason || 'ok'}</td>
                   <td className="pr-3 whitespace-nowrap text-[#6d46b8] font-bold">
