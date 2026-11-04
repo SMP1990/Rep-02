@@ -75,6 +75,7 @@ export async function runSoundsJob(): Promise<void> {
           if (!s) { s = sounds[h.id] = { ...h, regions: [], days: [], firstSeen: today, lastSeen: today, status: 'new', hist: {} }; log.added++; }
           s.name = h.name || s.name;
           s.original = h.original;
+          if (h.video && h.video.views >= (s.video?.views ?? -1)) s.video = h.video;
           s.views = Math.max(s.views, h.views);
           s.videos = Math.max(s.videos, h.videos);
           s.lastSeen = today;

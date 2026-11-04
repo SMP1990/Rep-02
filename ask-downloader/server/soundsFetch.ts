@@ -14,6 +14,7 @@ export type SoundHit = {
   original: boolean; // true = a user's own "original sound", false = probably a song
   views: number;
   videos: number;
+  video?: { id: string; user: string; views: number }; // the most viewed video that uses it (for the admin "check on TikTok" link)
 };
 
 type Provider = { name: string; feed: (region: string) => Promise<any[]> };
@@ -69,7 +70,10 @@ export async function fetchRegion(region: string): Promise<{ hits: SoundHit[]; s
       id, name, creator: clean(m.author, 80), duration: Number(m.duration) || 0,
       original: ORIGINAL.test(name.slice(0, 40)), views: 0, videos: 0,
     };
-    hit.views += Number(v.play_count) || 0;
+    const plays = Number(v.play_count) || 0;
+    const vid = clean(v.video_id, 30), user = clean(v.author?.unique_id, 40);
+    if (/^\d+$/.test(vid) && /^[\w.]+$/.test(user) && plays >= (hit.video?.views ?? -1)) hit.video = { id: vid, user, views: plays };
+    hit.views += plays;
     hit.videos += 1;
     byId.set(id, hit);
   }

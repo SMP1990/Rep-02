@@ -5,6 +5,7 @@ import { useAdmin } from '../context/AdminContext';
 type Sound = {
   id: string; name: string; creator: string; duration: number; original: boolean; views: number;
   regions: string[]; days: string[]; firstSeen: string; status?: string; reason?: string; score?: number;
+  video?: { id: string; user: string; views: number };
 };
 type Settings = { minViews: number; minSec: number; maxSec: number; perCreator: number; excludeMusic: boolean };
 type Status = {
@@ -125,7 +126,7 @@ export const SoundsPage: React.FC<{ onOpenMobileMenu: () => void }> = ({ onOpenM
           <table className="w-full text-xs text-left">
             <thead><tr className="text-[#726c85] dark:text-[#b5a9cd]">
               <th className="py-2 pr-3">Sound</th><th className="pr-3">Creator</th><th className="pr-3">Sec</th><th className="pr-3">Views</th>
-              <th className="pr-3">Regions</th><th className="pr-3">Days</th><th className="pr-3">Score</th><th className="pr-3">Filter</th><th>Review</th>
+              <th className="pr-3">Regions</th><th className="pr-3">Days</th><th className="pr-3">Score</th><th className="pr-3">Filter</th><th className="pr-3">Check on TikTok</th><th>Review</th>
             </tr></thead>
             <tbody>
               {rows.map((s) => (
@@ -134,6 +135,11 @@ export const SoundsPage: React.FC<{ onOpenMobileMenu: () => void }> = ({ onOpenM
                   <td className="pr-3">{s.creator}</td><td className="pr-3">{s.duration}</td><td className="pr-3">{fmt(s.views)}</td>
                   <td className="pr-3">{s.regions.join(', ')}</td><td className="pr-3">{s.days.length}</td><td className="pr-3">{s.score}</td>
                   <td className="pr-3">{s.reason || 'ok'}</td>
+                  <td className="pr-3 whitespace-nowrap text-[#6d46b8] font-bold">
+                    {s.video && <a href={`https://www.tiktok.com/@${s.video.user}/video/${s.video.id}`} target="_blank" rel="noopener noreferrer" title={`Video with ${fmt(s.video.views)} views when fetched`}>Video</a>}
+                    {s.video && ' · '}
+                    <a href={`https://www.tiktok.com/music/x-${s.id}`} target="_blank" rel="noopener noreferrer">Sound</a>
+                  </td>
                   <td className="whitespace-nowrap">
                     {s.status !== 'approved' && <button className={`${mini} bg-green-600 mr-1`} onClick={() => mark(s.id, 'approved')}>Approve</button>}
                     {s.status !== 'rejected' && <button className={`${mini} bg-red-600`} onClick={() => mark(s.id, 'rejected')}>Reject</button>}
@@ -141,7 +147,7 @@ export const SoundsPage: React.FC<{ onOpenMobileMenu: () => void }> = ({ onOpenM
                   </td>
                 </tr>
               ))}
-              {!rows.length && <tr><td colSpan={9} className="py-6 text-center text-[#726c85]">Nothing here.</td></tr>}
+              {!rows.length && <tr><td colSpan={10} className="py-6 text-center text-[#726c85]">Nothing here.</td></tr>}
             </tbody>
           </table>
         </div>
