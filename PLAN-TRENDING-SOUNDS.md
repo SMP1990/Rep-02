@@ -122,3 +122,12 @@ lower-case/no trailing slash, `sitemap.xml` with hreflang, `robots.txt`). Per so
 8. Platform aspect ratio and video resizer templates
 
 Suggested first of these (safe, fits the existing tools): hashtag bundles, font/bio generators, thumbnail downloader.
+
+## 11. Owner decisions on content and copyright (2026-11-04)
+- **Hosting stays on Hostinger.** No offshore / "DMCA-ignored" hosting.
+- **Content focus:** only spoken-word memes, funny dialogues, funny sound effects (SFX) and AI voice templates. No commercial
+  music tracks. The Step A / filter work must be able to tell these apart from music.
+- **Known risk (told to the owner):** many viral meme sounds are cut from films, dramas or creators, so "meme" does not mean
+  "no owner". SFX and own AI voices are the safest; check the share of "original sound" in the Step A data.
+- **Report Content page** (footer link, 11 languages): a form whose reports arrive in admin. The owner/admin reviews and
+  removes the file within 24-48 h. **No automatic delete** (a competitor could abuse it). Build it before any sound page goes public (before Step E).

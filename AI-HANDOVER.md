@@ -40,6 +40,9 @@ protected on GitHub (no delete, no force-push).
 
 > **Planned next feature (not built):** daily auto-updated **Trending Sounds** directory with admin panel, full SEO and
 > a free-tier API fallback chain. Full agreed plan, test results and step order (start at Step A): **`PLAN-TRENDING-SOUNDS.md`**.
+> Owner decisions of 2026-11-04 (section 11 of that plan): stay on Hostinger; only spoken-word memes, funny dialogues, SFX
+> and AI voice templates (no commercial music); a "Report Content" page with admin review (no auto-delete) before any public sound page.
+> Step A is NOT started yet; ask the owner first and also ask whether v26 is deployed.
 
 ## 2. The owner and how to work
 
