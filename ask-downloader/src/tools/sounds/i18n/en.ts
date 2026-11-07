@@ -56,5 +56,6 @@ export const en = {
   reportInvalid: 'Please fill in every field and enter a valid email address.',
   reportThisSound: 'Report this sound',
   reportNote: 'Reports are read by a person. Nothing is deleted automatically.',
+  prev: 'Previous sound', next: 'Next sound', seek: 'Seek',
 };
 export type Strings = typeof en;

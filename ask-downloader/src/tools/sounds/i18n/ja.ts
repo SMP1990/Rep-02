@@ -52,4 +52,5 @@ export const ja: Strings = {
   reportInvalid: 'すべての項目を入力し、正しいメールアドレスを入力してください。',
   reportThisSound: 'このサウンドを報告する',
   reportNote: '報告は人が読みます。自動的に削除されることはありません。',
+  prev: '前のサウンド', next: '次のサウンド', seek: 'シーク',
 };

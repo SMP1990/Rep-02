@@ -52,4 +52,5 @@ export const id: Strings = {
   reportInvalid: 'Mohon isi semua kolom dan masukkan alamat email yang valid.',
   reportThisSound: 'Laporkan suara ini',
   reportNote: 'Laporan dibaca oleh seseorang. Tidak ada yang dihapus secara otomatis.',
+  prev: 'Suara sebelumnya', next: 'Suara berikutnya', seek: 'Geser posisi',
 };

@@ -5,6 +5,7 @@ import { Seo } from '../components/Seo.tsx';
 import { useLanguage } from '../context/LanguageContext.tsx';
 import { fillN, soundStrings } from '../tools/sounds/i18n/index.ts';
 import { SoundAbout, soundAbout, soundFaq } from '../tools/sounds/SoundAbout.tsx';
+import { SoundPlayer } from '../tools/sounds/SoundPlayer.tsx';
 import { buildBreadcrumbSchema, buildFaqSchema, buildWebPageSchema } from '../utils/seoSchema.ts';
 import type { PublicSound } from '../tools/sounds/SoundCard.tsx';
 
@@ -31,6 +32,20 @@ export const SoundPage: React.FC = () => {
       .then((d) => { setIndexable(d.indexable === true); setSound(d.sound); setRelated(Array.isArray(d.related) ? d.related : []); setState('ok'); })
       .catch((e) => setState(e?.message === 'missing' ? 'missing' : 'failed'));
   }, [slug]);
+
+  // The order of all public sounds (most viewed first), only to know which sound is before / after this one.
+  const [order, setOrder] = useState<string[]>([]);
+  useEffect(() => {
+    fetch('/api/sounds')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (Array.isArray(d?.sounds)) setOrder(d.sounds.map((x: PublicSound) => x.slug)); })
+      .catch(() => {});
+  }, []);
+  const neighbour = (step: number) => {
+    const i = order.indexOf(slug);
+    return order[(i + step + order.length) % order.length];
+  };
+  const open = (to: string) => { if (to && to !== slug) window.location.assign(`/sounds/${encodeURIComponent(to)}`); };
 
   const title = sound ? `${sound.title} MP3` : s.title;
   const views = sound ? new Intl.NumberFormat(currentLang, { notation: 'compact', maximumFractionDigits: 1 }).format(sound.views) : '';
@@ -84,11 +99,17 @@ export const SoundPage: React.FC = () => {
           {state === 'ok' && sound && (
             <>
               <div className="text-center mt-6">
-                <h1 className="font-heading text-3xl sm:text-5xl font-extrabold tracking-tight text-[#341d5b] dark:text-[#d1b9f7]">{sound.title}</h1>
-                <p className="mt-3 text-slate-600 dark:text-slate-300">
-                  {sound.creator} · {fillN(s.sec, sound.duration)} · {fillN(s.views, views)}
+                <SoundPlayer
+                  src={mp3}
+                  title={sound.title}
+                  creator={sound.creator}
+                  t={s}
+                  onPrev={order.length > 1 ? () => open(neighbour(-1)) : undefined}
+                  onNext={order.length > 1 ? () => open(neighbour(1)) : undefined}
+                />
+                <p className="mt-4 text-sm text-slate-600 dark:text-slate-300">
+                  {fillN(s.sec, sound.duration)} · {fillN(s.views, views)}
                 </p>
-                <audio className="w-full mt-8" controls preload="none" src={mp3} aria-label={sound.title} />
                 <a
                   href={`${mp3}?dl=1`}
                   download

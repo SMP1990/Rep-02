@@ -52,4 +52,5 @@ export const fr: Strings = {
   reportInvalid: 'Veuillez remplir tous les champs et saisir une adresse e-mail valide.',
   reportThisSound: 'Signaler ce son',
   reportNote: 'Les signalements sont lus par une personne. Rien n\'est supprimé automatiquement.',
+  prev: 'Son précédent', next: 'Son suivant', seek: 'Position de lecture',
 };

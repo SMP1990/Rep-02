@@ -510,3 +510,30 @@ html.dark .bgr-checkerboard {
   .bgr-scan-line { animation: none; display: none; }
 }
 
+
+/* Sound page player (src/tools/sounds/SoundPlayer.tsx): a light speaker vibration and waveform bars while playing. */
+@keyframes sp-vibe {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  20% { transform: translate(-1px, 0.5px) scale(1.03); }
+  40% { transform: translate(1px, -0.5px) scale(0.99); }
+  60% { transform: translate(-0.5px, -0.5px) scale(1.04); }
+  80% { transform: translate(0.5px, 0.5px) scale(1); }
+}
+@keyframes sp-ring {
+  0% { transform: scale(0.9); opacity: 0.55; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+@keyframes sp-bar {
+  0%, 100% { transform: scaleY(0.35); }
+  50% { transform: scaleY(1); }
+}
+.sp-vibe { animation: sp-vibe 0.45s linear infinite; }
+.sp-ring { animation: sp-ring 1.6s ease-out infinite; }
+.sp-bar { transform-origin: center; animation: sp-bar 0.9s ease-in-out infinite; }
+.sp-range { -webkit-appearance: none; appearance: none; height: 6px; border-radius: 9999px; outline: none; cursor: pointer; }
+.sp-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 9999px; background: #f5b84b; border: 2px solid #261447; }
+.sp-range::-moz-range-thumb { width: 14px; height: 14px; border-radius: 9999px; background: #f5b84b; border: 2px solid #261447; }
+.sp-range:focus-visible { box-shadow: 0 0 0 3px rgba(245, 184, 75, 0.5); }
+@media (prefers-reduced-motion: reduce) {
+  .sp-vibe, .sp-ring, .sp-bar { animation: none; }
+}
