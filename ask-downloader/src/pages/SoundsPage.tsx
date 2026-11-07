@@ -3,7 +3,7 @@ import { TopHeader } from '../components/TopHeader';
 import { useAdmin } from '../context/AdminContext';
 
 type Sound = {
-  id: string; name: string; creator: string; duration: number; original: boolean; views: number; file?: boolean; mp3Error?: string;
+  id: string; name: string; creator: string; duration: number; original: boolean; views: number; file?: boolean; mp3Error?: string; mp3Busy?: boolean;
   regions: string[]; days: string[]; firstSeen: string; status?: string; reason?: string; score?: number;
   video?: { id: string; user: string; views: number };
   vs?: number;
@@ -67,9 +67,33 @@ export const SoundsPage: React.FC<{ onOpenMobileMenu: () => void }> = ({ onOpenM
     setStatus(d.status); setSounds(d.sounds); setSet(d.status.settings);
     showToast('Filter saved.', 'success');
   };
+  // While any MP3 is being saved, look again every 1.5 seconds so "Saving MP3…" turns into "MP3 saved" by itself.
+  const anyBusy = sounds.some((s) => s.mp3Busy);
+  useEffect(() => {
+    if (!anyBusy) return;
+    const t = setInterval(load, 1500);
+    return () => clearInterval(t);
+  }, [anyBusy, load]);
+
+  const [pending, setPending] = useState<string | null>(null); // the row whose click is on its way to the server
   const mark = async (id: string, to: string) => {
+    setPending(id);
+    // Show the new state at once; the server's answer then confirms it.
+    setSounds((list) => list.map((s) => (s.id === id ? { ...s, status: to, mp3Busy: to === 'approved' && !s.file ? true : s.mp3Busy } : s)));
     const d = await call('POST', '/api/admin/sounds/status', { id, status: to });
-    if (d.success) setSounds(d.sounds);
+    setPending(null);
+    if (d.success) {
+      setSounds(d.sounds);
+      if (to === 'approved') showToast('Approved. Saving the MP3…', 'info');
+    } else {
+      showToast('Could not save. Please try again.', 'error');
+      void load();
+    }
+  };
+  const retryMp3 = async (id: string) => {
+    setSounds((list) => list.map((s) => (s.id === id ? { ...s, mp3Busy: true, mp3Error: '' } : s)));
+    const d = await call('POST', '/api/admin/sounds/mp3', { id });
+    if (d.success) setSounds(d.sounds); else void load();
   };
 
   const rows = useMemo(() => {
@@ -145,10 +169,16 @@ export const SoundsPage: React.FC<{ onOpenMobileMenu: () => void }> = ({ onOpenM
                     <a href={`https://www.tiktok.com/music/x-${s.id}`} target="_blank" rel="noopener noreferrer">Sound</a>
                   </td>
                   <td className="whitespace-nowrap">
-                    {s.status !== 'approved' && <button className={`${mini} bg-green-600 mr-1`} onClick={() => mark(s.id, 'approved')}>Approve</button>}
-                    {s.status !== 'rejected' && <button className={`${mini} bg-red-600`} onClick={() => mark(s.id, 'rejected')}>Reject</button>}
-                    {(s.status === 'approved' || s.status === 'rejected') && <button className={`${mini} bg-gray-500 ml-1`} onClick={() => mark(s.id, 'new')}>Undo</button>}
-                    {s.status === 'approved' && <div className="text-xs mt-1">{s.file ? '✅ MP3 saved' : `⏳ MP3: ${s.mp3Error || 'downloading…'}`}</div>}
+                    {s.status !== 'approved' && <button disabled={pending === s.id} className={`${mini} bg-green-600 mr-1 disabled:opacity-50`} onClick={() => mark(s.id, 'approved')}>{pending === s.id ? '…' : 'Approve'}</button>}
+                    {s.status !== 'rejected' && <button disabled={pending === s.id} className={`${mini} bg-red-600 disabled:opacity-50`} onClick={() => mark(s.id, 'rejected')}>Reject</button>}
+                    {(s.status === 'approved' || s.status === 'rejected') && <button disabled={pending === s.id} className={`${mini} bg-gray-500 ml-1 disabled:opacity-50`} onClick={() => mark(s.id, 'new')}>Undo</button>}
+                    {s.status === 'approved' && (
+                      <div className="text-xs mt-1">
+                        {s.file ? '✅ MP3 saved'
+                          : s.mp3Busy ? '⏳ Saving MP3…'
+                          : <>⚠ {s.mp3Error || 'MP3 not saved yet'} <button className={`${mini} bg-[#6d46b8] ml-1`} onClick={() => retryMp3(s.id)}>Retry</button></>}
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}

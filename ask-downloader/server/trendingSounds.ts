@@ -39,7 +39,7 @@ export function soundsStatus() {
 export function soundsList() {
   const list = Object.values(getSounds());
   const verdicts = judge(list, getState().settings);
-  return list.map((s) => ({ ...s, ...verdicts.get(s.id), file: hasSoundFile(s.id) }));
+  return list.map((s) => ({ ...s, ...verdicts.get(s.id), file: hasSoundFile(s.id), mp3Busy: mp3Busy.has(s.id) }));
 }
 
 export function setSoundsEnabled(on: boolean) {
@@ -72,13 +72,21 @@ function addSlugs(all: Record<string, Sound>) {
 }
 
 /** Saves the MP3 of an approved sound; the result ("" = ok) is kept on the sound for the admin page. */
-export async function fetchMp3(id: string): Promise<string> {
-  const before = getSounds()[id];
-  if (!before) return 'unknown sound';
-  const err = hasSoundFile(id) ? '' : await saveSoundMp3(id, before.mp3);
-  const all = getSounds(); // read again: the collector may have saved meanwhile
-  if (all[id]) { all[id].mp3Error = err; write('soundsData', all); }
-  return err;
+const mp3Busy = new Set<string>(); // sounds whose MP3 is waiting for / in a download: the admin page shows "downloading" only for these
+let mp3Queue: Promise<unknown> = Promise.resolve(); // downloads run one after another (the host has about 1 CPU core)
+
+export function fetchMp3(id: string): Promise<string> {
+  mp3Busy.add(id);
+  const job = mp3Queue.then(async () => {
+    const before = getSounds()[id];
+    if (!before) return 'unknown sound';
+    const err = hasSoundFile(id) ? '' : await saveSoundMp3(id, before.mp3);
+    const all = getSounds(); // read again: the collector may have saved meanwhile
+    if (all[id]) { all[id].mp3Error = err; write('soundsData', all); }
+    return err;
+  }).finally(() => mp3Busy.delete(id));
+  mp3Queue = job.catch(() => '');
+  return job;
 }
 
 export async function runSoundsJob(): Promise<void> {
