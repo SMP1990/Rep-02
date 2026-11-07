@@ -5,7 +5,7 @@ without the old chat. Read it fully, then `ask-downloader/CLAUDE.md` (owner
 rules and site details) and `TOOLS-GUIDE.md` (tools map), before changing
 anything.
 
-Last updated: 2026-11-07 (v34 deployed; Trending Sounds collecting + filter cleaned; NEXT = public pages first, see section 6 and `PLAN-TRENDING-SOUNDS.md` section 13).
+Last updated: 2026-11-07 (v36 built = MP3 save + public /sounds list; NEXT = step 2c single sound page; see section 6 "LATEST PROGRESS" and `PLAN-TRENDING-SOUNDS.md` section 13).
 
 **Where the owner keeps it on his PC (since 2026-10-27):** `F:\ask-downloader` (a full git clone of `SMP1990/Rep-02`,
 already on branch `claude/upbeat-archimedes-266v06`). Open Claude Code in that folder, then say: "AI-HANDOVER.md parho
@@ -143,7 +143,14 @@ How to add the next tool (registry, page, route, tile, SEO, FAQ): see
 
 ## 6. Last state
 
-- **WHERE WE STOP (2026-11-07) - read this first:** v33 and v34 are DEPLOYED (owner pasted admin pages showing the new checkbox and the "Min days seen" box).
+- **LATEST PROGRESS (2026-11-07, later) - newest, read first:** owner chose front end first; steps are done ONE at a time, owner says "ok" before each.
+  - **v35** (commit 8651765, `releases/ask-downloader-v35-sounds-mp3.zip`): collector saves the MP3 link (`mp3` = `music_info.play`, refreshed each sighting); Approve downloads the MP3 to `<data>/sounds/<id>.mp3` (`server/soundsMp3.ts`: https + TikTok CDN/TikWM hosts only, 8 MB max, MP3 header check, own file name, one download at a time); after every collector run, approved sounds without a file are retried; admin shows "MP3 saved" or the reason. Tested with real TikWM (88 KB MP3 saved; bad host/http/bad id rejected).
+  - **Step 2a** (commit b19a30e): `server/soundsPublic.ts` = public read-only API `GET /api/sounds`, `/api/sounds/:slug`, `/api/sounds/:slug/mp3` (Range works, `?dl=1` forces download). Only approved + MP3 saved sounds are visible. Each approved sound gets a permanent `slug` (`<name>-mp3`) once, in `addSlugs()` (`trendingSounds.ts`), at Approve time or at the end of the next collector run.
+  - **Step 2b = v36** (commit 37ffa33, `releases/ask-downloader-v36-sounds-list-page.zip`): public `/sounds` list page (`src/pages/SoundsListPage.tsx`, `src/tools/sounds/SoundCard.tsx`, words in `src/tools/sounds/i18n/` for 11 languages), route name `public-sounds` (`'sounds'` is the ADMIN route), server meta for `/sounds` in `getRouteMeta` (noindex while no approved sound exists). Tested in the browser: desktop, 375 px phone, English + Urdu (RTL), play/pause/switch, search. Only checked with 3 sample sounds on a local data folder; the other 8 languages and the admin pages were not opened.
+  - **Owner must:** deploy v36 (includes v35), then in `/admin/sounds` press "Run now" so his 4 approved sounds get MP3 + slug, then open `/sounds`. Not confirmed yet that this worked on Hostinger (first real test of TikWM MP3 links from the Hostinger IP).
+  - **Next steps, in order:** **2c** single sound page `/sounds/<slug>` (route e.g. `public-sound` + slug, server meta + JSON-LD AudioObject/BreadcrumbList, big player, Download MP3, link to the video downloader, FAQ, >= 150 words of unique text built from the sound's data, related sounds from `/api/sounds/:slug` `related`; make the card title a link; add its strings to all 11 `i18n` files); **2d** sitemap entries (published sounds only, `lastmod`), "Sounds" link in header/footer, rate limit on the MP3 route, check how other languages are routed; **2e** "Report Content" page (footer link, form -> admin inbox, no auto-delete) BEFORE any sound is shown to Google. Code is kept in small files; do not write long code in one go (owner rule).
+  - Bash note: very long heredocs with many files failed once in the Bash tool; use the Write tool for many files. Background servers for tests: use the Bash `run_in_background` and stop them with PowerShell `Stop-Process` on the port owner.
+- **WHERE WE STOP (2026-11-07, earlier):** v33 and v34 are DEPLOYED (owner pasted admin pages showing the new checkbox and the "Min days seen" box).
   The collector is alive on Hostinger (Last run 8:39 AM and 11:54 AM on 7 Nov, all 8 regions ok), so no hPanel cron is needed. 902 sounds saved, **40 pass the filter**.
   The owner approved 4 sounds: nostalgia.zz (60 s, 150M - doubtful, probably music/edit, he must listen and Reject if so), Abdi (7 s), Eva (8 s), Daisy (15 s).
   **OWNER PRIORITY (2026-11-07): he wants the FRONT END (public pages), not more admin.** I had put admin (Sounds Manager) before public pages and he objected.
