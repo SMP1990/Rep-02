@@ -137,7 +137,7 @@ Suggested first of these (safe, fits the existing tools): hashtag bundles, font/
   (`/sounds/<name>-mp3`: player, Download MP3, link to the video downloader, FAQ, 11 languages, server meta, JSON-LD, sitemap) + footer "Report Content" page.
 - Order now: (1) MP3 saved at Approve time, (2) public pages, (3) Report Content page before anything is public. The Sounds Manager / API Providers panels are NOT needed;
   the existing Approve/Reject buttons are the publish switch. Test first with the 4 approved sounds (nostalgia.zz may be a song: owner decides by ear).
-- Progress: MP3 save (v35) and public API (2a) and `/sounds` list page (2b, v36) are built. Left: 2c single sound page, 2d sitemap + header/footer link + rate limit, 2e Report Content page. Details in `AI-HANDOVER.md` section 6.
+- Progress: everything in this plan's front end is BUILT up to v39: MP3 save (v35), public API (2a), `/sounds` list (v36), single sound pages with schema (v37), sitemap + noindex switch `SOUNDS_OPEN_TO_SEARCH` (OFF) + MP3 rate limit (v38), Report Content page (v39). Left: owner deploys and tests on Hostinger; then turn the switch ON; optional header link; MP3 path outside `/api/` for Google; report notification by email. Details in `AI-HANDOVER.md` section 6 "NEWEST".
 - Status of the collector/filter: see `AI-HANDOVER.md` section 6 (v33, v34 deployed).
 
 ## 12. Owner decision: no extra APIs, no "total videos" number (2026-11-05)
