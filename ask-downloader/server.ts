@@ -43,6 +43,7 @@ import { registerBgRoutes, prefetchBgModels } from './server/bgRoutes.ts';
 import { registerDnsRoutes } from './server/dns/routes.ts';
 import { registerWmRoutes, prefetchWmModel } from './server/wmRoutes.ts';
 import { registerSoundsRoutes } from './server/soundsRoutes.ts';
+import { registerPublicSoundsRoutes } from './server/soundsPublic.ts';
 import { startSoundsScheduler } from './server/trendingSounds.ts';
 import { TOOL_PAGE_LIST, cleanToolsContent, type ToolsContent } from './src/config/toolPages.ts';
 import { addRedirect, findRedirect, clearRedirectFrom, listRedirects, deleteRedirect, normalizePath, normalizeTarget, isProtectedPath, setOwnHost } from './server/redirects.ts';
@@ -2341,6 +2342,7 @@ app.put('/api/admin/media/alt', requirePermission('blog.edit'), (req: Request, r
 
 /** Trending Sounds collector (admin only, step A). */
 registerSoundsRoutes(app, requirePermission('settings.view'), requirePermission('settings.edit'));
+registerPublicSoundsRoutes(app);
 
 /** 301 Redirect Manager (admin). */
 app.get('/api/admin/redirects', requirePermission('settings.view'), (_req: Request, res: Response): any => {

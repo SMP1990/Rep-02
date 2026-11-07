@@ -10,6 +10,7 @@ export type Status = 'new' | 'approved' | 'rejected';
 export type Sound = SoundHit & {
   regions: string[]; days: string[]; firstSeen: string; lastSeen: string;
   status: Status; hist: Record<string, number>; // hist: views seen per day (last 14 days)
+  slug?: string; // public address /sounds/<slug>, made once when the sound is approved and never changed
   mp3Error?: string; // result of the last MP3 download for an approved sound ("" = ok)
   vs?: number; // 2 = "views" is the top video's views (v30+); older sounds summed videos, repeats included
 };
@@ -50,7 +51,7 @@ export function cleanSettings(x: any, d: Settings = DEFAULT_SETTINGS): Settings 
 const plain = (t: string) => t.normalize('NFKC').replace(/[\p{M}\p{C}]/gu, '');
 
 /** The sound's own name without the "original sound - " part; empty if it has no real letters. */
-function realName(name: string): string {
+export function realName(name: string): string {
   const n = name.replace(/\p{C}/gu, '').replace(/^[^-–—]*(original|asli|оригинал|オリジナル)[^-–—]*[-–—]/iu, '').trim();
   return /[\p{L}\p{N}]{2}/u.test(n) ? n : '';
 }

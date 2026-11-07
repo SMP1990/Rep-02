@@ -9,6 +9,7 @@
 import { read, write } from './store.ts';
 import { fetchRegion } from './soundsFetch.ts';
 import { hasSoundFile, saveSoundMp3 } from './soundsMp3.ts';
+import { makeSlug } from './soundsPublic.ts';
 import { DEFAULT_SETTINGS, cleanSettings, judge, type Settings, type Sound, type Status } from './soundsFilter.ts';
 
 export const REGIONS = ['PK', 'IN', 'US', 'GB', 'AE', 'SA', 'ID', 'BR'];
@@ -54,9 +55,20 @@ export function setSoundStatus(id: string, status: Status): boolean {
   const s = getSounds()[id];
   if (!s || !['new', 'approved', 'rejected'].includes(status)) return false;
   s.status = status;
-  write('soundsData', getSounds());
+  const all = getSounds();
+  all[id].status = status;
+  addSlugs(all);
+  write('soundsData', all);
   if (status === 'approved') void fetchMp3(id);
   return true;
+}
+
+/** Every approved sound gets its public address once; it never changes afterwards (so links and Google keep working). */
+function addSlugs(all: Record<string, Sound>) {
+  const taken = new Set(Object.values(all).map((s) => s.slug).filter(Boolean) as string[]);
+  for (const s of Object.values(all)) {
+    if (s.status === 'approved' && !s.slug) { s.slug = makeSlug(s.name, s.id, taken); taken.add(s.slug); }
+  }
 }
 
 /** Saves the MP3 of an approved sound; the result ("" = ok) is kept on the sound for the admin page. */
@@ -117,6 +129,7 @@ export async function runSoundsJob(): Promise<void> {
       }
       for (const d of Object.keys(s.hist ?? {})) if (d < histCut) delete s.hist[d];
     }
+    addSlugs(sounds);
     write('soundsData', sounds);
     const st = getState();
     write('soundsState', { ...st, lastRun: log.at, log: [log, ...st.log].slice(0, 40) });
