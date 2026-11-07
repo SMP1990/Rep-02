@@ -1,6 +1,7 @@
 import type { ExtraDict } from './en.ts';
 
 export const ur: ExtraDict = {
+  soundsHome: { nav: 'ساؤنڈز', badge: 'ابھی ٹرینڈنگ', title: 'ٹرینڈنگ میم ساؤنڈز', subtitle: 'اس وقت وائرل ہونے والے سب سے مزاحیہ ساؤنڈز۔ سنیں اور مفت MP3 ڈاؤن لوڈ کریں۔', seeAll: 'تمام ساؤنڈز دیکھیں', sec: '{n} سیکنڈ', views: '{n} ویوز', listen: 'سنیں اور ڈاؤن لوڈ کریں' },
   footer: {
     brandBio: 'تمام بڑے سوشل پلیٹ فارمز کے لیے تیز رفتار، صاف اور بغیر واٹر مارک ویڈیو اور آڈیو ڈاؤنلوڈ۔',
     company: 'کمپنی', here: 'یہاں', legal: 'قانونی', privacyPolicy: 'رازداری کی پالیسی', termsOfUse: 'استعمال کی شرائط',

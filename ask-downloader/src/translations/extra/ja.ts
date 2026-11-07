@@ -1,6 +1,7 @@
 import type { ExtraDict } from './en.ts';
 
 export const ja: ExtraDict = {
+  soundsHome: { nav: 'サウンド', badge: 'いまトレンド', title: 'トレンドのミーム音声', subtitle: '今バズっている面白いサウンド。聴いて、無料でMP3をダウンロード。', seeAll: 'すべてのサウンドを見る', sec: '{n}秒', views: '{n}回視聴', listen: '聴いてダウンロード' },
   footer: {
     brandBio: '主要SNSすべてに対応した、高速・クリーンでウォーターマークなしの動画・音声ダウンロード。',
     company: '会社情報', here: 'こちら', legal: '法的情報', privacyPolicy: 'プライバシーポリシー', termsOfUse: '利用規約',

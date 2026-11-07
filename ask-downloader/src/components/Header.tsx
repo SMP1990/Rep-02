@@ -25,6 +25,7 @@ import {
   ArrowRight,
   Globe,
   SunMoon,
+  Headphones,
 } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext.tsx';
 import { useLanguage, LANGUAGES } from '../context/LanguageContext.tsx';
@@ -280,6 +281,7 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
   // Determine active route state
   const isHomeActive = currentRoute === 'home';
   const isBlogActive = currentRoute === 'public-blog' || currentRoute === 'public-blog-post';
+  const isSoundsActive = currentRoute === 'public-sounds' || currentRoute === 'public-sound';
   const isContactActive = currentRoute === 'contact';
   const isDownloaderActive = isHomeActive && (activeSocialPlatform !== undefined);
 
@@ -466,6 +468,19 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
             >
               <BookOpen className={`w-4 h-4 ${isBlogActive ? 'text-[#6d46b8] dark:text-[#d1b9f7]' : 'text-[#8b849c]'}`} />
               <span>{t.header?.blog || 'Blog'}</span>
+            </RouteLink>
+
+            {/* 3b. SOUNDS */}
+            <RouteLink route="public-sounds" onBeforeNavigate={closeMenus}
+              id="nav-link-sounds"
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold transition-all duration-150 cursor-pointer ${
+                isSoundsActive
+                  ? 'text-[#4b2e83] dark:text-[#f4eefb] bg-[#f1e9fb] dark:bg-[#261b3b] shadow-2xs'
+                  : 'text-[#5e5473] dark:text-[#b5a9cd] hover:text-[#2e2440] dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/60'
+              }`}
+            >
+              <Headphones className={`w-4 h-4 ${isSoundsActive ? 'text-[#6d46b8] dark:text-[#d1b9f7]' : 'text-[#8b849c]'}`} />
+              <span>{t.soundsHome?.nav || 'Sounds'}</span>
             </RouteLink>
 
             {/* 4. CONTACT US */}
@@ -821,6 +836,25 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
                           <BookOpen className="w-4 h-4" />
                         </div>
                         <span>{t.header?.blog || 'Blog'}</span>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-[#8b849c]" />
+                    </MotionRouteLink>
+
+                    {/* 3b. SOUNDS */}
+                    <MotionRouteLink route="public-sounds" onBeforeNavigate={closeMenus}
+                      whileTap={{ scale: 0.98 }}
+                      id="mobile-nav-sounds"
+                      className={`w-full flex items-center justify-between p-3 rounded-xl text-sm font-bold transition-all cursor-pointer ${
+                        isSoundsActive
+                          ? 'bg-[#f1e9fb] dark:bg-[#261b3b] text-[#4b2e83] dark:text-[#f4eefb] shadow-2xs'
+                          : 'text-[#2e2440] dark:text-[#f4eefb] hover:bg-slate-100/80 dark:hover:bg-slate-800/60'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-lg ${isSoundsActive ? 'bg-white dark:bg-[#341d5b] text-[#6d46b8]' : 'bg-slate-100 dark:bg-slate-800 text-[#726c85] dark:text-[#b5a9cd]'}`}>
+                          <Headphones className="w-4 h-4" />
+                        </div>
+                        <span>{t.soundsHome?.nav || 'Sounds'}</span>
                       </div>
                       <ArrowRight className="w-4 h-4 text-[#8b849c]" />
                     </MotionRouteLink>

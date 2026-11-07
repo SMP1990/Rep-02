@@ -4,6 +4,7 @@
  * Placeholders: {brand} site name, {lang} language name, {network}, {file}.
  */
 export const en = {
+  soundsHome: { nav: 'Sounds', badge: 'Trending now', title: 'Trending Meme Sounds', subtitle: 'The funniest sounds going viral right now. Listen and download them as free MP3.', seeAll: 'See all sounds', sec: '{n} sec', views: '{n} views', listen: 'Listen & download' },
   footer: {
     reportContent: 'Report Content',
     brandBio: 'High-speed, clean, and watermark-free video & audio extraction for all major social platforms.',

@@ -1,6 +1,7 @@
 import type { ExtraDict } from './en.ts';
 
 export const hi: ExtraDict = {
+  soundsHome: { nav: 'साउंड', badge: 'अभी ट्रेंडिंग', title: 'ट्रेंडिंग मीम साउंड', subtitle: 'अभी वायरल हो रहे सबसे मज़ेदार साउंड। सुनें और मुफ़्त MP3 में डाउनलोड करें।', seeAll: 'सभी साउंड देखें', sec: '{n} सेकंड', views: '{n} व्यूज़', listen: 'सुनें और डाउनलोड करें' },
   footer: {
     brandBio: 'सभी बड़े सोशल प्लेटफ़ॉर्म के लिए तेज़, साफ़ और बिना वॉटरमार्क वीडियो व ऑडियो डाउनलोड।',
     company: 'कंपनी', here: 'यहाँ', legal: 'कानूनी', privacyPolicy: 'गोपनीयता नीति', termsOfUse: 'उपयोग की शर्तें',

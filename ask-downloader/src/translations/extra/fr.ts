@@ -1,6 +1,7 @@
 import type { ExtraDict } from './en.ts';
 
 export const fr: ExtraDict = {
+  soundsHome: { nav: 'Sons', badge: 'Tendance du moment', title: 'Sons de mèmes tendance', subtitle: 'Les sons les plus drôles du moment. Écoutez-les et téléchargez-les gratuitement en MP3.', seeAll: 'Voir tous les sons', sec: '{n} s', views: '{n} vues', listen: 'Écouter et télécharger' },
   footer: {
     brandBio: 'Extraction vidéo et audio rapide, propre et sans filigrane pour les grands réseaux sociaux.',
     company: 'Entreprise', here: 'ici', legal: 'Mentions légales', privacyPolicy: 'Politique de confidentialité', termsOfUse: 'Conditions d’utilisation',

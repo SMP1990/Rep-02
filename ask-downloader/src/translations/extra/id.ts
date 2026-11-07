@@ -1,6 +1,7 @@
 import type { ExtraDict } from './en.ts';
 
 export const id: ExtraDict = {
+  soundsHome: { nav: 'Suara', badge: 'Sedang trending', title: 'Suara Meme Trending', subtitle: 'Suara paling lucu yang sedang viral. Dengarkan dan unduh gratis sebagai MP3.', seeAll: 'Lihat semua suara', sec: '{n} dtk', views: '{n} tayangan', listen: 'Dengar & unduh' },
   footer: {
     brandBio: 'Unduhan video & audio cepat, bersih, dan tanpa watermark untuk semua platform sosial besar.',
     company: 'Perusahaan', here: 'di sini', legal: 'Legal', privacyPolicy: 'Kebijakan Privasi', termsOfUse: 'Ketentuan Penggunaan',

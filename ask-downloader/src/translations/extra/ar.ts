@@ -1,6 +1,7 @@
 import type { ExtraDict } from './en.ts';
 
 export const ar: ExtraDict = {
+  soundsHome: { nav: 'الأصوات', badge: 'رائج الآن', title: 'أصوات ميمز رائجة', subtitle: 'أطرف الأصوات الرائجة الآن. استمع وحمّلها بصيغة MP3 مجانًا.', seeAll: 'عرض كل الأصوات', sec: '{n} ث', views: '{n} مشاهدة', listen: 'استمع وحمّل' },
   footer: {
     brandBio: 'تنزيل سريع ونظيف للفيديو والصوت بدون علامة مائية من جميع المنصات الاجتماعية الكبرى.',
     company: 'الشركة', here: 'هنا', legal: 'قانوني', privacyPolicy: 'سياسة الخصوصية', termsOfUse: 'شروط الاستخدام',

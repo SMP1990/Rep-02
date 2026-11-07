@@ -1,6 +1,7 @@
 import type { ExtraDict } from './en.ts';
 
 export const de: ExtraDict = {
+  soundsHome: { nav: 'Sounds', badge: 'Gerade im Trend', title: 'Trendende Meme-Sounds', subtitle: 'Die lustigsten Sounds, die gerade viral gehen. Anhören und kostenlos als MP3 herunterladen.', seeAll: 'Alle Sounds ansehen', sec: '{n} Sek.', views: '{n} Aufrufe', listen: 'Anhören & herunterladen' },
   footer: {
     brandBio: 'Schnelle, saubere Video- und Audio-Downloads ohne Wasserzeichen für alle großen sozialen Plattformen.',
     company: 'Unternehmen', here: 'hier', legal: 'Rechtliches', privacyPolicy: 'Datenschutzerklärung', termsOfUse: 'Nutzungsbedingungen',

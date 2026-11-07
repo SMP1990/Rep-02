@@ -1,6 +1,7 @@
 import type { ExtraDict } from './en.ts';
 
 export const pt: ExtraDict = {
+  soundsHome: { nav: 'Sons', badge: 'Em alta agora', title: 'Sons de memes em alta', subtitle: 'Os sons mais engraçados que estão viralizando agora. Ouça e baixe grátis em MP3.', seeAll: 'Ver todos os sons', sec: '{n} s', views: '{n} visualizações', listen: 'Ouvir e baixar' },
   footer: {
     brandBio: 'Extração rápida e limpa de vídeo e áudio sem marca d’água para as principais redes sociais.',
     company: 'Empresa', here: 'aqui', legal: 'Aviso legal', privacyPolicy: 'Política de Privacidade', termsOfUse: 'Termos de Uso',

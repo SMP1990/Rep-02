@@ -7,6 +7,7 @@ import { Header } from '../components/Header.tsx';
 import { DualToolSection } from '../components/DualToolSection.tsx';
 import { HomeBlogSection } from '../components/HomeBlogSection.tsx';
 import { ToolsSection } from '../components/ToolsSection.tsx';
+import { TrendingSoundsSection } from '../components/TrendingSoundsSection.tsx';
 import { BlogLanguagesSection } from '../components/BlogLanguagesSection.tsx';
 import { FeaturesSection } from '../components/FeaturesSection.tsx';
 import { HowToGuide } from '../components/HowToGuide.tsx';
@@ -479,6 +480,9 @@ export const PublicHomePage: React.FC = () => {
           />
         </div>
       )}
+
+      {/* 3a. TRENDING SOUNDS (top sounds; renders nothing until a sound is approved) */}
+      <TrendingSoundsSection />
 
       {/* 3b. FREE ONLINE TOOLS (tiles; each tool has its own page) */}
       <motion.section
