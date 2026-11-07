@@ -43,7 +43,7 @@ import { registerBgRoutes, prefetchBgModels } from './server/bgRoutes.ts';
 import { registerDnsRoutes } from './server/dns/routes.ts';
 import { registerWmRoutes, prefetchWmModel } from './server/wmRoutes.ts';
 import { registerSoundsRoutes } from './server/soundsRoutes.ts';
-import { publicSound, publicSounds, registerPublicSoundsRoutes } from './server/soundsPublic.ts';
+import { SOUNDS_OPEN_TO_SEARCH, publicSound, publicSounds, registerPublicSoundsRoutes, soundsSitemap } from './server/soundsPublic.ts';
 import { startSoundsScheduler } from './server/trendingSounds.ts';
 import { TOOL_PAGE_LIST, cleanToolsContent, type ToolsContent } from './src/config/toolPages.ts';
 import { addRedirect, findRedirect, clearRedirectFrom, listRedirects, deleteRedirect, normalizePath, normalizeTarget, isProtectedPath, setOwnHost } from './server/redirects.ts';
@@ -2617,7 +2617,7 @@ function getRouteMeta(pathname: string, isAdmin = false): RouteMeta {
     '/sounds': {
       title: `Trending Meme Sounds - Download Funny MP3 Audio - ${SEO_SITE_NAME}`,
       description: `Listen to the funniest viral meme sounds and download them as free MP3. New trending sounds on ${SEO_SITE_NAME} every day.`,
-      noindex: publicSounds().length === 0, // an empty list is a thin page: keep it out of search until there is something to show
+      noindex: !SOUNDS_OPEN_TO_SEARCH || publicSounds().length === 0, // hidden from search until the Report Content page exists (see soundsPublic.ts); an empty list is a thin page anyway
     },
     '/admin': {
       title: `Admin Sign In - ${SEO_SITE_NAME}`,
@@ -2683,7 +2683,7 @@ function getRouteMeta(pathname: string, isAdmin = false): RouteMeta {
     return {
       title: `${sound.title} MP3 Download - Trending Sound - ${SEO_SITE_NAME}`,
       description: `Listen to "${sound.title}" by ${sound.creator} (${sound.duration} sec) and download it as a free MP3. A trending sound with ${new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(sound.views)} views.`.slice(0, 300),
-      noindex: false,
+      noindex: !SOUNDS_OPEN_TO_SEARCH,
       status: 200,
     };
   }
@@ -2840,6 +2840,15 @@ function renderSitemap(req: Request, res: Response) {
       }
     }
     xml += `  </url>\n`;
+  }
+
+  // Trending sounds (empty until the switch in server/soundsPublic.ts is turned on).
+  const sounds = soundsSitemap();
+  if (sounds.length) {
+    xml += `  <url>\n    <loc>${baseUrl}/sounds</loc>\n    <lastmod>${sounds.map((s) => s.lastmod).sort().pop()}</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>0.8</priority>\n  </url>\n`;
+    for (const s of sounds) {
+      xml += `  <url>\n    <loc>${baseUrl}/sounds/${esc(s.slug)}</loc>\n    <lastmod>${esc(s.lastmod)}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.6</priority>\n  </url>\n`;
+    }
   }
 
   xml += `</urlset>`;

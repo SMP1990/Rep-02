@@ -22,12 +22,13 @@ export const SoundPage: React.FC = () => {
   const [sound, setSound] = useState<PublicSound | null>(null);
   const [related, setRelated] = useState<PublicSound[]>([]);
   const [state, setState] = useState<'loading' | 'ok' | 'missing' | 'failed'>('loading');
+  const [indexable, setIndexable] = useState(false); // the server decides when search engines may list these pages
 
   useEffect(() => {
     setState('loading');
     fetch(`/api/sounds/${encodeURIComponent(slug)}`)
       .then((r) => (r.status === 404 ? Promise.reject(new Error('missing')) : r.ok ? r.json() : Promise.reject(new Error('failed'))))
-      .then((d) => { setSound(d.sound); setRelated(Array.isArray(d.related) ? d.related : []); setState('ok'); })
+      .then((d) => { setIndexable(d.indexable === true); setSound(d.sound); setRelated(Array.isArray(d.related) ? d.related : []); setState('ok'); })
       .catch((e) => setState(e?.message === 'missing' ? 'missing' : 'failed'));
   }, [slug]);
 
@@ -68,7 +69,7 @@ export const SoundPage: React.FC = () => {
         title={title}
         description={sound ? soundAbout(sound, s, currentLang)[0] : s.notFound}
         path={`/sounds/${slug}`}
-        noindex={state !== 'ok'}
+        noindex={state !== 'ok' || !indexable}
         jsonLd={jsonLd}
       />
       <Header />

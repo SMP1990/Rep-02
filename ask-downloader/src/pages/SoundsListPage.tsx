@@ -21,6 +21,7 @@ export const SoundsListPage: React.FC = () => {
 
   const [sounds, setSounds] = useState<PublicSound[] | null>(null);
   const [failed, setFailed] = useState(false);
+  const [indexable, setIndexable] = useState(false); // the server decides when search engines may list these pages
   const [query, setQuery] = useState('');
   const [playing, setPlaying] = useState<string | null>(null);
   const audio = useRef<HTMLAudioElement | null>(null);
@@ -30,7 +31,7 @@ export const SoundsListPage: React.FC = () => {
     setSounds(null);
     fetch('/api/sounds')
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error('bad reply'))))
-      .then((d) => setSounds(Array.isArray(d?.sounds) ? d.sounds : []))
+      .then((d) => { setIndexable(d?.indexable === true); setSounds(Array.isArray(d?.sounds) ? d.sounds : []); })
       .catch(() => setFailed(true));
   }, []);
   useEffect(load, [load]);
@@ -64,7 +65,7 @@ export const SoundsListPage: React.FC = () => {
         title={title}
         description={s.subtitle}
         path={PATH}
-        noindex={sounds !== null && sounds.length === 0}
+        noindex={!indexable || (sounds !== null && sounds.length === 0)}
         jsonLd={[
           buildWebPageSchema(title, s.subtitle, origin + PATH),
           buildBreadcrumbSchema([

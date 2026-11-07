@@ -17,6 +17,17 @@ export function makeSlug(name: string, id: string, taken: Set<string>): string {
   return slug;
 }
 
+/**
+ * THE SWITCH. false = the sound pages work for anyone who has the link, but are marked noindex
+ * and left out of the sitemap, so Google does not list them. Owner decision (2026-11-04): turn it
+ * to true only AFTER the "Report Content" page exists (step 2e).
+ */
+export const SOUNDS_OPEN_TO_SEARCH = false;
+
+/** Sitemap entries: one per public sound, dated with the day it was last seen trending (a real date). */
+export const soundsSitemap = (): { slug: string; lastmod: string }[] =>
+  SOUNDS_OPEN_TO_SEARCH ? visible().map((s) => ({ slug: s.slug as string, lastmod: s.lastSeen })) : [];
+
 export type PublicSound = {
   slug: string; title: string; creator: string; duration: number; views: number;
   regions: string[]; firstSeen: string; lastSeen: string; video?: { id: string; user: string };
@@ -38,19 +49,31 @@ export const publicSound = (slug: string): PublicSound | undefined => {
   return s ? toPublic(s) : undefined;
 };
 
+// MP3 downloads: at most 60 requests a minute per visitor (a player makes a few per play); the site-wide /api limit still applies too.
+const hits = new Map<string, { n: number; reset: number }>();
+function mp3Limit(req: Request, res: Response, next: () => void) {
+  const now = Date.now();
+  const key = req.ip || 'x';
+  let h = hits.get(key);
+  if (!h || now > h.reset) { h = { n: 0, reset: now + 60_000 }; hits.set(key, h); }
+  if (hits.size > 5000) for (const [k, v] of hits) if (now > v.reset) hits.delete(k);
+  if (++h.n > 60) return void res.status(429).set('Retry-After', String(Math.ceil((h.reset - now) / 1000))).end();
+  next();
+}
+
 export function registerPublicSoundsRoutes(app: Express) {
   app.get('/api/sounds', (_req: Request, res: Response) => {
-    res.set('Cache-Control', 'public, max-age=300').json({ sounds: publicSounds() });
+    res.set('Cache-Control', 'public, max-age=300').json({ sounds: publicSounds(), indexable: SOUNDS_OPEN_TO_SEARCH });
   });
 
   app.get('/api/sounds/:slug', (req: Request, res: Response) => {
     const s = publicSound(String(req.params.slug));
     if (!s) return void res.status(404).json({ error: 'not found' });
-    res.set('Cache-Control', 'public, max-age=300').json({ sound: s, related: publicSounds().filter((x) => x.slug !== s.slug).slice(0, 6) });
+    res.set('Cache-Control', 'public, max-age=300').json({ sound: s, related: publicSounds().filter((x) => x.slug !== s.slug).slice(0, 6), indexable: SOUNDS_OPEN_TO_SEARCH });
   });
 
   /** The MP3 itself. Add ?dl=1 to make the browser download it instead of playing it. */
-  app.get('/api/sounds/:slug/mp3', (req: Request, res: Response) => {
+  app.get('/api/sounds/:slug/mp3', mp3Limit, (req: Request, res: Response) => {
     const s = visible().find((x) => x.slug === String(req.params.slug));
     if (!s) return void res.status(404).end();
     res.set('Cache-Control', 'public, max-age=3600');
