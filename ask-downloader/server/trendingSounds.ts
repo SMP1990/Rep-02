@@ -8,6 +8,7 @@
  */
 import { read, write } from './store.ts';
 import { fetchRegion } from './soundsFetch.ts';
+import { hasSoundFile, saveSoundMp3 } from './soundsMp3.ts';
 import { DEFAULT_SETTINGS, cleanSettings, judge, type Settings, type Sound, type Status } from './soundsFilter.ts';
 
 export const REGIONS = ['PK', 'IN', 'US', 'GB', 'AE', 'SA', 'ID', 'BR'];
@@ -37,7 +38,7 @@ export function soundsStatus() {
 export function soundsList() {
   const list = Object.values(getSounds());
   const verdicts = judge(list, getState().settings);
-  return list.map((s) => ({ ...s, ...verdicts.get(s.id) }));
+  return list.map((s) => ({ ...s, ...verdicts.get(s.id), file: hasSoundFile(s.id) }));
 }
 
 export function setSoundsEnabled(on: boolean) {
@@ -54,7 +55,18 @@ export function setSoundStatus(id: string, status: Status): boolean {
   if (!s || !['new', 'approved', 'rejected'].includes(status)) return false;
   s.status = status;
   write('soundsData', getSounds());
+  if (status === 'approved') void fetchMp3(id);
   return true;
+}
+
+/** Saves the MP3 of an approved sound; the result ("" = ok) is kept on the sound for the admin page. */
+export async function fetchMp3(id: string): Promise<string> {
+  const before = getSounds()[id];
+  if (!before) return 'unknown sound';
+  const err = hasSoundFile(id) ? '' : await saveSoundMp3(id, before.mp3);
+  const all = getSounds(); // read again: the collector may have saved meanwhile
+  if (all[id]) { all[id].mp3Error = err; write('soundsData', all); }
+  return err;
 }
 
 export async function runSoundsJob(): Promise<void> {
@@ -76,6 +88,7 @@ export async function runSoundsJob(): Promise<void> {
           if (s.vs !== 2) { s.views = h.views; s.hist = {}; s.vs = 2; } // old numbers counted repeated videos twice
           s.name = h.name || (s.name.startsWith('[object ') ? '' : s.name);
           s.original = h.original;
+          if (h.mp3) s.mp3 = h.mp3;
           if (h.video && h.video.views >= (s.video?.views ?? -1)) s.video = h.video;
           s.views = Math.max(s.views, h.views);
           s.videos = Math.max(s.videos, h.videos);
@@ -107,6 +120,7 @@ export async function runSoundsJob(): Promise<void> {
     write('soundsData', sounds);
     const st = getState();
     write('soundsState', { ...st, lastRun: log.at, log: [log, ...st.log].slice(0, 40) });
+    for (const s of Object.values(getSounds())) if (s.status === 'approved' && !hasSoundFile(s.id)) await fetchMp3(s.id); // retry missing MP3s of approved sounds
     console.log(`[sounds] run done: ${log.found} found, ${log.added} new, ${log.failed} failed`, log.regions);
   } catch (err) {
     console.warn('[sounds] run failed:', err);

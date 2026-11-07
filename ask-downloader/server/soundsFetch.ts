@@ -15,6 +15,7 @@ export type SoundHit = {
   views: number;
   videos: number;
   video?: { id: string; user: string; views: number }; // the most viewed video that uses it (for the admin "check on TikTok" link)
+  mp3?: string; // direct MP3 link from the feed (music_info.play); it can expire, so it is refreshed every time the sound is seen
 };
 
 type Provider = { name: string; feed: (region: string) => Promise<any[]> };
@@ -22,6 +23,7 @@ type Provider = { name: string; feed: (region: string) => Promise<any[]> };
 const clean = (v: unknown, max: number) => (typeof v === 'string' || typeof v === 'number' ? String(v) : '').replace(/[\u0000-\u001f<>]/g, ' ').trim().slice(0, max);
 // "original sound" in the languages of our regions (PT, ID, ES, FR, RU, JA, AR, UR)
 const ORIGINAL = /original|\basli\b|оригинал|オリジナル|اصلی|الأصلي|asli/i;
+const cleanUrl = (v: unknown) => { const u = typeof v === 'string' ? v.trim() : ''; return /^https:\/\/[^\s<>"']{5,600}$/.test(u) ? u : ''; };
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const tikwm: Provider = {
@@ -76,6 +78,8 @@ export async function fetchRegion(region: string): Promise<{ hits: SoundHit[]; s
     const plays = Number(v.play_count) || 0;
     const vid = clean(v.video_id, 30), user = clean(v.author?.unique_id, 40);
     if (/^\d+$/.test(vid) && /^[\w.]+$/.test(user) && plays >= (hit.video?.views ?? -1)) hit.video = { id: vid, user, views: plays };
+    const mp3 = cleanUrl(m.play);
+    if (mp3) hit.mp3 = mp3;
     hit.views = Math.max(hit.views, plays); // views = the most viewed video using the sound
     hit.videos += 1;
     byId.set(id, hit);

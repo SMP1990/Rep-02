@@ -10,6 +10,7 @@ export type Status = 'new' | 'approved' | 'rejected';
 export type Sound = SoundHit & {
   regions: string[]; days: string[]; firstSeen: string; lastSeen: string;
   status: Status; hist: Record<string, number>; // hist: views seen per day (last 14 days)
+  mp3Error?: string; // result of the last MP3 download for an approved sound ("" = ok)
   vs?: number; // 2 = "views" is the top video's views (v30+); older sounds summed videos, repeats included
 };
 export type Settings = { minViews: number; minSec: number; maxSec: number; perCreator: number; minDays: number; excludeMusic: boolean; excludeJunk: boolean };

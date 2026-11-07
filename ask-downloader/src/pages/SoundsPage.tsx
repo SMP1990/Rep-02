@@ -3,7 +3,7 @@ import { TopHeader } from '../components/TopHeader';
 import { useAdmin } from '../context/AdminContext';
 
 type Sound = {
-  id: string; name: string; creator: string; duration: number; original: boolean; views: number;
+  id: string; name: string; creator: string; duration: number; original: boolean; views: number; file?: boolean; mp3Error?: string;
   regions: string[]; days: string[]; firstSeen: string; status?: string; reason?: string; score?: number;
   video?: { id: string; user: string; views: number };
   vs?: number;
@@ -148,6 +148,7 @@ export const SoundsPage: React.FC<{ onOpenMobileMenu: () => void }> = ({ onOpenM
                     {s.status !== 'approved' && <button className={`${mini} bg-green-600 mr-1`} onClick={() => mark(s.id, 'approved')}>Approve</button>}
                     {s.status !== 'rejected' && <button className={`${mini} bg-red-600`} onClick={() => mark(s.id, 'rejected')}>Reject</button>}
                     {(s.status === 'approved' || s.status === 'rejected') && <button className={`${mini} bg-gray-500 ml-1`} onClick={() => mark(s.id, 'new')}>Undo</button>}
+                    {s.status === 'approved' && <div className="text-xs mt-1">{s.file ? '✅ MP3 saved' : `⏳ MP3: ${s.mp3Error || 'downloading…'}`}</div>}
                   </td>
                 </tr>
               ))}
