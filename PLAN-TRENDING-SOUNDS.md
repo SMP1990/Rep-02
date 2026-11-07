@@ -132,6 +132,13 @@ Suggested first of these (safe, fits the existing tools): hashtag bundles, font/
 - **Report Content page** (footer link, 11 languages): a form whose reports arrive in admin. The owner/admin reviews and
   removes the file within 24-48 h. **No automatic delete** (a competitor could abuse it). Build it before any sound page goes public (before Step E).
 
+## 13. Owner decision 2026-11-07: front end first (replaces the order in section 8 for what remains)
+- Owner objected to building admin panels first: he wants the public site. Final product = `/sounds` list + one SEO page per approved sound
+  (`/sounds/<name>-mp3`: player, Download MP3, link to the video downloader, FAQ, 11 languages, server meta, JSON-LD, sitemap) + footer "Report Content" page.
+- Order now: (1) MP3 saved at Approve time, (2) public pages, (3) Report Content page before anything is public. The Sounds Manager / API Providers panels are NOT needed;
+  the existing Approve/Reject buttons are the publish switch. Test first with the 4 approved sounds (nostalgia.zz may be a song: owner decides by ear).
+- Status of the collector/filter: see `AI-HANDOVER.md` section 6 (v33, v34 deployed).
+
 ## 12. Owner decision: no extra APIs, no "total videos" number (2026-11-05)
 - The owner decided **not to show the sound's total number of videos** and **not to add RapidAPI / Apify or any other API**.
   "Top video views" is enough. Step B is **dropped** (research only: `tiktok-scraper7` free plan = 300 calls/month, TikWM's
