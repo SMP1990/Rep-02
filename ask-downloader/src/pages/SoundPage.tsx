@@ -37,7 +37,7 @@ export const SoundPage: React.FC = () => {
         <div className="max-w-3xl mx-auto px-4">
           {state === 'loading' && <p className="text-center text-slate-500 py-10" role="status">{s.loading}</p>}
           {state === 'failed' && <p className="text-center py-10" role="alert">{s.loadError}</p>}
-          {state === 'missing' && <p className="text-center py-10">{s.noResults}</p>}
+          {state === 'missing' && <p className="text-center py-10">{s.notFound}</p>}
           {state === 'ok' && sound && (
             <div className="text-center">
               <h1 className="font-heading text-3xl sm:text-5xl font-extrabold tracking-tight text-[#341d5b] dark:text-[#d1b9f7]">{sound.title}</h1>

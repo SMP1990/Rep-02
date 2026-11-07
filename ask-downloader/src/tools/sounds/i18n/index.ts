@@ -17,4 +17,7 @@ export type { Strings };
 const ALL: Record<string, Strings> = { en, ur, ar, hi, es, pt, fr, de, id, ru, ja };
 
 export const soundStrings = (lang: string): Strings => ALL[lang] || en;
-export const fillN = (s: string, n: string | number) => s.split('{n}').join(String(n));
+/** Replaces {name} placeholders: fill('Hi {a}', { a: 'x' }) -> 'Hi x'. */
+export const fill = (s: string, vars: Record<string, string | number>) =>
+  Object.entries(vars).reduce((out, [k, v]) => out.split(`{${k}}`).join(String(v)), s);
+export const fillN =(s: string, n: string | number) => s.split('{n}').join(String(n));
