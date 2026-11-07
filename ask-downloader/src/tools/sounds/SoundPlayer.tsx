@@ -10,6 +10,8 @@ type Props = {
   /** Open the previous / next sound. A button is greyed out when its handler is missing. */
   onPrev?: () => void;
   onNext?: () => void;
+  /** Start playing as soon as the page opens (the visitor just pressed Play in a list). */
+  autoPlay?: boolean;
 };
 
 const BARS = [0.5, 0.8, 0.4, 0.9, 0.6, 1, 0.55, 0.85, 0.45, 0.75, 0.5];
@@ -24,13 +26,17 @@ const clock = (s: number) => {
  * Previous / Play-Pause / Next. The audio element itself is hidden; this card controls it.
  * (Media controls stay left-to-right in every language, as on a phone.)
  */
-export const SoundPlayer: React.FC<Props> = ({ src, title, creator, t, onPrev, onNext }) => {
+export const SoundPlayer: React.FC<Props> = ({ src, title, creator, t, onPrev, onNext, autoPlay }) => {
   const audio = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
   const [now, setNow] = useState(0);
   const [total, setTotal] = useState(0);
 
-  useEffect(() => () => { audio.current?.pause(); }, []);
+  useEffect(() => {
+    const a = audio.current;
+    if (autoPlay) a?.play().catch(() => {}); // if the browser blocks it, the Play button is still there
+    return () => { a?.pause(); };
+  }, [autoPlay]);
 
   const toggle = () => {
     const a = audio.current;

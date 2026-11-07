@@ -45,7 +45,9 @@ export const SoundPage: React.FC = () => {
     const i = order.indexOf(slug);
     return order[(i + step + order.length) % order.length];
   };
-  const open = (to: string) => { if (to && to !== slug) window.location.assign(`/sounds/${encodeURIComponent(to)}`); };
+  const autoPlay = new URLSearchParams(window.location.search).get('play') === '1';
+  // Previous / Next keep playing: the next page also starts by itself.
+  const open = (to: string) => { if (to && to !== slug) window.location.assign(`/sounds/${encodeURIComponent(to)}?play=1`); };
 
   const title = sound ? `${sound.title} MP3` : s.title;
   const views = sound ? new Intl.NumberFormat(currentLang, { notation: 'compact', maximumFractionDigits: 1 }).format(sound.views) : '';
@@ -104,6 +106,7 @@ export const SoundPage: React.FC = () => {
                   title={sound.title}
                   creator={sound.creator}
                   t={s}
+                  autoPlay={autoPlay}
                   onPrev={order.length > 1 ? () => open(neighbour(-1)) : undefined}
                   onNext={order.length > 1 ? () => open(neighbour(1)) : undefined}
                 />

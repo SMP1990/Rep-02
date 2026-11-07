@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Header } from '../components/Header.tsx';
 import { Footer } from '../components/Footer.tsx';
 import { Seo } from '../components/Seo.tsx';
@@ -12,7 +12,7 @@ const PATH = '/sounds';
 /**
  * /sounds — the public list of approved trending sounds. Lazy-loaded (App.tsx).
  * It only reads the saved list from /api/sounds; nothing is sent to anyone.
- * One audio element is shared, so only one sound plays at a time.
+ * The round Play button opens the sound page, where the player card plays it.
  */
 export const SoundsListPage: React.FC = () => {
   const { t, currentLang } = useLanguage();
@@ -23,8 +23,6 @@ export const SoundsListPage: React.FC = () => {
   const [failed, setFailed] = useState(false);
   const [indexable, setIndexable] = useState(false); // the server decides when search engines may list these pages
   const [query, setQuery] = useState('');
-  const [playing, setPlaying] = useState<string | null>(null);
-  const audio = useRef<HTMLAudioElement | null>(null);
 
   const load = useCallback(() => {
     setFailed(false);
@@ -35,22 +33,6 @@ export const SoundsListPage: React.FC = () => {
       .catch(() => setFailed(true));
   }, []);
   useEffect(load, [load]);
-
-  // Stop the sound when the visitor leaves the page.
-  useEffect(() => () => { audio.current?.pause(); }, []);
-
-  const toggle = useCallback((slug: string) => {
-    if (!audio.current) {
-      audio.current = new Audio();
-      audio.current.preload = 'none';
-      audio.current.addEventListener('ended', () => setPlaying(null));
-      audio.current.addEventListener('error', () => setPlaying(null));
-    }
-    const a = audio.current;
-    if (playing === slug) { a.pause(); setPlaying(null); return; }
-    a.src = `/api/sounds/${encodeURIComponent(slug)}/mp3`;
-    a.play().then(() => setPlaying(slug)).catch(() => setPlaying(null));
-  }, [playing]);
 
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -116,7 +98,7 @@ export const SoundsListPage: React.FC = () => {
           {shown.length > 0 && (
             <ul className="space-y-3">
               {shown.map((x) => (
-                <SoundCard key={x.slug} sound={x} t={s} lang={currentLang} playing={playing === x.slug} onToggle={toggle} />
+                <SoundCard key={x.slug} sound={x} t={s} lang={currentLang} />
               ))}
             </ul>
           )}
