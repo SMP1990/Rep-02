@@ -1,4 +1,4 @@
-# AI handover — read this first
+# AI handover â€” read this first
 
 This file lets a new AI session (Claude Code or any other) continue the work
 without the old chat. Read it fully, then `ask-downloader/CLAUDE.md` (owner
@@ -33,7 +33,7 @@ The owner then deployed **v22** the same day (see section 6).
 |---|---|
 | GitHub repo | `SMP1990/Rep-02` (owner account: **SMP1990**) |
 | **Branch with all this work** | **`claude/upbeat-archimedes-266v06`** |
-| Repo default branch | `claude/hello-a3y98x` — a DIFFERENT project (Haven Realty WordPress). Do not build on it. |
+| Repo default branch | `claude/hello-a3y98x` â€” a DIFFERENT project (Haven Realty WordPress). Do not build on it. |
 | Backup copy (locked) | branch `backup/tools-v1`, tag/release `tools-v1` (state of commit `1ed196e`) |
 | Live site | https://social.al-marifat.org (Hostinger "Web Apps", Node.js) |
 
@@ -67,7 +67,7 @@ protected on GitHub (no delete, no force-push).
 - Every visible word in **11 languages**: en, ur, ar, hi, es, pt, fr, de, id, ru, ja
   (ur and ar are right-to-left).
 - Honest reviews; say clearly what is not verified.
-- Deploy is **ZIP upload in hPanel** (Deployments → Settings and redeploy → Upload new files). SSH exists now (see
+- Deploy is **ZIP upload in hPanel** (Deployments â†’ Settings and redeploy â†’ Upload new files). SSH exists now (see
   "Server access" below) but is for **looking only**, not for deploying. Deliver a complete project ZIP in
   `releases/` and give the owner a download link:
   `https://github.com/SMP1990/Rep-02/raw/<commit>/releases/<zip-name>.zip`
@@ -81,7 +81,7 @@ protected on GitHub (no delete, no force-push).
 
 ## 3. The site (short)
 
-`ask-downloader/` — React 19 + Vite + Tailwind client, Express server
+`ask-downloader/` â€” React 19 + Vite + Tailwind client, Express server
 (`server.ts` + `server/`), JSON file storage in a data folder outside the app
 (survives redeploys). Admin at `/admin`. Full details, commands, deploy steps
 and translation/SEO rules: **`ask-downloader/CLAUDE.md`**.
@@ -91,7 +91,7 @@ Commands (inside `ask-downloader/`): `npm install`, `npm run lint`
 `rm -f dist/server.cjs.map` and
 `zip -qr ../releases/<name>.zip . -x "node_modules/*" -x ".git/*"`.
 
-Hosting: Hostinger **Business** plan: 3 GB RAM, CPU limit 100% (≈ 1 core),
+Hosting: Hostinger **Business** plan: 3 GB RAM, CPU limit 100% (â‰ˆ 1 core),
 50 GB disk, shared by 3 websites.
 
 ## 4. Tools added so far
@@ -105,16 +105,16 @@ phones show 4 per swipe page. Config: `ask-downloader/src/config/tools.ts`.
 | 2 | Password Generator | `/password-generator` | Live. Runs in the browser (Web Crypto), nothing sent or stored. Logic ported from generate-password (MIT). |
 | 3 | Age Calculator | `/age-calculator` | Built 2026-10-11. Runs in the browser (`lib/age.ts`, no library), nothing sent or stored. 29 Feb birthdays count on 28 Feb in common years (owner's choice). Its page links to the other live tools (`tools/shared/RelatedTools.tsx`, on this page only, owner's choice). |
 | 4 | Word Counter | `/word-counter` | Built 2026-10-12. Runs in the browser (`lib/count.ts`): words = whitespace-separated pieces with a letter/digit; Japanese/Chinese/Thai via `Intl.Segmenter` only when present (10x slower, measured); characters = Unicode graphemes (fast path verified against Intl.Segmenter on 20,000 random texts); text over 20,000 chars is counted when typing pauses (`lib/useSettled.ts`). Paste/Copy/Clear with Undo. |
-| 5 | Image Compressor | `/image-compressor` | Built 2026-10-13, ideas from Sethispr/image-compressor (MIT). Runs in the browser in Web Workers (`lib/worker.ts` builds to `assets/worker-*.js`, which server.ts already lets use WebAssembly — no server change). Codecs: jSquash (Apache-2.0) MozJPEG / WebP (Safari only) / OxiPNG, bundled, loaded on demand; WebP uses the browser's own encoder (same size, measured). No AVIF (14–31 s per photo). Phones 1 image at a time, desktop 2. Target-size mode keeps quality >= 40 and shrinks the image instead. |
-| 6–8 | "Coming soon" | — | Placeholders. The owner said more tools will come. |
+| 5 | Image Compressor | `/image-compressor` | Built 2026-10-13, ideas from Sethispr/image-compressor (MIT). Runs in the browser in Web Workers (`lib/worker.ts` builds to `assets/worker-*.js`, which server.ts already lets use WebAssembly â€” no server change). Codecs: jSquash (Apache-2.0) MozJPEG / WebP (Safari only) / OxiPNG, bundled, loaded on demand; WebP uses the browser's own encoder (same size, measured). No AVIF (14â€“31 s per photo). Phones 1 image at a time, desktop 2. Target-size mode keeps quality >= 40 and shrinks the image instead. |
+| 6â€“8 | "Coming soon" | â€” | Placeholders. The owner said more tools will come. |
 
-**Admin → Tools SEO & FAQ** (`src/pages/ToolsSeoPage.tsx`): per tool meta
+**Admin â†’ Tools SEO & FAQ** (`src/pages/ToolsSeoPage.tsx`): per tool meta
 title ({brand}), description, keywords, share image, noindex, and the FAQ.
 Data file `toolsContent`; admin text is machine-translated into all languages
 (like the home FAQ). Built-in FAQ items keep their human translations.
 
 How to add the next tool (registry, page, route, tile, SEO, FAQ): see
-**`TOOLS-GUIDE.md` → "Adding the next tool"**. Reuse
+**`TOOLS-GUIDE.md` â†’ "Adding the next tool"**. Reuse
 `src/tools/shared/ToolGuide.tsx` and `src/tools/shared/useToolSeo.ts`.
 
 ## 5. Important technical facts (learned the hard way)
@@ -130,7 +130,7 @@ How to add the next tool (registry, page, route, tile, SEO, FAQ): see
   built to `dist/bg-worker.cjs`); on the main thread it froze the whole site
   for seconds.
 - Phones: WebGPU on cheap Android GPUs froze the screen and gave broken
-  output — never use the GPU on phones (`isPhone()` in `lib/models.ts`).
+  output â€” never use the GPU on phones (`isPhone()` in `lib/models.ts`).
 - Hidden test mode on the Background Remover page: `?test=1` shows timings
   (used to diagnose a real phone).
 - Tool pages that need special headers (Background Remover: COOP/COEP + CDN
@@ -155,7 +155,8 @@ How to add the next tool (registry, page, route, tile, SEO, FAQ): see
 
 ## 6. Last state
 
-- **v41 (2026-11-07, night) - newest of all:** owner (on the live admin) reported: (a) Approve felt like nothing happened, then "downloading…" never cleared until a page refresh; (b) after a refresh the admin must log in again. Findings: (a) was MY bug: the server answered at once while the MP3 download ran in the background and the page never asked again. v41 fixes it: `mp3Busy` flag + a one-at-a-time download queue (`trendingSounds.ts` `fetchMp3`), the Approve row changes at once, the page re-reads every 1.5 s while any MP3 is saving (so "Saving MP3…" turns into "MP3 saved" by itself), failures show the reason with a Retry button (`POST /api/admin/sounds/mp3`). Tested with the real collector + TikWM: Approve -> busy at once -> saved in ~1.5 s, no refresh. (b) is an OLD design of the site, not new: admin sessions live only in server memory (`adminSessions` Map in `server.ts`), so ANY server restart (a deploy, a Hostinger idle/memory restart, or several worker processes) logs the admin out. Proven locally: refresh keeps the login, a server restart ends it. FIXED in **v42** with the owner's OK (`releases/ask-downloader-v42-admin-session-persist.zip`): new `server/adminSessions.ts` keeps sessions in `<data folder>/adminSessions.json` as SHA-256 HASHES of the token (the file never holds a usable token; it is not in the backup list; cookie, 7-day expiry and API unchanged; `server.ts` only imports it and `cleanExpiredSessions` calls it). A token missing from memory is looked up in the file once, so a login made by another worker process still works. Tested locally: login survives a restart; file holds a hash only; bad cookie rejected; logout removes it; expired session rejected and cleaned; a second process on the same data folder accepts a login made by the first. Not tested: the old `/api/admin/change-password` route says "No admin account exists yet" for an account made by `/api/admin/setup` (existing behaviour, untouched; it calls `adminSessions.clear()` which now also empties the file). The first deploy of v42 still logs everyone out once (restart); after that deploys/restarts keep the admin logged in. If the owner is STILL asked to log in on every refresh after v42, the cookie is not being kept by the browser/proxy (check `isRequestSecure` and the Secure flag behind Hostinger's proxy). ZIP of the Approve fix: `releases/ask-downloader-v41-sounds-approve-feedback.zip` (included in v42).
+- **v43 (2026-11-08) - newest of all:** owner deployed v42 (login now survives restarts) and said saving the MP3 after Approve "takes a lot of time" on the live site. Locally a real download takes 0.9-1.4 s (300 KB-1.2 MB from TikTok's CDN). Found a real cost on MY side: while a download was running the admin page re-read the WHOLE list (1160 sounds, 541 KB) every 1.5 s and the server did one mkdir + file check per sound each time (0.5 s locally, much slower on the 1-core Hostinger host, competing with the download). v43: one directory read instead of a check per sound (list 0.5 s -> 0.02 s), a tiny status route `GET /api/admin/sounds/mp3status` (4 ms, ~250 bytes) used for the polling, and the real download time is now stored and shown ("MP3 saved (1.1 s, 300 KB)") and logged (`[sounds] mp3 <id>: saved in N ms`). NOT measured: the real speed of TikTok's CDN from the Hostinger IP; if it is still slow after v43, the number next to "MP3 saved" says whether the download itself is slow (network) or not. ZIP: `releases/ask-downloader-v43-sounds-faster-status.zip`.
+- **v41 (2026-11-07, night) - older:** owner (on the live admin) reported: (a) Approve felt like nothing happened, then "downloadingâ€¦" never cleared until a page refresh; (b) after a refresh the admin must log in again. Findings: (a) was MY bug: the server answered at once while the MP3 download ran in the background and the page never asked again. v41 fixes it: `mp3Busy` flag + a one-at-a-time download queue (`trendingSounds.ts` `fetchMp3`), the Approve row changes at once, the page re-reads every 1.5 s while any MP3 is saving (so "Saving MP3â€¦" turns into "MP3 saved" by itself), failures show the reason with a Retry button (`POST /api/admin/sounds/mp3`). Tested with the real collector + TikWM: Approve -> busy at once -> saved in ~1.5 s, no refresh. (b) is an OLD design of the site, not new: admin sessions live only in server memory (`adminSessions` Map in `server.ts`), so ANY server restart (a deploy, a Hostinger idle/memory restart, or several worker processes) logs the admin out. Proven locally: refresh keeps the login, a server restart ends it. FIXED in **v42** with the owner's OK (`releases/ask-downloader-v42-admin-session-persist.zip`): new `server/adminSessions.ts` keeps sessions in `<data folder>/adminSessions.json` as SHA-256 HASHES of the token (the file never holds a usable token; it is not in the backup list; cookie, 7-day expiry and API unchanged; `server.ts` only imports it and `cleanExpiredSessions` calls it). A token missing from memory is looked up in the file once, so a login made by another worker process still works. Tested locally: login survives a restart; file holds a hash only; bad cookie rejected; logout removes it; expired session rejected and cleaned; a second process on the same data folder accepts a login made by the first. Not tested: the old `/api/admin/change-password` route says "No admin account exists yet" for an account made by `/api/admin/setup` (existing behaviour, untouched; it calls `adminSessions.clear()` which now also empties the file). The first deploy of v42 still logs everyone out once (restart); after that deploys/restarts keep the admin logged in. If the owner is STILL asked to log in on every refresh after v42, the cookie is not being kept by the browser/proxy (check `isRequestSecure` and the Secure flag behind Hostinger's proxy). ZIP of the Approve fix: `releases/ask-downloader-v41-sounds-approve-feedback.zip` (included in v42).
 - **v40 (2026-11-07, later) - older:** owner checked the live site (v39 deployed; `/sounds` showed 4 approved sounds with MP3 working on Hostinger, so the MP3 test passed) and said nothing showed on the front end: there was no link to it. v40 adds (1) a "Sounds" link in the header (desktop + phone menu, `t.soundsHome.nav`) and (2) a "Trending Sounds" section on the home page ABOVE "Free Online Tools" (`src/components/TrendingSoundsSection.tsx`, top 4 sounds from `/api/sounds`, renders nothing while no sound is approved; words in `translations/extra/*` group `soundsHome`, 11 languages). Footer link to Report Content exists since v39. Google switch `SOUNDS_OPEN_TO_SEARCH` is still false. Honest notes: on phones the new row pushes "Free Online Tools" lower than before (the owner had designed tools to fit the first screen); the section appears after a fetch, so the layout can shift once; Urdu/other languages of the new header link and section were not opened in a browser (only type-checked). Live nostalgia.zz (60 s) is still approved; owner must listen and Reject it if it is music.
 - **NEWEST before v40 (2026-11-07, end of day) - the "Next steps" list in the bullet below is OUTDATED, everything in it is built:** the whole public Sounds front end is BUILT. Latest ZIP: **`releases/ask-downloader-v39-report-content.zip`** (commit 7b832ff; it contains v35-v39, so only v39 needs uploading). Owner had NOT yet deployed v36-v39 when this was written; the last thing confirmed live is v34.
   - **2c (v37, commit a7004ae):** single sound page `/sounds/<slug>` (`src/pages/SoundPage.tsx`, `src/tools/sounds/SoundAbout.tsx`): player, Download MP3, "about" text of 4 paragraphs filled from the sound's own data (name, creator, seconds, views, regions, first-seen date), link to the video downloader, 4-question FAQ, related sounds (from `/api/sounds/:slug` `related`), "Report this sound" link. Schema: WebPage + BreadcrumbList + AudioObject + FAQPage. Server `getRouteMeta` gives each sound its own title/description and a real HTTP 404 for unknown/unapproved slugs. List cards link to the page. Route names: `public-sounds`, `public-sound` (slug read from the URL), `report-content`; `'sounds'` is still the ADMIN route. Right-to-left fix: Latin names are wrapped in Unicode isolates (U+2068/2069) for on-screen text only, never in meta/schema.
@@ -216,8 +217,8 @@ How to add the next tool (registry, page, route, tile, SEO, FAQ): see
 - **Audit the owner pasted (CORS, SSL, word counter, 5 MB image, speed, mobile)** was checked against code and live site:
   mostly wrong or outdated. Only real weakness: extractors can break when Instagram/TikTok/Facebook change.
 
-### Server access (SSH) — added 2026-10-27
-- hPanel → Websites → social.al-marifat.org → Advanced → **SSH Access** is Active. Port **65002**, user `u770730940`.
+### Server access (SSH) â€” added 2026-10-27
+- hPanel â†’ Websites â†’ social.al-marifat.org â†’ Advanced â†’ **SSH Access** is Active. Port **65002**, user `u770730940`.
   A dedicated key pair was made on the owner's PC (`~/.ssh/ask_hostinger`, public key added in hPanel). Never put a
   password or private key in chat, git or this file.
 - Use it to **read only** (logs, files). The server has no `node` in the SSH shell. Hostinger itself runs
@@ -232,12 +233,12 @@ How to add the next tool (registry, page, route, tile, SEO, FAQ): see
   had not been pushed; v20/v21 contain them and everything after. Highlights:
   - Speed: long cache on hashed `/assets`, Google Fonts preloaded (no render
     block), non-English translations lazy-loaded (`src/translations/loadLanguage.ts`,
-    entry JS 925 → 486 KB), home page chunks modulepreloaded by the server
+    entry JS 925 â†’ 486 KB), home page chunks modulepreloaded by the server
     (`server/preloadHints.ts`, needs `build.manifest`).
   - v21: the Arabic/Urdu/Hindi Google fonts (~443 KB) load only when `<html lang>`
     or the saved interface language is ur/ar/hi (`src/loadFonts.ts`; index.html
     preloads the Latin fonts only). Measured live, new visitor, mobile home:
-    ~1,005 KB → ~558 KB. Biggest part now: JS 356 KB.
+    ~1,005 KB â†’ ~558 KB. Biggest part now: JS 356 KB.
   - Images: `/thumb/<w>/<file>` gives a sharp WebP copy of `/uploads/<file>`
     (`server/imageResize.ts`, `src/utils/imageSize.ts`). On Hostinger, LiteSpeed
     serves real files under `/uploads/` itself, so query strings there never
@@ -247,7 +248,7 @@ How to add the next tool (registry, page, route, tile, SEO, FAQ): see
     (`src/tools/grade-calculator/`, tool id `grade-calculator`).
   - Password Generator: the typed length box works (`LengthInput.tsx`).
   - Phones only (desktop checked identical): hero heading in a gradient box with
-    a "More info" fold, tools as a 4×2 icon grid (`ToolsIconGrid.tsx`) so the
+    a "More info" fold, tools as a 4Ã—2 icon grid (`ToolsIconGrid.tsx`) so the
     downloader and all tools fit the first screen, slimmer header (theme in the
     menu), reworked menu drawer (theme at the top, one scroll, language and
     downloader lists folded, its words in 11 languages).
@@ -276,10 +277,10 @@ How to add the next tool (registry, page, route, tile, SEO, FAQ): see
   request. v4 uses the first successful response as the download.
 - **TOP PRIORITY (owner's order, 2026-10-12):** with v4 live, TikTok VIDEO
   still failed (MP3 worked). v5: when the CDN refuses Node's fetch,
-  `ytdlpFile()` falls back to `viaYtdlp()` — yt-dlp downloads the file itself
+  `ytdlpFile()` falls back to `viaYtdlp()` â€” yt-dlp downloads the file itself
   (`-f b[height<=H] -o -`) and it is streamed through (max 3 at once).
   Every yt-dlp download response carries `X-Source-Status` ("cdn 200",
-  "yt-dlp after cdn 403", "cdn 403; yt-dlp failed") — read it with curl on
+  "yt-dlp after cdn 403", "cdn 403; yt-dlp failed") â€” read it with curl on
   `/api/video/ytdlp-stream/<token>` to see what happened. NOT yet verified
   live; if yt-dlp also fails, its stderr is logged as
   "[yt-dlp] direct download gave no data".

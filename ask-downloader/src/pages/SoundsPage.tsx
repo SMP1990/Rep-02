@@ -3,7 +3,7 @@ import { TopHeader } from '../components/TopHeader';
 import { useAdmin } from '../context/AdminContext';
 
 type Sound = {
-  id: string; name: string; creator: string; duration: number; original: boolean; views: number; file?: boolean; mp3Error?: string; mp3Busy?: boolean;
+  id: string; name: string; creator: string; duration: number; original: boolean; views: number; file?: boolean; mp3Error?: string; mp3Busy?: boolean; mp3Ms?: number; mp3Kb?: number;
   regions: string[]; days: string[]; firstSeen: string; status?: string; reason?: string; score?: number;
   video?: { id: string; user: string; views: number };
   vs?: number;
@@ -67,13 +67,21 @@ export const SoundsPage: React.FC<{ onOpenMobileMenu: () => void }> = ({ onOpenM
     setStatus(d.status); setSounds(d.sounds); setSet(d.status.settings);
     showToast('Filter saved.', 'success');
   };
-  // While any MP3 is being saved, look again every 1.5 seconds so "Saving MP3…" turns into "MP3 saved" by itself.
+  // While any MP3 is being saved, ask a TINY status (only the approved sounds' MP3 state) every 1.5 seconds,
+  // so "Saving MP3…" turns into "MP3 saved" by itself without reloading the whole list each time.
   const anyBusy = sounds.some((s) => s.mp3Busy);
   useEffect(() => {
     if (!anyBusy) return;
-    const t = setInterval(load, 1500);
+    const t = setInterval(async () => {
+      const d = await call('GET', '/api/admin/sounds/mp3status');
+      if (!d?.mp3) return;
+      setSounds((list) => list.map((s) => {
+        const m = d.mp3[s.id];
+        return m ? { ...s, file: m.file, mp3Busy: m.busy, mp3Error: m.error, mp3Ms: m.ms, mp3Kb: m.kb } : s;
+      }));
+    }, 1500);
     return () => clearInterval(t);
-  }, [anyBusy, load]);
+  }, [anyBusy]);
 
   const [pending, setPending] = useState<string | null>(null); // the row whose click is on its way to the server
   const mark = async (id: string, to: string) => {
@@ -174,7 +182,7 @@ export const SoundsPage: React.FC<{ onOpenMobileMenu: () => void }> = ({ onOpenM
                     {(s.status === 'approved' || s.status === 'rejected') && <button disabled={pending === s.id} className={`${mini} bg-gray-500 ml-1 disabled:opacity-50`} onClick={() => mark(s.id, 'new')}>Undo</button>}
                     {s.status === 'approved' && (
                       <div className="text-xs mt-1">
-                        {s.file ? '✅ MP3 saved'
+                        {s.file ? `✅ MP3 saved${s.mp3Ms ? ` (${(s.mp3Ms / 1000).toFixed(1)} s, ${s.mp3Kb} KB)` : ''}`
                           : s.mp3Busy ? '⏳ Saving MP3…'
                           : <>⚠ {s.mp3Error || 'MP3 not saved yet'} <button className={`${mini} bg-[#6d46b8] ml-1`} onClick={() => retryMp3(s.id)}>Retry</button></>}
                       </div>

@@ -12,6 +12,8 @@ export type Sound = SoundHit & {
   status: Status; hist: Record<string, number>; // hist: views seen per day (last 14 days)
   slug?: string; // public address /sounds/<slug>, made once when the sound is approved and never changed
   mp3Error?: string; // result of the last MP3 download for an approved sound ("" = ok)
+  mp3Ms?: number; // how long that download took (milliseconds) and how big the file is (KB), for the admin page
+  mp3Kb?: number;
   vs?: number; // 2 = "views" is the top video's views (v30+); older sounds summed videos, repeats included
 };
 export type Settings = { minViews: number; minSec: number; maxSec: number; perCreator: number; minDays: number; excludeMusic: boolean; excludeJunk: boolean };

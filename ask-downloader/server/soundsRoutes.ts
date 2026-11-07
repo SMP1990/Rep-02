@@ -1,6 +1,6 @@
 /** Admin-only routes of the Trending Sounds collector. Nothing public. */
 import type { Express, Request, RequestHandler, Response } from 'express';
-import { fetchMp3, runSoundsJob, setSoundStatus, setSoundsEnabled, setSoundsSettings, soundsList, soundsStatus } from './trendingSounds.ts';
+import { fetchMp3, mp3Status, runSoundsJob, setSoundStatus, setSoundsEnabled, setSoundsSettings, soundsList, soundsStatus } from './trendingSounds.ts';
 
 export function registerSoundsRoutes(app: Express, canView: RequestHandler, canEdit: RequestHandler) {
   app.get('/api/admin/sounds', canView, (_req: Request, res: Response) => {
@@ -20,6 +20,11 @@ export function registerSoundsRoutes(app: Express, canView: RequestHandler, canE
   app.post('/api/admin/sounds/settings', canEdit, (req: Request, res: Response) => {
     setSoundsSettings(req.body);
     res.json({ success: true, status: soundsStatus(), sounds: soundsList() });
+  });
+
+  /** Small status of the approved sounds' MP3s (the admin page asks this every second or two while one is saving). */
+  app.get('/api/admin/sounds/mp3status', canView, (_req: Request, res: Response) => {
+    res.set('Cache-Control', 'no-store').json({ mp3: mp3Status() });
   });
 
   /** "Try again" for the MP3 of one approved sound; answers at once, the download runs in the background. */

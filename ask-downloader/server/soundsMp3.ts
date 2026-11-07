@@ -12,11 +12,21 @@ import { dataFolder } from './store.ts';
 const MAX_BYTES = 8 * 1024 * 1024;
 const HOSTS = [/(^|\.)tiktokcdn(-us|-eu)?\.com$/i, /(^|\.)tikwm\.com$/i];
 
+let ensured = '';
 export const soundsDir = () => {
   const dir = path.join(dataFolder(), 'sounds');
-  fs.mkdirSync(dir, { recursive: true });
+  if (ensured !== dir) { fs.mkdirSync(dir, { recursive: true }); ensured = dir; } // once, not on every file check
   return dir;
 };
+
+/** Ids of all saved MP3 files, from ONE directory read (much cheaper than one file check per sound). */
+export function savedIds(): Set<string> {
+  try {
+    return new Set(fs.readdirSync(soundsDir()).filter((f) => f.endsWith('.mp3')).map((f) => f.slice(0, -4)));
+  } catch {
+    return new Set();
+  }
+}
 export const soundFile = (id: string) => (/^\d{1,30}$/.test(id) ? path.join(soundsDir(), `${id}.mp3`) : '');
 export const hasSoundFile = (id: string) => { const f = soundFile(id); return !!f && fs.existsSync(f); };
 

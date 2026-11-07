@@ -8,7 +8,8 @@
  */
 import { read, write } from './store.ts';
 import { fetchRegion } from './soundsFetch.ts';
-import { hasSoundFile, saveSoundMp3 } from './soundsMp3.ts';
+import fs from 'node:fs';
+import { hasSoundFile, savedIds, saveSoundMp3, soundFile } from './soundsMp3.ts';
 import { makeSlug } from './soundsPublic.ts';
 import { DEFAULT_SETTINGS, cleanSettings, judge, type Settings, type Sound, type Status } from './soundsFilter.ts';
 
@@ -39,7 +40,18 @@ export function soundsStatus() {
 export function soundsList() {
   const list = Object.values(getSounds());
   const verdicts = judge(list, getState().settings);
-  return list.map((s) => ({ ...s, ...verdicts.get(s.id), file: hasSoundFile(s.id), mp3Busy: mp3Busy.has(s.id) }));
+  const saved = savedIds();
+  return list.map((s) => ({ ...s, ...verdicts.get(s.id), file: saved.has(s.id), mp3Busy: mp3Busy.has(s.id) }));
+}
+
+/** Tiny answer for the admin page while an MP3 is being saved: only approved sounds, only what changes. */
+export function mp3Status(): Record<string, { file: boolean; busy: boolean; error: string; ms?: number; kb?: number }> {
+  const saved = savedIds();
+  const out: Record<string, { file: boolean; busy: boolean; error: string; ms?: number; kb?: number }> = {};
+  for (const s of Object.values(getSounds())) {
+    if (s.status === 'approved') out[s.id] = { file: saved.has(s.id), busy: mp3Busy.has(s.id), error: s.mp3Error ?? '', ms: s.mp3Ms, kb: s.mp3Kb };
+  }
+  return out;
 }
 
 export function setSoundsEnabled(on: boolean) {
@@ -80,9 +92,17 @@ export function fetchMp3(id: string): Promise<string> {
   const job = mp3Queue.then(async () => {
     const before = getSounds()[id];
     if (!before) return 'unknown sound';
-    const err = hasSoundFile(id) ? '' : await saveSoundMp3(id, before.mp3);
+    const t0 = Date.now();
+    const had = hasSoundFile(id);
+    const err = had ? '' : await saveSoundMp3(id, before.mp3);
+    const ms = Date.now() - t0;
     const all = getSounds(); // read again: the collector may have saved meanwhile
-    if (all[id]) { all[id].mp3Error = err; write('soundsData', all); }
+    if (all[id]) {
+      all[id].mp3Error = err;
+      if (!had && !err) { all[id].mp3Ms = ms; all[id].mp3Kb = Math.round(fs.statSync(soundFile(id)).size / 1024); } // shown in admin: how long the download really took
+      write('soundsData', all);
+    }
+    if (!had) console.log(`[sounds] mp3 ${id}: ${err ? 'FAILED (' + err + ')' : 'saved'} in ${ms} ms`);
     return err;
   }).finally(() => mp3Busy.delete(id));
   mp3Queue = job.catch(() => '');
