@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Trending Sounds - User Guide</title>
+<style>/* Trending Sounds user guide: A4 print style */
+@page { size: A4; margin: 18mm 17mm 20mm 17mm; }
+@page :first { margin: 0; }
+
+:root {
+  --purple: #341d5b; --purple2: #6d46b8; --lilac: #f1e9fb; --pink: #e6799f; --amber: #f5b84b;
+  --ink: #2e2440; --muted: #6b6480; --line: #e5d9ef; --red: #e11d48;
+}
+* { box-sizing: border-box; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { margin: 0; font-family: "Segoe UI", Arial, Helvetica, sans-serif; font-size: 10.5pt; line-height: 1.5; color: var(--ink); }
+
+h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; color: var(--purple); margin: 0; line-height: 1.2; }
+h1 { font-size: 22pt; }
+h2 { font-size: 15pt; margin: 14pt 0 5pt; padding-bottom: 3pt; border-bottom: 2px solid var(--amber); }
+h3 { font-size: 12pt; margin: 11pt 0 3pt; color: var(--purple2); }
+p { margin: 0 0 6pt; }
+ul, ol { margin: 0 0 7pt; padding-left: 17pt; }
+li { margin-bottom: 2.5pt; }
+b, strong { color: var(--purple); }
+
+.page { break-after: page; }
+.page:last-child { break-after: auto; }
+.avoid { break-inside: avoid; }
+
+/* cover */
+.cover { height: 297mm; width: 210mm; padding: 0; position: relative; overflow: hidden; background: linear-gradient(160deg, #3a2166 0%, #271349 55%, #150b2b 100%); color: #fff; break-after: page; }
+.cover .band { position: absolute; left: 0; right: 0; top: 0; height: 7mm; background: linear-gradient(90deg, var(--pink), #a78bda, var(--amber)); }
+.cover .inner { position: absolute; left: 22mm; right: 22mm; top: 48mm; }
+.cover .brand { font-size: 12pt; letter-spacing: 2pt; text-transform: uppercase; color: var(--amber); font-weight: 700; }
+.cover h1 { color: #fff; font-size: 40pt; margin: 8mm 0 5mm; line-height: 1.1; }
+.cover .sub { font-size: 15pt; color: #d9ccf0; max-width: 150mm; line-height: 1.4; }
+.cover .art { position: absolute; left: 0; right: 0; bottom: 24mm; text-align: center; }
+.cover .art img { width: 82mm; border-radius: 6mm; box-shadow: 0 8px 30px rgba(0,0,0,.5); }
+.cover .foot { position: absolute; left: 22mm; right: 22mm; bottom: 10mm; display: flex; justify-content: space-between; color: #b9a9d6; font-size: 9.5pt; }
+
+/* part title bar */
+.part { background: var(--purple); color: #fff; padding: 9pt 14pt; border-radius: 8pt; margin: 0 0 10pt; display: flex; align-items: center; gap: 12pt; }
+.part .no { background: var(--amber); color: var(--purple); font-weight: 800; border-radius: 50%; width: 28pt; height: 28pt; display: flex; align-items: center; justify-content: center; font-size: 14pt; }
+.part h1 { color: #fff; font-size: 18pt; }
+.part small { display: block; color: #d9ccf0; font-size: 9.5pt; font-family: "Segoe UI", Arial, sans-serif; }
+
+/* figures */
+figure { margin: 6pt 0 9pt; break-inside: avoid; text-align: center; }
+figure img { max-width: 100%; border: 1px solid var(--line); border-radius: 6pt; box-shadow: 0 1px 4px rgba(52,29,91,.12); }
+figcaption { font-size: 8.8pt; color: var(--muted); margin-top: 3pt; }
+.w100 img { width: 100%; } .w85 img { width: 85%; } .w70 img { width: 70%; } .w55 img { width: 55%; } .w40 img { width: 40%; }
+
+/* red numbers, same as on the pictures */
+.n { display: inline-block; background: var(--red); color: #fff; font-weight: 700; border-radius: 50%; min-width: 14pt; height: 14pt; line-height: 14pt; text-align: center; font-size: 8.5pt; margin-right: 4pt; font-family: Arial, sans-serif; }
+ol.key { list-style: none; padding: 0; margin: 4pt 0 8pt; }
+ol.key li { margin-bottom: 3.5pt; }
+
+/* callouts */
+.box { border-radius: 7pt; padding: 7pt 10pt; margin: 7pt 0 9pt; break-inside: avoid; font-size: 10pt; }
+.box b:first-child { text-transform: uppercase; font-size: 8.5pt; letter-spacing: .8pt; margin-right: 4pt; }
+.tip { background: #fff7e0; border-left: 4px solid var(--amber); }
+.note { background: var(--lilac); border-left: 4px solid var(--purple2); }
+.warn { background: #ffecef; border-left: 4px solid var(--red); }
+
+/* tables */
+table { width: 100%; border-collapse: collapse; margin: 5pt 0 9pt; font-size: 9.6pt; break-inside: auto; }
+th { background: var(--purple); color: #fff; text-align: left; padding: 4.5pt 7pt; font-weight: 600; }
+td { padding: 4.5pt 7pt; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr { break-inside: avoid; }
+tbody tr:nth-child(even) td { background: #faf7fd; }
+td:first-child { font-weight: 600; color: var(--purple); white-space: nowrap; }
+
+/* 3-step flow */
+.flow { display: flex; gap: 8pt; margin: 8pt 0 10pt; }
+.flow .st { flex: 1; border: 1.5px solid var(--line); border-radius: 9pt; padding: 9pt 9pt 7pt; background: #fff; position: relative; }
+.flow .st .no { position: absolute; top: -9pt; left: 9pt; background: var(--purple2); color: #fff; width: 20pt; height: 20pt; border-radius: 50%; text-align: center; line-height: 20pt; font-weight: 700; font-size: 10pt; }
+.flow .st h3 { margin: 5pt 0 2pt; font-size: 11.5pt; }
+.flow .st p { font-size: 9.6pt; margin: 0; color: var(--muted); }
+.flow .arrow { align-self: center; color: var(--amber); font-size: 16pt; font-weight: 700; }
+
+/* two columns */
+.cols { display: flex; gap: 12pt; align-items: flex-start; }
+.cols > * { flex: 1; }
+.good, .bad { border-radius: 8pt; padding: 8pt 11pt; break-inside: avoid; }
+.good { background: #eefaf1; border: 1.5px solid #a6dcb4; } .bad { background: #fff1f3; border: 1.5px solid #f2b3be; }
+.good h3 { color: #1d7a3a; margin-top: 0; } .bad h3 { color: #b3203f; margin-top: 0; }
+.good ul, .bad ul { margin: 3pt 0 0; }
+
+.btn { display: inline-block; padding: 1.5pt 8pt; border-radius: 5pt; color: #fff; font-weight: 700; font-size: 9pt; font-family: Arial, sans-serif; }
+.b-green { background: #16a34a; } .b-red { background: #dc2626; } .b-grey { background: #6b7280; } .b-purple { background: var(--purple2); } .b-dark { background: var(--purple); }
+.kbd { background: #f3eefa; border: 1px solid var(--line); border-radius: 4pt; padding: 0 5pt; font-family: Consolas, monospace; font-size: 9.5pt; }
+
+.checklist li { list-style: none; position: relative; padding-left: 4pt; }
+.checklist li::before { content: "☐"; position: absolute; left: -15pt; color: var(--purple2); font-weight: 700; }
+.toc td:first-child { white-space: normal; }
+.small { font-size: 9pt; color: var(--muted); }
+
+/* flowing layout: only the big parts start on a new page */
+.start { break-before: page; }
+.start:first-of-type { break-before: auto; }
+h2, h3 { break-after: avoid; }
+.cols { break-inside: avoid; }
+.key li { break-inside: avoid; }
+p { orphans: 3; widows: 3; }
+ol, ul { break-inside: avoid; }
+</style></head><body>
+<!-- COVER -->
+<section class="cover">
+  <div class="band"></div>
+  <div class="inner">
+    <div class="brand">ASK video Downloader</div>
+    <h1>Trending Sounds</h1>
+    <div class="sub">User Guide: how to choose sounds in the admin panel, and how visitors listen and download them</div>
+  </div>
+  <div class="art"><img src="shots/raw/fe-player.png" alt="The sound player"></div>
+  <div class="foot"><span>Version 1.0 &middot; November 2026</span><span>For the website owner and admin team</span></div>
+</section>
+
+<!-- CONTENTS + WORDS -->
+<section class="page">
+  <h1>Contents</h1>
+  <table class="toc" style="margin-top:8pt">
+    <thead><tr><th style="width:12%">Part</th><th>What you will learn</th></tr></thead>
+    <tbody>
+      <tr><td>Welcome</td><td>What Trending Sounds is, how it works in 3 steps, and a 5-minute quick start.</td></tr>
+      <tr><td>Part 1</td><td><b>The admin panel.</b> Where to find the sounds, what the top box and the filter do, how to read the list, how to listen before you choose, how to Approve, Reject and Undo, how to handle a report from a visitor, and a short daily routine.</td></tr>
+      <tr><td>Part 2</td><td><b>What visitors see.</b> Where sounds appear on your website (menu, home page, list page), the sound page with its player, how visitors download an MP3, and how they can report a sound.</td></tr>
+      <tr><td>Part 3</td><td><b>Questions and answers</b> for the most common situations, and a one-page quick reference of every button.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Words used in this guide</h2>
+  <table>
+    <thead><tr><th style="width:24%">Word</th><th>What it means</th></tr></thead>
+    <tbody>
+      <tr><td>Sound</td><td>A short piece of audio, for example a funny voice, a dialogue or a sound effect.</td></tr>
+      <tr><td>Admin panel</td><td>The private control area of your website. Only you and your team can open it.</td></tr>
+      <tr><td>Collector</td><td>The part of the website that finds trending sounds automatically.</td></tr>
+      <tr><td>Filter</td><td>A set of rules that hides sounds you probably do not want (for example songs). Hidden sounds are never deleted.</td></tr>
+      <tr><td>Approve</td><td>You say &ldquo;yes, publish this sound&rdquo;. It then appears on the website.</td></tr>
+      <tr><td>Reject</td><td>You say &ldquo;no&rdquo;. The sound is hidden from the website and from your main list.</td></tr>
+      <tr><td>MP3</td><td>The audio file that visitors download. It works on every phone and computer.</td></tr>
+      <tr><td>Visitor</td><td>A person who opens your website. They cannot see the admin panel.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="box tip"><b>Tip</b> Keep this guide open the first few times. After a day or two you will not need it: the whole job takes about 2 to 3 minutes a day.</div>
+  <div class="box note"><b>Pictures</b> The pictures use <b>sample sounds</b>. The names and numbers on your own screen will be different. Red numbers like <span class="n">1</span> on a picture match the numbers in the text next to it.</div>
+</section>
+
+<!-- WELCOME -->
+<section class="page">
+  <h1>Welcome</h1>
+  <p style="margin-top:6pt">Trending Sounds is a feature of your website. Every day it finds funny sounds that many people are using in TikTok videos. You look at the list, choose the ones you like, and your visitors can then <b>listen to them and download them as free MP3 files</b>.</p>
+  <p>You do not need any technical knowledge. This guide shows every screen with pictures and tells you exactly what to click.</p>
+
+  <h2>How it works: 3 simple steps</h2>
+  <div class="flow">
+    <div class="st"><span class="no">1</span><h3>Collect</h3><p>The website looks for trending sounds by itself, 4 times every day. You do nothing.</p></div>
+    <div class="arrow">&#10148;</div>
+    <div class="st"><span class="no">2</span><h3>Review</h3><p>You open the admin panel, check the sounds, and press <b>Approve</b> or <b>Reject</b>.</p></div>
+    <div class="arrow">&#10148;</div>
+    <div class="st"><span class="no">3</span><h3>Publish</h3><p>Approved sounds appear on your website. Visitors listen and download.</p></div>
+  </div>
+  <div class="box note"><b>Important</b> Nothing goes on your website until <b>you</b> approve it. The website never publishes a sound on its own.</div>
+
+  <h2>Quick start (5 minutes)</h2>
+  <ol>
+    <li>Log in to your admin panel and click <b>Trending Sounds</b> in the left menu.</li>
+    <li>Look at the list of sounds. It shows <b>Passed the filter</b> by default.</li>
+    <li>Click <b>Sound</b> next to a name to listen to it on TikTok.</li>
+    <li>Press the green <span class="btn b-green">Approve</span> button on the sounds you like.</li>
+    <li>Wait a few seconds until you see <b>MP3 saved</b> under the sound.</li>
+    <li>Open your website and click <b>Sounds</b> in the top menu. Your sound is there.</li>
+  </ol>
+
+  <h2>What you need</h2>
+  <ul>
+    <li>A computer, tablet or phone with internet.</li>
+    <li>Your admin login (the same one you use for the blog and other admin pages).</li>
+    <li>About 2 to 3 minutes a day.</li>
+  </ul>
+</section>
+
+<!-- PART 1 : ADMIN (a) -->
+<section class="start">
+  <div class="part"><span class="no">1</span><div><h1>The admin panel</h1><small>Where you choose the sounds</small></div></div>
+
+  <h2>1.1 Open the Trending Sounds page</h2>
+  <div class="cols">
+    <div>
+      <ol>
+        <li>Open your website address and add <span class="kbd">/admin</span> at the end.</li>
+        <li>Log in with your admin email and password.</li>
+        <li>In the menu on the left, click <b>Trending Sounds</b> <span class="n">1</span>.</li>
+      </ol>
+      <div class="box tip"><b>Tip</b> You can also click <b>Messages &amp; Inquiries</b> in the same menu to read reports from visitors (see section 1.8).</div>
+    </div>
+    <figure class="w55"><img src="shots/admin-menu.png" alt="Admin menu"><figcaption>Figure 1. The left menu of the admin panel</figcaption></figure>
+  </div>
+
+  <h2>1.2 The top box</h2>
+  <p>The first box on the page tells you if the automatic search is working.</p>
+  <figure class="w100"><img src="shots/admin-top.png" alt="Top box"><figcaption>Figure 2. The top box</figcaption></figure>
+  <ol class="key">
+    <li><span class="n">1</span><b>Turn OFF / Turn ON.</b> Stops or starts the automatic search. Leave it <b>ON</b>.</li>
+    <li><span class="n">2</span><b>Run now.</b> Searches for new sounds right now. It takes 1 to 2 minutes. You normally do not need it, because the website searches by itself 4 times a day (about every 6 hours).</li>
+    <li><span class="n">3</span><b>Status and Last run.</b> &ldquo;Status: ON&rdquo; means it is working. &ldquo;Last run&rdquo; is the date and time of the last search. It should be recent (within about 6 hours).</li>
+    <li><span class="n">4</span><b>Counts.</b> &ldquo;99 sounds saved&rdquo; is everything found so far. &ldquo;29 pass the filter&rdquo; is how many match your rules.</li>
+    <li><span class="n">5</span><b>Result for each country.</b> The website checks 8 countries: PK (Pakistan), IN (India), US (USA), GB (United Kingdom), AE (UAE), SA (Saudi Arabia), ID (Indonesia), BR (Brazil). &ldquo;ok 7&rdquo; means 7 sounds were found there.</li>
+  </ol>
+  <div class="box note"><b>Good to know</b> Sometimes one country says &ldquo;failed&rdquo;. This is normal. The next search tries again. If a red message says the last run failed in every country, do nothing: the website tries again by itself after about 45 minutes and keeps all your old sounds.</div>
+</section>
+
+<section>
+  <h2 style="margin-top:0">1.3 The filter</h2>
+  <p>The filter is your assistant. It hides sounds that are probably not what you want, so your list stays short and good.</p>
+  <figure class="w100"><img src="shots/admin-filter.png" alt="Filter box"><figcaption>Figure 3. The filter box</figcaption></figure>
+  <table>
+    <thead><tr><th style="width:30%">Setting</th><th>What it does</th><th style="width:15%">Normal</th></tr></thead>
+    <tbody>
+      <tr><td><span class="n">1</span>Min views</td><td>A sound must have at least this many views on its most popular video.</td><td>1,000,000</td></tr>
+      <tr><td><span class="n">2</span>Min seconds</td><td>Hides sounds shorter than this.</td><td>3</td></tr>
+      <tr><td><span class="n">3</span>Max seconds</td><td>Hides sounds longer than this.</td><td>60</td></tr>
+      <tr><td><span class="n">4</span>Per creator</td><td>Shows at most this many sounds from the same creator, so one person does not fill your list.</td><td>2</td></tr>
+      <tr><td><span class="n">5</span>Min days seen</td><td>A sound must have been seen on at least this many different days. This keeps out sounds that were popular for only one day.</td><td>2</td></tr>
+      <tr><td><span class="n">6</span>No songs</td><td>When ticked, hides music tracks.</td><td>ticked</td></tr>
+      <tr><td><span class="n">7</span>No brands/news/lyrics</td><td>When ticked, hides company and brand sounds, news channels, song-lyrics pages, religious recitation, and famous people.</td><td>ticked</td></tr>
+      <tr><td><span class="n">8</span>Save</td><td>Press this after you change anything. Your list updates at once.</td><td></td></tr>
+    </tbody>
+  </table>
+  <div class="box note"><b>Safe to use</b> The filter <b>never deletes</b> a sound. It only hides it from your main list. You can always see hidden sounds again (section 1.4).</div>
+  <div class="box tip"><b>Tip</b> If your list is empty or very short, change <b>Min days seen</b> to <b>1</b> and press <b>Save</b>. You will then see every sound that matches your other rules, even those found only today. When you have more sounds, you can set it back to 2.</div>
+
+  <h2>1.4 Choose which list to see</h2>
+  <p>Above the table there is a menu with five choices. It decides which sounds the table shows.</p>
+  <table>
+    <thead><tr><th style="width:28%">Choice</th><th>What you see</th></tr></thead>
+    <tbody>
+      <tr><td>Passed the filter</td><td>The main list: sounds that match your rules and are waiting for your decision, plus the ones you approved. <b>This is where you work.</b></td></tr>
+      <tr><td>Approved</td><td>The sounds you approved. These are on your website.</td></tr>
+      <tr><td>Rejected</td><td>The sounds you rejected.</td></tr>
+      <tr><td>Filtered out</td><td>Sounds hidden by the filter. Look here if a sound you expected is missing. The <b>Filter</b> column tells you why it was hidden.</td></tr>
+      <tr><td>All</td><td>Everything, in one list.</td></tr>
+    </tbody>
+  </table>
+  <p class="small">Each list shows the best 300 sounds, highest score first.</p>
+</section>
+
+<!-- PART 1 : ADMIN (b) -->
+<section>
+  <h2 style="margin-top:0">1.5 How to read the list</h2>
+  <figure class="w100"><img src="shots/admin-list.png" alt="List of sounds"><figcaption>Figure 4. The list of sounds</figcaption></figure>
+  <ol class="key">
+    <li><span class="n">1</span><b>List chooser.</b> Chooses which sounds the table shows (section 1.4).</li>
+    <li><span class="n">2</span><b>Column titles.</b> Explained in the table below.</li>
+    <li><span class="n">3</span><b>Video &middot; Sound.</b> Two links to check the sound on TikTok (section 1.6).</li>
+    <li><span class="n">4</span><b>Approve.</b> Puts the sound on your website.</li>
+    <li><span class="n">5</span><b>Reject.</b> Hides the sound.</li>
+  </ol>
+  <table>
+    <thead><tr><th style="width:24%">Column</th><th>What it tells you</th></tr></thead>
+    <tbody>
+      <tr><td>Sound</td><td>The name of the sound on TikTok. Many start with &ldquo;original sound -&rdquo; followed by the creator&rsquo;s account name.</td></tr>
+      <tr><td>Creator</td><td>The person who made it.</td></tr>
+      <tr><td>Sec</td><td>How long it is, in seconds.</td></tr>
+      <tr><td>Top video views</td><td>Views of the most popular video that uses this sound. (&ldquo;1.2M&rdquo; means 1.2 million.)</td></tr>
+      <tr><td>Regions</td><td>The countries where the sound was found. <b>More countries is better.</b></td></tr>
+      <tr><td>Days</td><td>On how many different days it was found. <b>More days means a real trend.</b></td></tr>
+      <tr><td>Score</td><td>A number that combines views, countries and days. The list is sorted by it: the best sounds are at the top.</td></tr>
+      <tr><td>Filter</td><td>&ldquo;ok&rdquo; means it passed your rules. Otherwise it shows the reason it was hidden (see below).</td></tr>
+      <tr><td>Check on TikTok</td><td>The <b>Video</b> and <b>Sound</b> links.</td></tr>
+      <tr><td>Review</td><td>The buttons <b>Approve</b>, <b>Reject</b> and <b>Undo</b>.</td></tr>
+    </tbody>
+  </table>
+  <div class="box tip"><b>Tip</b> The best sign of a real trend is a sound that has <b>many countries and many days</b>, not just a very big number of views.</div>
+  <p><b>Reasons shown in the Filter column</b> (in the &ldquo;Filtered out&rdquo; list):</p>
+  <table>
+    <tbody>
+      <tr><td>low views</td><td>Fewer views than your Min views.</td></tr>
+      <tr><td>too short / too long</td><td>Outside your Min / Max seconds.</td></tr>
+      <tr><td>few days</td><td>Seen on fewer days than your Min days seen.</td></tr>
+      <tr><td>music</td><td>Looks like a song.</td></tr>
+      <tr><td>junk word</td><td>The name looks like a brand, news, lyrics, religious or famous-person sound.</td></tr>
+      <tr><td>duplicate / same creator</td><td>Another copy of the same sound, or too many from one creator.</td></tr>
+      <tr><td>bad name / no creator</td><td>The name or creator is empty or unreadable.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2 style="margin-top:0">1.6 Listen before you choose</h2>
+  <p>You cannot judge a sound by its name, so listen to it first. It takes a few seconds.</p>
+  <ol>
+    <li>Click <b>Sound</b> in the <b>Check on TikTok</b> column. The TikTok page of that sound opens. Press play and listen.</li>
+    <li>Click <b>Video</b> if you also want to watch the most popular video that uses it.</li>
+    <li>Come back to the admin panel and press <b>Approve</b> or <b>Reject</b>.</li>
+  </ol>
+  <h3>How to decide</h3>
+  <div class="cols">
+    <div class="good">
+      <h3>Good to approve</h3>
+      <ul>
+        <li>Funny voices and short dialogues</li>
+        <li>Meme sounds that people repeat</li>
+        <li>Funny sound effects</li>
+        <li>AI-voice jokes</li>
+        <li>Clear, short sounds that people would like to download</li>
+      </ul>
+    </div>
+    <div class="bad">
+      <h3>Better to reject</h3>
+      <ul>
+        <li>Songs and music, even short parts</li>
+        <li>Advertisements and brand sounds</li>
+        <li>News and politics, or the voice of a famous person</li>
+        <li>Religious recitation</li>
+        <li>Clips cut from films, dramas or someone else&rsquo;s work</li>
+        <li>Bad language, or just noise with no clear voice</li>
+      </ul>
+    </div>
+  </div>
+  <div class="box warn"><b>Copyright</b> A sound can belong to someone else, even when it is a famous meme. If you are not sure, press <b>Reject</b>. If an owner complains later, you can remove the sound at any time (section 1.8).</div>
+  <div class="box tip"><b>Tip</b> You do not have to decide on every sound. Approve only the ones you like. The others can wait in the list.</div>
+
+  <h2>1.7 Approve, Reject and Undo</h2>
+  <table>
+    <thead><tr><th style="width:20%">Button</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><span class="btn b-green">Approve</span></td><td>Publishes the sound. The website saves the MP3 file, and after a few seconds the sound is on your website.</td></tr>
+      <tr><td><span class="btn b-red">Reject</span></td><td>Hides the sound from your website and from your main list. You can find it later under <b>Rejected</b>.</td></tr>
+      <tr><td><span class="btn b-grey">Undo</span></td><td>Takes your decision back. The sound goes back to &ldquo;not decided&rdquo;. If it was approved, it disappears from the website.</td></tr>
+    </tbody>
+  </table>
+  <h3>What happens when you press Approve</h3>
+  <ol>
+    <li>The row changes <b>at once</b>: you now see <b>Reject</b> and <b>Undo</b>, and the words <b>&#9203; Saving MP3&hellip;</b></li>
+    <li>After a few seconds it changes by itself to <b>&#9989; MP3 saved</b>, with the time it took and the file size. Now the sound is live. You do not need to refresh the page.</li>
+  </ol>
+  <figure class="w100"><img src="shots/admin-approved.png" alt="Approved list"><figcaption>Figure 5. The Approved list</figcaption></figure>
+  <ol class="key">
+    <li><span class="n">1</span><b>MP3 saved.</b> The sound is ready and live. (Here it took 1.1 seconds and the file is 145 KB.)</li>
+    <li><span class="n">2</span><b>Warning.</b> The file could not be saved this time (for example &ldquo;download failed&rdquo;).</li>
+    <li><span class="n">3</span><b>Retry.</b> Press it to try again. If it keeps failing, wait: the website also retries by itself after every automatic search.</li>
+    <li><span class="n">4</span><b>Undo.</b> Takes the sound off the website.</li>
+    <li><span class="n">5</span><b>Reject.</b> Takes the sound off the website and moves it to Rejected.</li>
+  </ol>
+</section>
+
+<section>
+  <h3 style="margin-top:0">The Rejected list</h3>
+  <figure class="w100"><img src="shots/admin-rejected.png" alt="Rejected list"><figcaption>Figure 6. The Rejected list</figcaption></figure>
+  <ol class="key">
+    <li><span class="n">1</span><b>Undo.</b> Moves the sound back to &ldquo;not decided&rdquo;.</li>
+    <li><span class="n">2</span><b>Approve.</b> Changed your mind? Approve it straight from here.</li>
+  </ol>
+  <div class="box note"><b>Good to know</b> Sounds you approved <b>always stay</b> in your Approved list, even if the filter would hide them. Sounds you rejected <b>never come back</b> by themselves. Changes appear on your website within a few minutes.</div>
+
+  <div class="avoid">
+  <h2>1.8 Reports from visitors</h2>
+  <p>Every sound page has a link <b>Report this sound</b>, and the website footer has <b>Report Content</b>. When a visitor sends a report, it arrives in your admin panel.</p>
+  <div class="cols">
+    <div>
+      <ol>
+        <li>A small number <span class="n">1</span> appears next to <b>Messages &amp; Inquiries</b> in the left menu (Figure 7). Click it.</li>
+        <li>Find the message whose label starts with <b>Sound report</b> (<span class="n">1</span> in Figure 8).</li>
+        <li>Read what the visitor wrote (<span class="n">2</span> in Figure 8): the sound link, the reason and the details.</li>
+      </ol>
+    </div>
+    <figure class="w70"><img src="shots/admin-messages-menu.png" alt="Messages menu"><figcaption>Figure 7. New message</figcaption></figure>
+  </div>
+  </div>
+  <figure class="w100"><img src="shots/admin-messages.png" alt="A sound report"><figcaption>Figure 8. A sound report in Messages</figcaption></figure>
+  <ol class="key">
+    <li><span class="n">1</span><b>The label.</b> Shows it is a sound report and which sound.</li>
+    <li><span class="n">2</span><b>The report.</b> The sound link, the reason (for example Copyright) and the visitor&rsquo;s details.</li>
+    <li><span class="n">3</span><b>Buttons.</b> Mark as read, archive, or delete the message.</li>
+  </ol>
+  <h3>What to do</h3>
+  <ol>
+    <li>Open the sound link and listen to the sound.</li>
+    <li>If the report is right: go to <b>Trending Sounds</b>, choose <b>Approved</b> in the list chooser, find the sound and press <span class="btn b-red">Reject</span>. It leaves your website within a few minutes.</li>
+    <li>Write back to the visitor by email. The website promises that a valid report is handled within <b>24 to 48 hours</b>.</li>
+    <li>Mark the message as read, or archive it.</li>
+  </ol>
+  <div class="box warn"><b>Important</b> Nothing is removed automatically. Only you can remove a sound. This also protects you from false reports.</div>
+</section>
+
+<section>
+  <h2 style="margin-top:0">1.9 Your daily routine (2 to 3 minutes)</h2>
+  <ul class="checklist">
+    <li>Open <b>Trending Sounds</b>. Check that <b>Last run</b> is recent.</li>
+    <li>Look at the new sounds in <b>Passed the filter</b>. The best ones are at the top.</li>
+    <li>Click <b>Sound</b> to listen to the ones you like. Press <b>Approve</b> on the good ones.</li>
+    <li>Wait until each approved sound shows <b>MP3 saved</b>.</li>
+    <li>Open <b>Messages &amp; Inquiries</b> and check for a new <b>Sound report</b>.</li>
+    <li>Once a week, open the <b>Sounds</b> page of your website and check that everything looks good.</li>
+  </ul>
+  
+</section>
+
+<!-- PART 2 : VISITORS -->
+<section class="start">
+  <div class="part"><span class="no">2</span><div><h1>What visitors see</h1><small>Where sounds appear on your website and how people download them</small></div></div>
+
+  <h2>2.1 Where visitors find the sounds</h2>
+  <p>Approved sounds appear in three places on your website.</p>
+
+  <h3>The top menu</h3>
+  <p>A <b>Sounds</b> link <span class="n">1</span> in the top menu takes visitors to the list of all sounds. On a phone, it is in the menu opened with the three-line button.</p>
+  <figure class="w100"><img src="shots/fe-header.png" alt="Menu"><figcaption>Figure 9. The Sounds link in the menu</figcaption></figure>
+
+  <h3>The home page</h3>
+  <p>The section <b>Trending Meme Sounds</b> is on the home page, just <b>above</b> &ldquo;Free Online Tools&rdquo;. It shows your 4 most viewed approved sounds. It appears only when at least one sound is approved.</p>
+  <figure class="w85"><img src="shots/fe-home-section.png" alt="Home page section"><figcaption>Figure 10. The home page section</figcaption></figure>
+  <ol class="key">
+    <li><span class="n">1</span><b>&ldquo;Trending now&rdquo; label</b> and the heading of the section.</li>
+    <li><span class="n">2</span><b>A sound card.</b> Click it to open the sound page.</li>
+    <li><span class="n">3</span><b>See all sounds.</b> Opens the full list.</li>
+  </ol>
+</section>
+
+<section>
+  <div class="avoid">
+  <h3 style="margin-top:0">The Sounds page</h3>
+  <p>This page lists <b>every approved sound</b>, with the most viewed first.</p>
+  <figure class="w70"><img src="shots/fe-list.png" alt="Sounds page"><figcaption>Figure 11. The Sounds page</figcaption></figure>
+  </div>
+  <ol class="key">
+    <li><span class="n">1</span><b>Search box.</b> Type a word to find a sound.</li>
+    <li><span class="n">2</span><b>Counter.</b> How many sounds match.</li>
+    <li><span class="n">3</span><b>Play button.</b> Plays the sound right here. Only one sound plays at a time.</li>
+    <li><span class="n">4</span><b>Sound name.</b> Click it to open the sound&rsquo;s own page.</li>
+    <li><span class="n">5</span><b>Download MP3.</b> Saves the file to the visitor&rsquo;s phone or computer.</li>
+  </ol>
+  <div class="box note"><b>Good to know</b> A sound appears here only after you approved it <b>and</b> its MP3 shows &ldquo;MP3 saved&rdquo; in the admin panel.</div>
+</section>
+
+<section>
+  <div class="avoid">
+  <h2 style="margin-top:0">2.2 The sound page</h2>
+  <p>Every approved sound has its own page. It has a music player in the website&rsquo;s colours. The speaker in the middle <b>vibrates lightly while the sound plays</b>.</p>
+  <div class="cols">
+    <figure class="w100"><img src="shots/fe-player.png" alt="Player"><figcaption>Figure 12. The player</figcaption></figure>
+    <div>
+      <ol class="key">
+        <li><span class="n">1</span><b>Previous.</b> Opens the sound before this one in the list.</li>
+        <li><span class="n">2</span><b>Play / Pause.</b> Starts or stops the sound.</li>
+        <li><span class="n">3</span><b>Next.</b> Opens the next sound in the list.</li>
+        <li><span class="n">4</span><b>Progress bar.</b> Shows how far the sound has played. Tap or drag it to jump forward or back.</li>
+        <li><span class="n">5</span><b>Time.</b> On the left, how long it has played. On the right, the full length.</li>
+        <li><span class="n">6</span><b>Download MP3.</b> Saves the sound as a file. It is free, with no sign-up.</li>
+      </ol>
+      <p class="small">Under the player, visitors also see the length of the sound and the number of views.</p>
+    </div>
+  </div>
+  </div>
+  <h3>Under the player</h3>
+  <p>The page also has a short text about the sound, an answer to common questions, and a list of other sounds.</p>
+  <div class="cols">
+    <figure class="w85"><img src="shots/fe-sound-info.png" alt="Rest of the sound page"><figcaption>Figure 13. The rest of the sound page</figcaption></figure>
+    <div><ol class="key">
+    <li><span class="n">1</span><b>About this sound.</b> A short text written automatically from the sound&rsquo;s real details: its length, views, and since when it is trending.</li>
+    <li><span class="n">2</span><b>Open the video downloader.</b> Takes visitors to your video downloader on the home page.</li>
+    <li><span class="n">3</span><b>Frequently asked questions.</b> Four short answers, for example &ldquo;How do I download it as an MP3?&rdquo;.</li>
+    <li><span class="n">4</span><b>Report this sound.</b> Opens the report form (section 2.4).</li>
+    <li><span class="n">5</span><b>More trending sounds.</b> Links to other sounds.</li>
+  </ol></div>
+  </div>
+</section>
+
+<section>
+  
+
+  <h2>2.3 How a visitor downloads an MP3</h2>
+  <ol>
+    <li>Open your website and click <b>Sounds</b> in the menu (or click a sound on the home page).</li>
+    <li>Press the round <b>play</b> button to listen.</li>
+    <li>Press <span class="btn b-dark">Download MP3</span>, on the list or on the sound page.</li>
+    <li>The file is saved. On a computer it goes to the <b>Downloads</b> folder. On a phone, look in <b>Downloads</b> or in the <b>Files</b> app.</li>
+    <li>Open the file with any music or audio app. It also works as a ringtone or in a video editor.</li>
+  </ol>
+  <div class="cols" style="margin-top:6pt">
+    <figure class="w55"><img src="shots/fe-mobile-home.png" alt="Phone home page"><figcaption>Figure 14. On a phone: the home page</figcaption></figure>
+    <figure class="w55"><img src="shots/fe-mobile-sound.png" alt="Phone sound page"><figcaption>Figure 15. On a phone: the sound page</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <h2 style="margin-top:0">2.4 Report Content</h2>
+  <p>If someone thinks a sound should not be on your website (for example it uses their work), they can tell you. There are two ways to reach the form:</p>
+  <ul>
+    <li>the <b>Report this sound</b> link on every sound page (the sound link is filled in for them), or</li>
+    <li>the <b>Report Content</b> link <span class="n">1</span> at the bottom of every page of your website.</li>
+  </ul>
+  <figure class="w70"><img src="shots/fe-footer.png" alt="Footer link"><figcaption>Figure 16. The Report Content link in the website footer</figcaption></figure>
+  <div class="cols">
+    <figure class="w100"><img src="shots/fe-report.png" alt="Report form"><figcaption>Figure 17. The report form</figcaption></figure>
+    <div><ol class="key">
+    <li><span class="n">1</span><b>Sound link or name.</b> The visitor writes which sound (filled in automatically from a sound page).</li>
+    <li><span class="n">2</span><b>Reason.</b> Copyright, harmful or offensive, their voice or private information, or other.</li>
+    <li><span class="n">3</span><b>Details.</b> What is wrong, and who owns the sound.</li>
+    <li><span class="n">4</span><b>Name and email.</b> So you can answer.</li>
+    <li><span class="n">5</span><b>Send report.</b> The report arrives in your admin panel (section 1.8).</li>
+  </ol></div>
+  </div>
+  
+  <div class="box note"><b>Good to know</b> A visitor can only send a report. They can never remove a sound. A person (you) reads every report, and nothing is deleted automatically.</div>
+</section>
+
+<!-- PART 3 : QUESTIONS -->
+<section>
+  <div class="part"><span class="no">3</span><div><h1>Questions and answers</h1><small>The most common situations</small></div></div>
+  <table>
+    <thead><tr><th style="width:34%">Question</th><th>Answer</th></tr></thead>
+    <tbody>
+      <tr><td>I approved a sound but I cannot see it on the website.</td><td>Open the <b>Approved</b> list. Under the sound it must say <b>MP3 saved</b>. If it says &ldquo;Saving MP3&hellip;&rdquo;, wait a few seconds. If there is a warning, press <b>Retry</b>. After that, wait a few minutes: the website refreshes its list about every 5 minutes.</td></tr>
+      <tr><td>My list is empty or very short.</td><td>Most likely <b>Min days seen</b> is 2 and the sounds are new. Change it to <b>1</b> and press <b>Save</b>, or wait a day or two. Also check that the list chooser says <b>Passed the filter</b>.</td></tr>
+      <tr><td>How often does the website look for new sounds?</td><td>4 times a day, by itself. Press <b>Run now</b> to look right away.</td></tr>
+      <tr><td>&ldquo;Last run&rdquo; is old. What do I do?</td><td>Press <b>Run now</b>. If the status says <b>OFF</b>, press <b>Turn ON</b>.</td></tr>
+      <tr><td>A famous sound is missing from my list.</td><td>The filter may have hidden it. Choose <b>Filtered out</b> in the list chooser and read the <b>Filter</b> column to see why.</td></tr>
+      <tr><td>How do I remove a sound from the website?</td><td>Press <b>Reject</b> (or <b>Undo</b>). It leaves the website within a few minutes.</td></tr>
+      <tr><td>Can visitors see sounds that I did not approve?</td><td>No. Only approved sounds with a saved MP3 are shown.</td></tr>
+      <tr><td>A sound has huge views. Is it new?</td><td>Not always. &ldquo;Top video views&rdquo; counts one very popular video, which may be old. Look at <b>Days</b> and <b>Regions</b>: many days and many countries means it is really trending now.</td></tr>
+      <tr><td>How many sounds should I approve?</td><td>Start with 5 to 10 good ones. Then add a few every day. Quality is more important than quantity.</td></tr>
+      <tr><td>Will the sounds appear in Google search?</td><td>Not yet. For now the sound pages are kept out of Google search, because your website is still on a test address. When the final website address is ready, they can be switched on. Ask your developer at that time.</td></tr>
+      <tr><td>Do I need to refresh the admin page?</td><td>No. After you press Approve, the page updates by itself.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Quick reference</h2>
+  <h3>Where is what?</h3>
+  <table>
+    <thead><tr><th style="width:34%">I want to&hellip;</th><th>Go to&hellip;</th></tr></thead>
+    <tbody>
+      <tr><td>Choose sounds</td><td>Admin panel &rarr; <b>Trending Sounds</b></td></tr>
+      <tr><td>Read reports from visitors</td><td>Admin panel &rarr; <b>Messages &amp; Inquiries</b></td></tr>
+      <tr><td>See all sounds as a visitor</td><td>Website &rarr; <b>Sounds</b> in the top menu</td></tr>
+      <tr><td>See the home page section</td><td>Website home page, above <b>Free Online Tools</b></td></tr>
+      <tr><td>Open the report form</td><td>Website footer &rarr; <b>Report Content</b></td></tr>
+    </tbody>
+  </table>
+  <h3>All buttons</h3>
+  <table>
+    <thead><tr><th style="width:26%">Button</th><th>Where</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><span class="btn b-purple">Turn OFF / ON</span></td><td>Top box</td><td>Stops or starts the automatic search.</td></tr>
+      <tr><td><span class="btn b-purple">Run now</span></td><td>Top box</td><td>Looks for new sounds right now.</td></tr>
+      <tr><td><span class="btn b-purple">Save</span></td><td>Filter box</td><td>Saves your filter settings.</td></tr>
+      <tr><td>Video &middot; Sound</td><td>List</td><td>Opens the video or the sound on TikTok so you can check it.</td></tr>
+      <tr><td><span class="btn b-green">Approve</span></td><td>List</td><td>Publishes the sound on the website.</td></tr>
+      <tr><td><span class="btn b-red">Reject</span></td><td>List</td><td>Hides the sound.</td></tr>
+      <tr><td><span class="btn b-grey">Undo</span></td><td>List</td><td>Takes your decision back.</td></tr>
+      <tr><td><span class="btn b-purple">Retry</span></td><td>Approved list</td><td>Tries to save the MP3 again.</td></tr>
+      <tr><td><span class="btn b-dark">Download MP3</span></td><td>Website</td><td>Visitors save the sound as a file.</td></tr>
+    </tbody>
+  </table>
+  <div class="box tip"><b>Remember</b> Nothing is published until <b>you press Approve</b>. Nothing is deleted without you. When in doubt, press <b>Reject</b>: you can always change your mind.</div>
+  <p class="small" style="margin-top:14pt">ASK video Downloader &middot; Trending Sounds User Guide &middot; Version 1.0 &middot; November 2026</p>
+</section>
+
+</body></html>

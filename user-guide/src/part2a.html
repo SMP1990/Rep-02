@@ -1,0 +1,64 @@
+<!-- PART 1 : ADMIN (a) -->
+<section class="start">
+  <div class="part"><span class="no">1</span><div><h1>The admin panel</h1><small>Where you choose the sounds</small></div></div>
+
+  <h2>1.1 Open the Trending Sounds page</h2>
+  <div class="cols">
+    <div>
+      <ol>
+        <li>Open your website address and add <span class="kbd">/admin</span> at the end.</li>
+        <li>Log in with your admin email and password.</li>
+        <li>In the menu on the left, click <b>Trending Sounds</b> <span class="n">1</span>.</li>
+      </ol>
+      <div class="box tip"><b>Tip</b> You can also click <b>Messages &amp; Inquiries</b> in the same menu to read reports from visitors (see section 1.8).</div>
+    </div>
+    <figure class="w55"><img src="shots/admin-menu.png" alt="Admin menu"><figcaption>Figure 1. The left menu of the admin panel</figcaption></figure>
+  </div>
+
+  <h2>1.2 The top box</h2>
+  <p>The first box on the page tells you if the automatic search is working.</p>
+  <figure class="w100"><img src="shots/admin-top.png" alt="Top box"><figcaption>Figure 2. The top box</figcaption></figure>
+  <ol class="key">
+    <li><span class="n">1</span><b>Turn OFF / Turn ON.</b> Stops or starts the automatic search. Leave it <b>ON</b>.</li>
+    <li><span class="n">2</span><b>Run now.</b> Searches for new sounds right now. It takes 1 to 2 minutes. You normally do not need it, because the website searches by itself 4 times a day (about every 6 hours).</li>
+    <li><span class="n">3</span><b>Status and Last run.</b> &ldquo;Status: ON&rdquo; means it is working. &ldquo;Last run&rdquo; is the date and time of the last search. It should be recent (within about 6 hours).</li>
+    <li><span class="n">4</span><b>Counts.</b> &ldquo;99 sounds saved&rdquo; is everything found so far. &ldquo;29 pass the filter&rdquo; is how many match your rules.</li>
+    <li><span class="n">5</span><b>Result for each country.</b> The website checks 8 countries: PK (Pakistan), IN (India), US (USA), GB (United Kingdom), AE (UAE), SA (Saudi Arabia), ID (Indonesia), BR (Brazil). &ldquo;ok 7&rdquo; means 7 sounds were found there.</li>
+  </ol>
+  <div class="box note"><b>Good to know</b> Sometimes one country says &ldquo;failed&rdquo;. This is normal. The next search tries again. If a red message says the last run failed in every country, do nothing: the website tries again by itself after about 45 minutes and keeps all your old sounds.</div>
+</section>
+
+<section>
+  <h2 style="margin-top:0">1.3 The filter</h2>
+  <p>The filter is your assistant. It hides sounds that are probably not what you want, so your list stays short and good.</p>
+  <figure class="w100"><img src="shots/admin-filter.png" alt="Filter box"><figcaption>Figure 3. The filter box</figcaption></figure>
+  <table>
+    <thead><tr><th style="width:30%">Setting</th><th>What it does</th><th style="width:15%">Normal</th></tr></thead>
+    <tbody>
+      <tr><td><span class="n">1</span>Min views</td><td>A sound must have at least this many views on its most popular video.</td><td>1,000,000</td></tr>
+      <tr><td><span class="n">2</span>Min seconds</td><td>Hides sounds shorter than this.</td><td>3</td></tr>
+      <tr><td><span class="n">3</span>Max seconds</td><td>Hides sounds longer than this.</td><td>60</td></tr>
+      <tr><td><span class="n">4</span>Per creator</td><td>Shows at most this many sounds from the same creator, so one person does not fill your list.</td><td>2</td></tr>
+      <tr><td><span class="n">5</span>Min days seen</td><td>A sound must have been seen on at least this many different days. This keeps out sounds that were popular for only one day.</td><td>2</td></tr>
+      <tr><td><span class="n">6</span>No songs</td><td>When ticked, hides music tracks.</td><td>ticked</td></tr>
+      <tr><td><span class="n">7</span>No brands/news/lyrics</td><td>When ticked, hides company and brand sounds, news channels, song-lyrics pages, religious recitation, and famous people.</td><td>ticked</td></tr>
+      <tr><td><span class="n">8</span>Save</td><td>Press this after you change anything. Your list updates at once.</td><td></td></tr>
+    </tbody>
+  </table>
+  <div class="box note"><b>Safe to use</b> The filter <b>never deletes</b> a sound. It only hides it from your main list. You can always see hidden sounds again (section 1.4).</div>
+  <div class="box tip"><b>Tip</b> If your list is empty or very short, change <b>Min days seen</b> to <b>1</b> and press <b>Save</b>. You will then see every sound that matches your other rules, even those found only today. When you have more sounds, you can set it back to 2.</div>
+
+  <h2>1.4 Choose which list to see</h2>
+  <p>Above the table there is a menu with five choices. It decides which sounds the table shows.</p>
+  <table>
+    <thead><tr><th style="width:28%">Choice</th><th>What you see</th></tr></thead>
+    <tbody>
+      <tr><td>Passed the filter</td><td>The main list: sounds that match your rules and are waiting for your decision, plus the ones you approved. <b>This is where you work.</b></td></tr>
+      <tr><td>Approved</td><td>The sounds you approved. These are on your website.</td></tr>
+      <tr><td>Rejected</td><td>The sounds you rejected.</td></tr>
+      <tr><td>Filtered out</td><td>Sounds hidden by the filter. Look here if a sound you expected is missing. The <b>Filter</b> column tells you why it was hidden.</td></tr>
+      <tr><td>All</td><td>Everything, in one list.</td></tr>
+    </tbody>
+  </table>
+  <p class="small">Each list shows the best 300 sounds, highest score first.</p>
+</section>
