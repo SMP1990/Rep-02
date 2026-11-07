@@ -22,6 +22,7 @@ export const ROUTE_PATHS = {
   'image-compressor': '/image-compressor',
   'dns-checker': '/dns-checker',
   'watermark-remover': '/watermark-remover',
+  'public-sounds': '/sounds',
 } as const;
 
 export type PublicRoute = keyof typeof ROUTE_PATHS;

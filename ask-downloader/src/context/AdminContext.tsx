@@ -251,6 +251,9 @@ export function parseCurrentLocation(
   if (rawPath === '/image-compressor') {
     return { route: 'image-compressor', slug: null, language: null };
   }
+  if (rawPath === '/sounds') {
+    return { route: 'public-sounds', slug: null, language: null };
+  }
 
   // 4. Admin subroutes
   const adminRoutes: RouteType[] = ['dashboard', 'subscribers', 'downloads', 'visitors', 'admin-users', 'content-editor', 'blog-manager', 'settings', 'messages', 'redirects', 'media', 'tools-seo', 'sounds'];
@@ -940,6 +943,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           window.history.pushState(null, '', '/dns-checker');
         } else if (route === 'image-compressor') {
           window.history.pushState(null, '', '/image-compressor');
+        } else if (route === 'public-sounds') {
+          window.history.pushState(null, '', '/sounds');
         }
       } catch {
         window.location.hash = route;

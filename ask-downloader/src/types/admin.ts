@@ -32,6 +32,7 @@ export type RouteType =
   | 'image-compressor'
   | 'dns-checker'
   | 'watermark-remover'
+  | 'public-sounds'
   | 'not-found';
 
 export type ContactMessageTopic = 

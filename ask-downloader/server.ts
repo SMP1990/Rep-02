@@ -43,7 +43,7 @@ import { registerBgRoutes, prefetchBgModels } from './server/bgRoutes.ts';
 import { registerDnsRoutes } from './server/dns/routes.ts';
 import { registerWmRoutes, prefetchWmModel } from './server/wmRoutes.ts';
 import { registerSoundsRoutes } from './server/soundsRoutes.ts';
-import { registerPublicSoundsRoutes } from './server/soundsPublic.ts';
+import { publicSounds, registerPublicSoundsRoutes } from './server/soundsPublic.ts';
 import { startSoundsScheduler } from './server/trendingSounds.ts';
 import { TOOL_PAGE_LIST, cleanToolsContent, type ToolsContent } from './src/config/toolPages.ts';
 import { addRedirect, findRedirect, clearRedirectFrom, listRedirects, deleteRedirect, normalizePath, normalizeTarget, isProtectedPath, setOwnHost } from './server/redirects.ts';
@@ -2613,6 +2613,11 @@ function getRouteMeta(pathname: string, isAdmin = false): RouteMeta {
     '/legal': {
       title: `Legal & DMCA - ${SEO_SITE_NAME}`,
       description: `Legal information and DMCA policy for ${SEO_SITE_NAME}.`,
+    },
+    '/sounds': {
+      title: `Trending Meme Sounds - Download Funny MP3 Audio - ${SEO_SITE_NAME}`,
+      description: `Listen to the funniest viral meme sounds and download them as free MP3. New trending sounds on ${SEO_SITE_NAME} every day.`,
+      noindex: publicSounds().length === 0, // an empty list is a thin page: keep it out of search until there is something to show
     },
     '/admin': {
       title: `Admin Sign In - ${SEO_SITE_NAME}`,
