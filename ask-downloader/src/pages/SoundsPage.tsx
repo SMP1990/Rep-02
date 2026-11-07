@@ -8,7 +8,7 @@ type Sound = {
   video?: { id: string; user: string; views: number };
   vs?: number;
 };
-type Settings = { minViews: number; minSec: number; maxSec: number; perCreator: number; excludeMusic: boolean; excludeJunk: boolean };
+type Settings = { minViews: number; minSec: number; maxSec: number; perCreator: number; minDays: number; excludeMusic: boolean; excludeJunk: boolean };
 type Status = {
   enabled: boolean; lastRun: string; running: boolean; allFailed: boolean; settings: Settings;
   log: { regions: Record<string, string> }[];
@@ -109,7 +109,7 @@ export const SoundsPage: React.FC<{ onOpenMobileMenu: () => void }> = ({ onOpenM
         <div className={`${card} p-5 mb-6`}>
           <h2 className="text-sm font-bold mb-3">Filter (sounds are never deleted by it, only hidden from the list)</h2>
           <div className="flex flex-wrap items-end gap-3">
-            {field('minViews', 'Min views')}{field('minSec', 'Min seconds')}{field('maxSec', 'Max seconds')}{field('perCreator', 'Per creator')}
+            {field('minViews', 'Min views')}{field('minSec', 'Min seconds')}{field('maxSec', 'Max seconds')}{field('perCreator', 'Per creator')}{field('minDays', 'Min days seen')}
             <label className="text-xs flex items-center gap-2 pb-2 cursor-pointer">
               <input type="checkbox" checked={set.excludeMusic} onChange={(e) => setSet({ ...set, excludeMusic: e.target.checked })} /> No songs
             </label>
