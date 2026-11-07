@@ -43,6 +43,7 @@ import { registerBgRoutes, prefetchBgModels } from './server/bgRoutes.ts';
 import { registerDnsRoutes } from './server/dns/routes.ts';
 import { registerWmRoutes, prefetchWmModel } from './server/wmRoutes.ts';
 import { registerSoundsRoutes } from './server/soundsRoutes.ts';
+import { adminSessions } from './server/adminSessions.ts';
 import { SOUNDS_OPEN_TO_SEARCH, publicSound, publicSounds, registerPublicSoundsRoutes, soundsSitemap } from './server/soundsPublic.ts';
 import { startSoundsScheduler } from './server/trendingSounds.ts';
 import { TOOL_PAGE_LIST, cleanToolsContent, type ToolsContent } from './src/config/toolPages.ts';
@@ -154,19 +155,9 @@ app.use((req: Request, res: Response, next: Function) => {
 const SESSION_COOKIE_NAME = 'fdownloader_admin_session';
 const SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
-interface AdminSession {
-  createdAt: number;
-  expiresAt: number;
-  /** Which admin this session belongs to, so permissions can be checked. */
-  userId?: string;
-}
-const adminSessions = new Map<string, AdminSession>();
-
+// Sessions are kept (as hashes) in the data folder, so a restart does not log the admin out: see server/adminSessions.ts.
 function cleanExpiredSessions() {
-  const now = Date.now();
-  for (const [token, session] of adminSessions.entries()) {
-    if (session.expiresAt < now) adminSessions.delete(token);
-  }
+  adminSessions.cleanExpired();
 }
 
 function parseCookies(req: Request): Record<string, string> {
