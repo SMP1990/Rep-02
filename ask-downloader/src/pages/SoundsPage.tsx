@@ -8,7 +8,7 @@ type Sound = {
   video?: { id: string; user: string; views: number };
   vs?: number;
 };
-type Settings = { minViews: number; minSec: number; maxSec: number; perCreator: number; excludeMusic: boolean };
+type Settings = { minViews: number; minSec: number; maxSec: number; perCreator: number; excludeMusic: boolean; excludeJunk: boolean };
 type Status = {
   enabled: boolean; lastRun: string; running: boolean; allFailed: boolean; settings: Settings;
   log: { regions: Record<string, string> }[];
@@ -112,6 +112,9 @@ export const SoundsPage: React.FC<{ onOpenMobileMenu: () => void }> = ({ onOpenM
             {field('minViews', 'Min views')}{field('minSec', 'Min seconds')}{field('maxSec', 'Max seconds')}{field('perCreator', 'Per creator')}
             <label className="text-xs flex items-center gap-2 pb-2 cursor-pointer">
               <input type="checkbox" checked={set.excludeMusic} onChange={(e) => setSet({ ...set, excludeMusic: e.target.checked })} /> No songs
+            </label>
+            <label className="text-xs flex items-center gap-2 pb-2 cursor-pointer" title="Hides brands, news, lyrics, Quran, spam">
+              <input type="checkbox" checked={set.excludeJunk} onChange={(e) => setSet({ ...set, excludeJunk: e.target.checked })} /> No brands/news/lyrics
             </label>
             <button onClick={saveSettings} className={btn}>Save</button>
           </div>

@@ -21,7 +21,7 @@ type State = { enabled: boolean; lastRun: string; log: RunLog[]; settings: Setti
 
 const getState = (): State => {
   const s = read<State>('soundsState', { enabled: false, lastRun: '', log: [], settings: DEFAULT_SETTINGS });
-  if (!s.settings) s.settings = DEFAULT_SETTINGS;
+  s.settings = { ...DEFAULT_SETTINGS, ...(s.settings || {}) };
   return s;
 };
 const getSounds = () => read<Record<string, Sound>>('soundsData', {});
