@@ -5,6 +5,18 @@ without the old chat. Read it fully, then `ask-downloader/CLAUDE.md` (owner
 rules and site details) and `TOOLS-GUIDE.md` (tools map), before changing
 anything.
 
+> ## Google switch - remind the owner when the domain changes
+> **Owner decision 2026-11-07:** keep `SOUNDS_OPEN_TO_SEARCH = false` (`ask-downloader/server/soundsPublic.ts`)
+> because the site is still on a **testing domain** (`social.al-marifat.org`). OFF means: `/sounds` and every sound page work for
+> visitors (header link, home section, footer Report Content link) but are `noindex` and are NOT in `sitemap.xml`, so Google does not list them.
+> **When the owner says the real domain is live (or the domain changes), ASK/REMIND HIM** to decide about turning it ON. Checklist then:
+> 1. Owner listens to the approved sounds and Rejects songs/edits/copyrighted ones (e.g. nostalgia.zz, 60 s) BEFORE the switch (once Google indexes a page, removal takes days).
+> 2. Only on his clear yes: set the constant to `true`, `npm run lint && npm run build`, make a small ZIP, push, owner deploys.
+> 3. Open `/sitemap.xml` on the real domain: `/sounds` and each approved sound must be listed; check a sound page says `index, follow`.
+> 4. Owner submits the sitemap in Google Search Console for the real domain (guide him one click at a time).
+> 5. Optional first: serve the MP3 from a path outside `/api/` (robots.txt has `Disallow: /api/`) so Google can reach the audio file; check the Report Content page works on the new domain.
+> 6. Also check that data (`.fdownloader-data`, the saved MP3s in its `sounds/` folder) is present on the new domain/host.
+>
 Last updated: 2026-11-07, end of day (v39 built = whole public Sounds front end; Google switch still OFF; owner to deploy and test; see section 6 "NEWEST" and `PLAN-TRENDING-SOUNDS.md` section 13).
 
 **Where the owner keeps it on his PC (since 2026-10-27):** `F:\ask-downloader` (a full git clone of `SMP1990/Rep-02`,
