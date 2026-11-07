@@ -3,7 +3,8 @@ import { Header } from '../components/Header.tsx';
 import { Footer } from '../components/Footer.tsx';
 import { Seo } from '../components/Seo.tsx';
 import { useLanguage } from '../context/LanguageContext.tsx';
-import { soundStrings } from '../tools/sounds/i18n/index.ts';
+import { fillN, soundStrings } from '../tools/sounds/i18n/index.ts';
+import { SoundAbout } from '../tools/sounds/SoundAbout.tsx';
 import type { PublicSound } from '../tools/sounds/SoundCard.tsx';
 
 /** The slug is the last part of the address: /sounds/<slug>. */
@@ -18,38 +19,71 @@ export const SoundPage: React.FC = () => {
   const s = soundStrings(currentLang);
   const slug = slugFromUrl();
   const [sound, setSound] = useState<PublicSound | null>(null);
+  const [related, setRelated] = useState<PublicSound[]>([]);
   const [state, setState] = useState<'loading' | 'ok' | 'missing' | 'failed'>('loading');
 
   useEffect(() => {
+    setState('loading');
     fetch(`/api/sounds/${encodeURIComponent(slug)}`)
       .then((r) => (r.status === 404 ? Promise.reject(new Error('missing')) : r.ok ? r.json() : Promise.reject(new Error('failed'))))
-      .then((d) => { setSound(d.sound); setState('ok'); })
+      .then((d) => { setSound(d.sound); setRelated(Array.isArray(d.related) ? d.related : []); setState('ok'); })
       .catch((e) => setState(e?.message === 'missing' ? 'missing' : 'failed'));
   }, [slug]);
 
   const title = sound ? `${sound.title} MP3` : s.title;
+  const views = sound ? new Intl.NumberFormat(currentLang, { notation: 'compact', maximumFractionDigits: 1 }).format(sound.views) : '';
+  const mp3 = sound ? `/api/sounds/${encodeURIComponent(sound.slug)}/mp3` : '';
 
   return (
     <div className="min-h-screen bg-[#f6f0f4] dark:bg-[#0e0a17] text-[#2e2440] dark:text-[#f4eefb] flex flex-col transition-colors duration-200">
-      <Seo title={title} description={s.subtitle} path={`/sounds/${slug}`} noindex={state !== 'ok'} />
+      <Seo title={title} description={sound ? s.subtitle : s.notFound} path={`/sounds/${slug}`} noindex={state !== 'ok'} />
       <Header />
-      <main className="flex-1 w-full py-10 sm:py-14">
+      <main className="flex-1 w-full py-8 sm:py-12">
         <div className="max-w-3xl mx-auto px-4">
+          <a href="/sounds" className="text-sm font-semibold text-[#341d5b] dark:text-[#d1b9f7] underline underline-offset-4">{s.allSounds}</a>
+
           {state === 'loading' && <p className="text-center text-slate-500 py-10" role="status">{s.loading}</p>}
           {state === 'failed' && <p className="text-center py-10" role="alert">{s.loadError}</p>}
           {state === 'missing' && <p className="text-center py-10">{s.notFound}</p>}
+
           {state === 'ok' && sound && (
-            <div className="text-center">
-              <h1 className="font-heading text-3xl sm:text-5xl font-extrabold tracking-tight text-[#341d5b] dark:text-[#d1b9f7]">{sound.title}</h1>
-              <audio className="w-full mt-8" controls preload="none" src={`/api/sounds/${encodeURIComponent(sound.slug)}/mp3`} />
-              <a
-                href={`/api/sounds/${encodeURIComponent(sound.slug)}/mp3?dl=1`}
-                download
-                className="inline-block mt-5 rounded-xl bg-[#341d5b] text-white font-semibold px-6 py-3 hover:bg-[#4a2b80]"
-              >
-                {s.download}
-              </a>
-            </div>
+            <>
+              <div className="text-center mt-6">
+                <h1 className="font-heading text-3xl sm:text-5xl font-extrabold tracking-tight text-[#341d5b] dark:text-[#d1b9f7]">{sound.title}</h1>
+                <p className="mt-3 text-slate-600 dark:text-slate-300">
+                  {sound.creator} · {fillN(s.sec, sound.duration)} · {fillN(s.views, views)}
+                </p>
+                <audio className="w-full mt-8" controls preload="none" src={mp3} aria-label={sound.title} />
+                <a
+                  href={`${mp3}?dl=1`}
+                  download
+                  className="inline-block mt-5 rounded-xl bg-[#341d5b] text-white font-semibold px-6 py-3 hover:bg-[#4a2b80] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#6d46b8] focus-visible:ring-offset-2"
+                >
+                  {s.download}
+                </a>
+              </div>
+
+              <SoundAbout sound={sound} s={s} lang={currentLang} />
+
+              {related.length > 0 && (
+                <section className="mt-12">
+                  <h2 className="font-heading text-xl sm:text-2xl font-bold mb-3">{s.relatedTitle}</h2>
+                  <ul className="space-y-2">
+                    {related.map((r) => (
+                      <li key={r.slug}>
+                        <a
+                          href={`/sounds/${encodeURIComponent(r.slug)}`}
+                          className="flex items-center justify-between gap-3 rounded-xl border border-[#e5d9ef] dark:border-[#2e2440] bg-white dark:bg-[#171025] px-4 py-3 hover:border-[#6d46b8]"
+                        >
+                          <span className="font-semibold truncate">{r.title}</span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">{fillN(s.sec, r.duration)}</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+            </>
           )}
         </div>
       </main>
