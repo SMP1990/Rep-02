@@ -254,6 +254,9 @@ export function parseCurrentLocation(
   if (rawPath === '/sounds') {
     return { route: 'public-sounds', slug: null, language: null };
   }
+  if (rawPath.startsWith('/sounds/')) {
+    return { route: 'public-sound', slug: rawPath.slice('/sounds/'.length) || null, language: null };
+  }
 
   // 4. Admin subroutes
   const adminRoutes: RouteType[] = ['dashboard', 'subscribers', 'downloads', 'visitors', 'admin-users', 'content-editor', 'blog-manager', 'settings', 'messages', 'redirects', 'media', 'tools-seo', 'sounds'];

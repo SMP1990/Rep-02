@@ -43,7 +43,7 @@ import { registerBgRoutes, prefetchBgModels } from './server/bgRoutes.ts';
 import { registerDnsRoutes } from './server/dns/routes.ts';
 import { registerWmRoutes, prefetchWmModel } from './server/wmRoutes.ts';
 import { registerSoundsRoutes } from './server/soundsRoutes.ts';
-import { publicSounds, registerPublicSoundsRoutes } from './server/soundsPublic.ts';
+import { publicSound, publicSounds, registerPublicSoundsRoutes } from './server/soundsPublic.ts';
 import { startSoundsScheduler } from './server/trendingSounds.ts';
 import { TOOL_PAGE_LIST, cleanToolsContent, type ToolsContent } from './src/config/toolPages.ts';
 import { addRedirect, findRedirect, clearRedirectFrom, listRedirects, deleteRedirect, normalizePath, normalizeTarget, isProtectedPath, setOwnHost } from './server/redirects.ts';
@@ -2674,6 +2674,18 @@ function getRouteMeta(pathname: string, isAdmin = false): RouteMeta {
       };
     }
     return notFoundMeta(SEO_SITE_NAME);
+  }
+
+  // /sounds/<slug> is one sound page, but only for an approved sound whose MP3 is saved; anything else is a real 404.
+  if (pathname.startsWith('/sounds/')) {
+    const sound = publicSound(pathname.slice('/sounds/'.length));
+    if (!sound) return notFoundMeta(SEO_SITE_NAME);
+    return {
+      title: `${sound.title} MP3 Download - Trending Sound - ${SEO_SITE_NAME}`,
+      description: `Listen to "${sound.title}" by ${sound.creator} (${sound.duration} sec) and download it as a free MP3. A trending sound with ${new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(sound.views)} views.`.slice(0, 300),
+      noindex: false,
+      status: 200,
+    };
   }
 
   // Admin dashboard sub-pages (only reachable after login) — never index.

@@ -33,6 +33,7 @@ export type RouteType =
   | 'dns-checker'
   | 'watermark-remover'
   | 'public-sounds'
+  | 'public-sound'
   | 'not-found';
 
 export type ContactMessageTopic = 
