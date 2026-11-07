@@ -356,6 +356,11 @@ export const Footer: React.FC = () => {
                 >
                   {t.footer?.legal || 'Legal'}
                 </RouteLink>
+                <RouteLink route="report-content"
+                  className="hover:text-[#6d46b8] dark:hover:text-[#f0a8bf] transition-colors cursor-pointer"
+                >
+                  {t.footer?.reportContent || 'Report Content'}
+                </RouteLink>
                 <button
                   type="button"
                   onClick={() => setActiveModal('sitemap')}

@@ -4,6 +4,7 @@ export const de: ExtraDict = {
   footer: {
     brandBio: 'Schnelle, saubere Video- und Audio-Downloads ohne Wasserzeichen für alle großen sozialen Plattformen.',
     company: 'Unternehmen', here: 'hier', legal: 'Rechtliches', privacyPolicy: 'Datenschutzerklärung', termsOfUse: 'Nutzungsbedingungen',
+    reportContent: 'Inhalt melden',
     sitemap: 'Sitemap', subscribeBtn: 'Abonnieren', privacyNote: 'Sie können sich jederzeit wieder abmelden.',
     downloaders: 'Downloader', rights: 'Alle Rechte vorbehalten.', developedWith: 'Entwickelt mit', by: 'von',
     emailPlaceholder: 'E-Mail-Adresse eingeben', emailRequired: 'Bitte geben Sie Ihre E-Mail-Adresse ein.',

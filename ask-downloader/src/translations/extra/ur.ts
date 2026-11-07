@@ -4,6 +4,7 @@ export const ur: ExtraDict = {
   footer: {
     brandBio: 'تمام بڑے سوشل پلیٹ فارمز کے لیے تیز رفتار، صاف اور بغیر واٹر مارک ویڈیو اور آڈیو ڈاؤنلوڈ۔',
     company: 'کمپنی', here: 'یہاں', legal: 'قانونی', privacyPolicy: 'رازداری کی پالیسی', termsOfUse: 'استعمال کی شرائط',
+    reportContent: 'مواد کی رپورٹ کریں',
     sitemap: 'سائٹ میپ', subscribeBtn: 'سبسکرائب کریں', privacyNote: 'آپ کسی بھی وقت ان سبسکرائب کر سکیں گے۔',
     downloaders: 'ڈاؤنلوڈرز', rights: 'جملہ حقوق محفوظ ہیں۔', developedWith: 'تیار کردہ', by: 'از',
     emailPlaceholder: 'اپنا ای میل درج کریں', emailRequired: 'براہ کرم اپنا ای میل ایڈریس درج کریں۔',

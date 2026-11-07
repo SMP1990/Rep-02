@@ -4,6 +4,7 @@ export const hi: ExtraDict = {
   footer: {
     brandBio: 'सभी बड़े सोशल प्लेटफ़ॉर्म के लिए तेज़, साफ़ और बिना वॉटरमार्क वीडियो व ऑडियो डाउनलोड।',
     company: 'कंपनी', here: 'यहाँ', legal: 'कानूनी', privacyPolicy: 'गोपनीयता नीति', termsOfUse: 'उपयोग की शर्तें',
+    reportContent: 'कंटेंट की रिपोर्ट करें',
     sitemap: 'साइट मैप', subscribeBtn: 'सब्सक्राइब करें', privacyNote: 'आप कभी भी अनसब्सक्राइब कर सकेंगे।',
     downloaders: 'डाउनलोडर', rights: 'सर्वाधिकार सुरक्षित।', developedWith: 'बनाया गया', by: 'द्वारा',
     emailPlaceholder: 'अपना ईमेल दर्ज करें', emailRequired: 'कृपया अपना ईमेल पता दर्ज करें।',

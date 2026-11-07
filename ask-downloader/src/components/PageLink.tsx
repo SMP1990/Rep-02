@@ -23,6 +23,7 @@ export const ROUTE_PATHS = {
   'dns-checker': '/dns-checker',
   'watermark-remover': '/watermark-remover',
   'public-sounds': '/sounds',
+  'report-content': '/report-content',
 } as const;
 
 export type PublicRoute = keyof typeof ROUTE_PATHS;

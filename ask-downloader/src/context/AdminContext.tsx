@@ -254,6 +254,9 @@ export function parseCurrentLocation(
   if (rawPath === '/sounds') {
     return { route: 'public-sounds', slug: null, language: null };
   }
+  if (rawPath === '/report-content') {
+    return { route: 'report-content', slug: null, language: null };
+  }
   if (rawPath.startsWith('/sounds/')) {
     return { route: 'public-sound', slug: rawPath.slice('/sounds/'.length) || null, language: null };
   }
@@ -948,6 +951,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           window.history.pushState(null, '', '/image-compressor');
         } else if (route === 'public-sounds') {
           window.history.pushState(null, '', '/sounds');
+        } else if (route === 'report-content') {
+          window.history.pushState(null, '', '/report-content');
         }
       } catch {
         window.location.hash = route;

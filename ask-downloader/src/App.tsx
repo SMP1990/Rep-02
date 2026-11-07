@@ -37,6 +37,7 @@ const AgeCalculatorPage = lazy(() => import('./pages/AgeCalculatorPage').then((m
 const WatermarkRemoverPage = lazy(() => import('./pages/WatermarkRemoverPage').then((m) => ({ default: m.WatermarkRemoverPage })));
 const DnsCheckerPage = lazy(() => import('./pages/DnsCheckerPage').then((m) => ({ default: m.DnsCheckerPage })));
 const SoundsListPage = lazy(() => import('./pages/SoundsListPage').then((m) => ({ default: m.SoundsListPage })));
+const ReportContentPage = lazy(() => import('./pages/ReportContentPage').then((m) => ({ default: m.ReportContentPage })));
 const SoundPage = lazy(() => import('./pages/SoundPage').then((m) => ({ default: m.SoundPage })));
 const WordCounterPage = lazy(() => import('./pages/WordCounterPage').then((m) => ({ default: m.WordCounterPage })));
 const GradeCalculatorPage = lazy(() => import('./pages/GradeCalculatorPage').then((m) => ({ default: m.GradeCalculatorPage })));
@@ -172,6 +173,14 @@ const AppContent: React.FC = () => {
     return (
       <div className="min-h-screen bg-[#f6f0f4] dark:bg-[#0e0a17] font-sans antialiased text-[#2e2440] dark:text-[#f1e9fb]">
         <SoundsListPage />
+      </div>
+    );
+  }
+
+  if (currentRoute === 'report-content') {
+    return (
+      <div className="min-h-screen bg-[#f6f0f4] dark:bg-[#0e0a17] font-sans antialiased text-[#2e2440] dark:text-[#f1e9fb]">
+        <ReportContentPage />
       </div>
     );
   }

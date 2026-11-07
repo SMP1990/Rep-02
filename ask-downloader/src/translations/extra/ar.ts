@@ -4,6 +4,7 @@ export const ar: ExtraDict = {
   footer: {
     brandBio: 'تنزيل سريع ونظيف للفيديو والصوت بدون علامة مائية من جميع المنصات الاجتماعية الكبرى.',
     company: 'الشركة', here: 'هنا', legal: 'قانوني', privacyPolicy: 'سياسة الخصوصية', termsOfUse: 'شروط الاستخدام',
+    reportContent: 'الإبلاغ عن محتوى',
     sitemap: 'خريطة الموقع', subscribeBtn: 'اشترك', privacyNote: 'يمكنك إلغاء الاشتراك في أي وقت.',
     downloaders: 'أدوات التنزيل', rights: 'جميع الحقوق محفوظة.', developedWith: 'طُوّر بـ', by: 'بواسطة',
     emailPlaceholder: 'أدخل بريدك الإلكتروني', emailRequired: 'يرجى إدخال عنوان بريدك الإلكتروني.',

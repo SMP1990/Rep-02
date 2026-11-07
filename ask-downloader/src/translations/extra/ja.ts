@@ -4,6 +4,7 @@ export const ja: ExtraDict = {
   footer: {
     brandBio: '主要SNSすべてに対応した、高速・クリーンでウォーターマークなしの動画・音声ダウンロード。',
     company: '会社情報', here: 'こちら', legal: '法的情報', privacyPolicy: 'プライバシーポリシー', termsOfUse: '利用規約',
+    reportContent: 'コンテンツを報告する',
     sitemap: 'サイトマップ', subscribeBtn: '登録する', privacyNote: 'いつでも配信を停止できます。',
     downloaders: 'ダウンローダー', rights: '無断転載を禁じます。', developedWith: '制作', by: '：',
     emailPlaceholder: 'メールアドレスを入力', emailRequired: 'メールアドレスを入力してください。',

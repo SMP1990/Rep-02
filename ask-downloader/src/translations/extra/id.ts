@@ -4,6 +4,7 @@ export const id: ExtraDict = {
   footer: {
     brandBio: 'Unduhan video & audio cepat, bersih, dan tanpa watermark untuk semua platform sosial besar.',
     company: 'Perusahaan', here: 'di sini', legal: 'Legal', privacyPolicy: 'Kebijakan Privasi', termsOfUse: 'Ketentuan Penggunaan',
+    reportContent: 'Laporkan Konten',
     sitemap: 'Peta Situs', subscribeBtn: 'Berlangganan', privacyNote: 'Anda dapat berhenti berlangganan kapan saja.',
     downloaders: 'Pengunduh', rights: 'Hak cipta dilindungi.', developedWith: 'Dikembangkan dengan', by: 'oleh',
     emailPlaceholder: 'Masukkan email Anda', emailRequired: 'Silakan masukkan alamat email Anda.',

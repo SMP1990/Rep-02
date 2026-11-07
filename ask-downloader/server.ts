@@ -2614,6 +2614,10 @@ function getRouteMeta(pathname: string, isAdmin = false): RouteMeta {
       title: `Legal & DMCA - ${SEO_SITE_NAME}`,
       description: `Legal information and DMCA policy for ${SEO_SITE_NAME}.`,
     },
+    '/report-content': {
+      title: `Report Content - ${SEO_SITE_NAME}`,
+      description: `Report a sound that should not be on ${SEO_SITE_NAME}: copyright, harmful content or private information. A person reviews every report.`,
+    },
     '/sounds': {
       title: `Trending Meme Sounds - Download Funny MP3 Audio - ${SEO_SITE_NAME}`,
       description: `Listen to the funniest viral meme sounds and download them as free MP3. New trending sounds on ${SEO_SITE_NAME} every day.`,

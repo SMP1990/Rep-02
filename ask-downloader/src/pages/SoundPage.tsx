@@ -100,6 +100,10 @@ export const SoundPage: React.FC = () => {
 
               <SoundAbout sound={sound} s={s} lang={currentLang} />
 
+              <p className="mt-8 text-center text-sm">
+                <a href={`/report-content?sound=${encodeURIComponent(sound.slug)}`} className="text-slate-500 dark:text-slate-400 underline underline-offset-4 hover:text-[#6d46b8]">{s.reportThisSound}</a>
+              </p>
+
               {related.length > 0 && (
                 <section className="mt-12">
                   <h2 className="font-heading text-xl sm:text-2xl font-bold mb-3">{s.relatedTitle}</h2>

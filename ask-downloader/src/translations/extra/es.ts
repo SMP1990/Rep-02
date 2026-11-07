@@ -4,6 +4,7 @@ export const es: ExtraDict = {
   footer: {
     brandBio: 'Extracción rápida y limpia de vídeo y audio sin marca de agua para las principales redes sociales.',
     company: 'Empresa', here: 'aquí', legal: 'Aviso legal', privacyPolicy: 'Política de privacidad', termsOfUse: 'Términos de uso',
+    reportContent: 'Denunciar contenido',
     sitemap: 'Mapa del sitio', subscribeBtn: 'Suscribirse', privacyNote: 'Podrás darte de baja en cualquier momento.',
     downloaders: 'Descargadores', rights: 'Todos los derechos reservados.', developedWith: 'Desarrollado con', by: 'por',
     emailPlaceholder: 'Introduce tu correo', emailRequired: 'Introduce tu dirección de correo electrónico.',

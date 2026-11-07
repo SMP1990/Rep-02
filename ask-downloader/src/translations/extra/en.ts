@@ -5,6 +5,7 @@
  */
 export const en = {
   footer: {
+    reportContent: 'Report Content',
     brandBio: 'High-speed, clean, and watermark-free video & audio extraction for all major social platforms.',
     company: 'Company', here: 'here', legal: 'Legal', privacyPolicy: 'Privacy Policy', termsOfUse: 'Terms of Use',
     sitemap: 'Site Map', subscribeBtn: 'Subscribe', privacyNote: 'You will be able to unsubscribe at any time.',

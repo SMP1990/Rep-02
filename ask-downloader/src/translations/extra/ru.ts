@@ -4,6 +4,7 @@ export const ru: ExtraDict = {
   footer: {
     brandBio: 'Быстрое и чистое скачивание видео и аудио без водяных знаков со всех крупных соцсетей.',
     company: 'Компания', here: 'здесь', legal: 'Правовая информация', privacyPolicy: 'Политика конфиденциальности', termsOfUse: 'Условия использования',
+    reportContent: 'Пожаловаться на контент',
     sitemap: 'Карта сайта', subscribeBtn: 'Подписаться', privacyNote: 'Вы сможете отписаться в любое время.',
     downloaders: 'Загрузчики', rights: 'Все права защищены.', developedWith: 'Сделано с', by: '—',
     emailPlaceholder: 'Введите ваш e-mail', emailRequired: 'Пожалуйста, введите адрес электронной почты.',

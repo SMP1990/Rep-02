@@ -34,6 +34,7 @@ export type RouteType =
   | 'watermark-remover'
   | 'public-sounds'
   | 'public-sound'
+  | 'report-content'
   | 'not-found';
 
 export type ContactMessageTopic = 
