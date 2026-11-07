@@ -4,7 +4,8 @@ import { Footer } from '../components/Footer.tsx';
 import { Seo } from '../components/Seo.tsx';
 import { useLanguage } from '../context/LanguageContext.tsx';
 import { fillN, soundStrings } from '../tools/sounds/i18n/index.ts';
-import { SoundAbout } from '../tools/sounds/SoundAbout.tsx';
+import { SoundAbout, soundAbout, soundFaq } from '../tools/sounds/SoundAbout.tsx';
+import { buildBreadcrumbSchema, buildFaqSchema, buildWebPageSchema } from '../utils/seoSchema.ts';
 import type { PublicSound } from '../tools/sounds/SoundCard.tsx';
 
 /** The slug is the last part of the address: /sounds/<slug>. */
@@ -34,9 +35,42 @@ export const SoundPage: React.FC = () => {
   const views = sound ? new Intl.NumberFormat(currentLang, { notation: 'compact', maximumFractionDigits: 1 }).format(sound.views) : '';
   const mp3 = sound ? `/api/sounds/${encodeURIComponent(sound.slug)}/mp3` : '';
 
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const url = `${origin}/sounds/${encodeURIComponent(slug)}`;
+  // Structured data for Google: the page, its breadcrumb, the audio file itself and the FAQ.
+  const jsonLd = sound
+    ? [
+        buildWebPageSchema(title, soundAbout(sound, s, currentLang)[0], url),
+        buildBreadcrumbSchema([
+          { name: 'Home', url: origin + '/' },
+          { name: s.allSounds, url: origin + '/sounds' },
+          { name: sound.title, url },
+        ]),
+        {
+          '@context': 'https://schema.org',
+          '@type': 'AudioObject',
+          name: sound.title,
+          description: soundAbout(sound, s, currentLang)[0],
+          contentUrl: origin + mp3,
+          encodingFormat: 'audio/mpeg',
+          duration: `PT${Math.max(1, Math.round(sound.duration))}S`,
+          uploadDate: sound.firstSeen,
+          author: { '@type': 'Person', name: sound.creator },
+          url,
+        },
+        buildFaqSchema(soundFaq(sound, s).map((f) => ({ question: f.q, answer: f.a }))),
+      ]
+    : undefined;
+
   return (
     <div className="min-h-screen bg-[#f6f0f4] dark:bg-[#0e0a17] text-[#2e2440] dark:text-[#f4eefb] flex flex-col transition-colors duration-200">
-      <Seo title={title} description={sound ? s.subtitle : s.notFound} path={`/sounds/${slug}`} noindex={state !== 'ok'} />
+      <Seo
+        title={title}
+        description={sound ? soundAbout(sound, s, currentLang)[0] : s.notFound}
+        path={`/sounds/${slug}`}
+        noindex={state !== 'ok'}
+        jsonLd={jsonLd}
+      />
       <Header />
       <main className="flex-1 w-full py-8 sm:py-12">
         <div className="max-w-3xl mx-auto px-4">

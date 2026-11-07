@@ -28,7 +28,9 @@ export const SoundCard: React.FC<Props> = ({ sound, t, lang, playing, onToggle }
       </button>
 
       <div className="min-w-0 flex-1">
-        <h2 className="font-heading text-base sm:text-lg font-bold truncate">{sound.title}</h2>
+        <h2 className="font-heading text-base sm:text-lg font-bold truncate">
+          <a href={`/sounds/${encodeURIComponent(sound.slug)}`} className="hover:underline focus:outline-none focus-visible:underline">{sound.title}</a>
+        </h2>
         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 break-words">
           {sound.creator} · {fillN(t.sec, sound.duration)} · {fillN(t.views, views)}
         </p>
