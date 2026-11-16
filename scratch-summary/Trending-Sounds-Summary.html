@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Trending Sounds - Project Summary</title>
+<style>
+@page { size: A4; margin: 18mm 16mm; }
+body { font-family: "Segoe UI", Arial, sans-serif; color: #231a3a; font-size: 11pt; line-height: 1.5; }
+h1 { font-size: 22pt; color: #341d5b; margin: 0 0 4px; }
+.sub { color: #6d46b8; margin: 0 0 14px; font-size: 11pt; }
+h2 { font-size: 13.5pt; color: #fff; background: #341d5b; padding: 5px 10px; border-radius: 5px; margin: 18px 0 8px; page-break-after: avoid; }
+ul { margin: 4px 0 6px 18px; padding: 0; }
+li { margin: 2px 0; }
+table { border-collapse: collapse; width: 100%; margin: 6px 0; page-break-inside: avoid; }
+th, td { border: 1px solid #cfc6e3; padding: 5px 8px; text-align: left; vertical-align: top; }
+th { background: #efe9fa; color: #341d5b; }
+.note { background: #f7f3fd; border-left: 4px solid #6d46b8; padding: 6px 10px; margin: 6px 0; }
+</style></head><body>
+
+<h1>Trending Sounds: Project Summary</h1>
+<p class="sub">Automatic discovery, review and publishing of trending TikTok sounds</p>
+
+<h2>What this feature does</h2>
+<p>The system automatically finds sounds that are trending on TikTok, such as spoken memes, dialogues, sound effects and voice clips. It stores them in a private admin dashboard. Our team reviews them and publishes the good ones on the website, where visitors can listen and download the MP3.</p>
+
+<h2>What we collect for every sound</h2>
+<ul>
+<li>Sound name and creator name</li>
+<li>Length of the sound (in seconds)</li>
+<li>Views of the most-watched video that uses the sound</li>
+<li>Countries where the sound is trending</li>
+<li>How many different days the sound has been trending</li>
+<li>First and last date it was seen</li>
+<li>A day-by-day view history for the last 14 days</li>
+<li>A ranking score. Sounds that keep trending day after day and in several countries score higher.</li>
+<li>A link to the original video and the original sound on TikTok, so our team can verify every sound by hand</li>
+</ul>
+
+<h2>How often it updates</h2>
+<ul>
+<li>It checks 8 regions: Pakistan, India, USA, UK, UAE, Saudi Arabia, Indonesia and Brazil.</li>
+<li>It updates automatically 4 times a day (about every 6 hours), with no manual work needed.</li>
+<li>If a region does not respond, the system tries again after about 45 minutes.</li>
+<li>The admin can also start a check at any time with one button.</li>
+</ul>
+
+<h2>Smart filtering</h2>
+<p>Not every sound is useful, so weak or risky ones are hidden automatically. Nothing is deleted by the filter. The admin can change these settings at any time.</p>
+<table>
+<tr><th>Filter</th><th>Default</th></tr>
+<tr><td>Minimum views</td><td>1,000,000</td></tr>
+<tr><td>Sound length</td><td>3 to 60 seconds</td></tr>
+<tr><td>Minimum days trending</td><td>2 days</td></tr>
+<tr><td>Maximum sounds per creator</td><td>2</td></tr>
+<tr><td>Songs and commercial music</td><td>Hidden</td></tr>
+<tr><td>Brands, news, lyrics, religious recitations, famous people and channels</td><td>Hidden</td></tr>
+<tr><td>Duplicates and sounds with no proper name or creator</td><td>Hidden</td></tr>
+</table>
+<p>Our focus is original voice content and memes, not commercial songs.</p>
+
+<h2>Human approval</h2>
+<ul>
+<li>Nothing goes live by itself. Our team listens to each sound and decides to <b>Approve</b> or <b>Reject</b>.</li>
+<li>Approving a sound saves its MP3 and creates its own public page.</li>
+<li>Only approved sounds appear on the website.</li>
+</ul>
+
+<h2>What visitors see</h2>
+<ul>
+<li>A <b>Trending Sounds</b> section on the home page, and a <b>Sounds</b> page with search.</li>
+<li>A page for each sound with a music-style player (play, pause, previous, next, progress bar) and a <b>Download MP3</b> button.</li>
+<li>A short description, FAQ and related sounds on each page.</li>
+<li>Available in 11 languages.</li>
+<li>A <b>Report Content</b> page for copyright or removal requests. Reports go straight to the admin inbox.</li>
+</ul>
+
+<h2>How long data is kept</h2>
+<table>
+<tr><th>Data</th><th>Kept for</th></tr>
+<tr><td>Normal sounds (not approved)</td><td>60 days after last seen trending, then removed automatically</td></tr>
+<tr><td>Approved sounds</td><td>Kept until the admin removes them</td></tr>
+<tr><td>Rejected sounds</td><td>Same as normal sounds (removed 60 days after last seen)</td></tr>
+<tr><td>Daily view history</td><td>Last 14 days</td></tr>
+<tr><td>Admin login session</td><td>7 days</td></tr>
+</table>
+
+<h2>Important points to know</h2>
+<ul>
+<li><b>Views:</b> the number shown is the views of the top video using the sound, not the total number of videos using it. That total is not available from our free data source.</li>
+<li><b>Memes versus songs:</b> the system decides mainly from the sound's name and numbers. It cannot hear audio, so our team makes the final decision by ear.</li>
+<li><b>Copyright:</b> a sound that feels like a meme may still have an owner, so we keep manual approval and a Report Content page.</li>
+<li><b>Data source:</b> we currently rely on one free public source. If it stops working, new sounds stop arriving, but everything already collected stays safe.</li>
+<li><b>Search engines:</b> while the site is on its testing domain, sound pages are not shown to Google. This will be switched on once the final domain is live.</li>
+</ul>
+
+<h2>Current status</h2>
+<ul>
+<li>The collector is live and running automatically.</li>
+<li>On 7 November the system had saved about 900 sounds, and about 40 passed the filters. The first 4 sounds were approved for the public test.</li>
+<li>The public pages, player, MP3 download and Report Content page are built and working.</li>
+</ul>
+
+</body></html>
