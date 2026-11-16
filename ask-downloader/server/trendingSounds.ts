@@ -13,7 +13,7 @@ import { hasSoundFile, savedIds, saveSoundMp3, soundFile } from './soundsMp3.ts'
 import { makeSlug } from './soundsPublic.ts';
 import { DEFAULT_SETTINGS, cleanSettings, judge, type Settings, type Sound, type Status } from './soundsFilter.ts';
 
-export const REGIONS = ['PK', 'IN', 'US', 'GB', 'AE', 'SA', 'ID', 'BR'];
+export const REGIONS = ['PK', 'IN', 'US', 'GB', 'AE', 'SA', 'ID', 'BR', 'ES', 'JP', 'DE', 'FR']; // ES/JP/DE/FR added v46: tested 2026-11-16, most sounds passed the filter
 const RUN_EVERY_MS = 6 * 3600 * 1000;
 const RETRY_AFTER_MS = 45 * 60 * 1000;
 const KEEP_DAYS = 60;
