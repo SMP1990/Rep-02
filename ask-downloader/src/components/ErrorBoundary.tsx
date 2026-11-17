@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { EXTRA_TRANSLATIONS } from '../translations/extra/index.ts';
+import { removeHeroShell } from '../utils/heroShell.ts';
 
 /** Works even if the language provider itself crashed. */
 const uiWords = () => {
@@ -39,6 +40,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
+    removeHeroShell(); // never let the home page's early copy cover this screen
     console.error('[ErrorBoundary] Caught a rendering error:', error, info.componentStack);
   }
 

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import { hasHeroShell, removeHeroShell } from '../utils/heroShell.ts';
 
 import { fill } from '../utils/i18n.ts';
 import { useGsapHome } from '../hooks/useGsapHome.ts';
@@ -88,6 +89,12 @@ export const PublicHomePage: React.FC = () => {
     'Dailymotion',
   ];
   const [platformIndex, setPlatformIndex] = useState(0);
+  // The server already painted the heading (server/heroShell.ts): show the real
+  // one in place without its fade-in, then remove the copy before the next paint.
+  const [fromShell] = useState(hasHeroShell);
+  useLayoutEffect(() => {
+    removeHeroShell();
+  }, []);
   // Phones: the hero's text and platform buttons start folded (see the hero).
   const [heroMoreOpen, setHeroMoreOpen] = useState(false);
 
@@ -250,15 +257,15 @@ export const PublicHomePage: React.FC = () => {
       <Header />
 
       {/* 2. HERO HEADLINE & QUICK PLATFORM PILLS */}
-      <motion.section 
-        initial={{ opacity: 0, y: 18 }}
+      <motion.section
+        initial={fromShell ? false : { opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
         className="relative z-10 pt-4 sm:pt-12 pb-1 sm:pb-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full text-center"
       >
         <div className="max-w-3xl mx-auto space-y-4">
-          <motion.div 
-            initial={{ scale: 0.9, opacity: 0 }}
+          <motion.div
+            initial={fromShell ? false : { scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.1, duration: 0.4 }}
             className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#f1e9fb] dark:bg-[#261b3b] text-[#6d46b8] dark:text-[#d1b9f7] border border-[#a78bda]/30 shadow-2xs hover:shadow-sm transition-all"
@@ -272,7 +279,7 @@ export const PublicHomePage: React.FC = () => {
             in the same colours as that card's "All Platforms" header. */}
         <div className="max-w-6xl mx-auto mt-3 sm:mt-4 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 px-3 py-3 sm:px-8 sm:py-7 shadow-lg shadow-purple-500/20">
           <motion.h1
-            initial={{ opacity: 0, y: 12 }}
+            initial={fromShell ? false : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}
             className="font-heading text-lg sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-[1.25] flex flex-wrap items-center justify-center gap-x-2"
@@ -283,7 +290,7 @@ export const PublicHomePage: React.FC = () => {
             <span>{heroHeadingBefore}</span>
             {heroShowsPlatform && (
             <span className="inline-block min-w-[170px] sm:min-w-[230px] md:min-w-[280px] text-left sm:text-center">
-              <AnimatePresence mode="wait">
+              <AnimatePresence mode="wait" initial={!fromShell}>
                 <motion.span
                   key={platforms[platformIndex]}
                   initial={{ opacity: 0, y: 15, scale: 0.94, filter: 'blur(4px)' }}

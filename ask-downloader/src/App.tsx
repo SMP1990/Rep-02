@@ -1,4 +1,5 @@
-import React, { useState, Suspense, lazy } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
+import { removeHeroShell } from './utils/heroShell.ts';
 import { AdminProvider, useAdmin } from './context/AdminContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { Toast } from './components/Toast';
@@ -53,6 +54,12 @@ const PageLoadingFallback: React.FC = () => (
 const AppContent: React.FC = () => {
   const { currentRoute, isAuthenticated, activeBlogLanguage, siteSettings } = useAdmin();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // The server's early copy of the home heading belongs to the home page only;
+  // the home page removes it itself once it is on screen.
+  useEffect(() => {
+    if (currentRoute !== 'home') removeHeroShell();
+  }, [currentRoute]);
 
   // 1. Public Home Downloader Page
   if (currentRoute === 'home') {

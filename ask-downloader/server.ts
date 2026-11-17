@@ -25,6 +25,7 @@ import { touchVisitor, recordVisitorDownload, visitorReport } from './server/vis
 import { saveImage, deleteImage, uploadsDir, imageProcessingAvailable } from './server/uploads.ts';
 import { resizedUpload } from './server/imageResize.ts';
 import { homePreloadTags } from './server/preloadHints.ts';
+import { heroShellHtml, HERO_SHELL_SCRIPT, HERO_SHELL_SCRIPT_CSP, bootConfigTag } from './server/heroShell.ts';
 import { handleMediaUpload, forgetMediaFile, uploadHeaders, readMediaFiles } from './server/mediaUpload.ts';
 import { INITIAL_BLOG_CATEGORIES, INITIAL_SITE_SETTINGS, INITIAL_LANDING_CONTENT, INITIAL_SITE_PAGES } from './src/data/mockAdminData.ts';
 import { INITIAL_BLOG_POSTS } from './src/data/blogSeed.ts';
@@ -106,7 +107,8 @@ app.use((req: Request, res: Response, next: Function) => {
     [
       "default-src 'self'",
       // blob: — the AI runtime wraps its CDN worker code in a blob: URL.
-      `script-src 'self'${tool ? ` ${TOOL_ASSET_HOSTS} 'wasm-unsafe-eval' blob:` : ''}${ga ? ' ' + GA_CSP.script : ''}`,
+      // HERO_SHELL_SCRIPT_CSP: the one small inline script of the home page (server/heroShell.ts), allowed by its hash only.
+      `script-src 'self' ${HERO_SHELL_SCRIPT_CSP}${tool ? ` ${TOOL_ASSET_HOSTS} 'wasm-unsafe-eval' blob:` : ''}${ga ? ' ' + GA_CSP.script : ''}`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       `img-src 'self' data: https:${tool || blobPage ? ' blob:' : ''}`,
@@ -3064,6 +3066,17 @@ async function startServer() {
       if (req.path === '/') {
         const preload = homePreloadTags(distPath);
         if (preload) html = html.replace('</head>', `${preload}  </head>`);
+        // Paint the heading at once instead of after the scripts (server/heroShell.ts).
+        if (meta.status === 200) {
+          const landing = store.read<any>(CONTENT, INITIAL_LANDING_CONTENT);
+          const shell = heroShellHtml(landing);
+          if (shell) {
+            html = html.replace(
+              '<div id="root"></div>',
+              `<div id="root"></div>\n    ${shell}\n    <script>${HERO_SHELL_SCRIPT}</script>\n    ${bootConfigTag(settings, landing)}`
+            );
+          }
+        }
       }
       const gaTags = gaHeadTags(req.path);
       if (gaTags) html = html.replace('</head>', `${gaTags}  </head>`);

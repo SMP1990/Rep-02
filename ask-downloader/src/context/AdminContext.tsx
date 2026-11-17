@@ -17,8 +17,9 @@ import {
   ContactMessageTopic
 } from '../types/admin';
 import { SocialPlatform } from '../types';
-import { 
-  playVideoDownloadChime, 
+import { bootConfig } from '../utils/heroShell.ts';
+import {
+  playVideoDownloadChime,
   playNewCommentChime 
 } from '../utils/audioChimes';
 import { 
@@ -400,6 +401,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   });
 
   const [landingContent, setLandingContent] = useState<LandingContent>(() => {
+    const fromServer = bootConfig()?.landingContent;
+    if (fromServer) return fromServer;
     const saved = localStorage.getItem('fdownloader_landing_content');
     return saved ? JSON.parse(saved) : INITIAL_LANDING_CONTENT;
   });
@@ -438,7 +441,9 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const [siteSettings, setSiteSettings] = useState<SiteSettings>(() => {
     const saved = localStorage.getItem('fdownloader_site_settings');
-    const initial: SiteSettings = saved ? JSON.parse(saved) : INITIAL_SITE_SETTINGS;
+    // The home page HTML carries the server's settings (server/heroShell.ts): the
+    // same data /api/site-config sends a moment later, so use it right away.
+    const initial: SiteSettings = bootConfig()?.siteSettings || (saved ? JSON.parse(saved) : INITIAL_SITE_SETTINGS);
     // Publish straight away so the very first render already shows the real
     // name instead of flashing the built-in default.
     setBrandName(initial.siteName);
