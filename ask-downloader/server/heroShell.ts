@@ -61,7 +61,7 @@ export function heroShellHtml(landingContent: any): string {
     `<div class="max-w-3xl mx-auto space-y-4"><div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#f1e9fb] dark:bg-[#261b3b] text-[#6d46b8] dark:text-[#d1b9f7] border border-[#a78bda]/30 shadow-2xs">` +
     `<span class="w-4 h-4 inline-block"></span><span>${esc(badge)}</span></div></div>` +
     `<div class="max-w-6xl mx-auto mt-3 sm:mt-4 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 px-3 py-3 sm:px-8 sm:py-7 shadow-lg shadow-purple-500/20">` +
-    `<p class="font-heading text-lg sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-[1.25] flex flex-wrap items-center justify-center gap-x-2">` +
+    `<p style="visibility:hidden" class="font-heading text-lg sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-[1.25] flex flex-wrap items-center justify-center gap-x-2">` +
     `<span>${esc(before)}</span>${platform}${after ? `<span>${esc(after)}</span>` : ''}` +
     `<span class="w-full block mt-1 sm:mt-2 text-sm sm:text-xl md:text-2xl font-bold text-white/90">${esc(EN_TITLE_HIGHLIGHT)}</span>` +
     `</p></div></section></div>`
@@ -72,6 +72,8 @@ export function heroShellHtml(landingContent: any): string {
  * Runs before the first paint (inline, allowed by its hash in the CSP):
  * - sets dark mode early, with the same rule as src/context/ThemeContext.tsx;
  * - removes the shell at once for visitors who chose another language;
+ * - applies the Latin font stylesheet early and shows the heading text when
+ *   Fraunces is ready (at the latest after 3 s);
  * - removes it after 10 s in any case.
  */
 export const HERO_SHELL_SCRIPT =
@@ -80,7 +82,17 @@ export const HERO_SHELL_SCRIPT =
   "if(t!=='dark'&&t!=='light')t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';" +
   "if(t==='dark'){d.documentElement.classList.add('dark');d.documentElement.style.colorScheme='dark';}" +
   "var l=localStorage.getItem('fdownloader_lang');if(s&&l&&l!=='en'){s.remove();s=null;}}catch(e){}" +
-  "if(s)setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},10000);})();";
+  "if(!s)return;" +
+  // The heading text waits for its real font (Fraunces): drawn first in the
+  // narrower fallback font, the real heading would later count as a new,
+  // larger "largest paint" and the speed gain would be lost.
+  "var p=s.querySelector('p'),shown=0,show=function(){if(!shown&&p){shown=1;p.style.visibility='';}};" +
+  "var g=d.getElementById('google-fonts');" +
+  "if(g&&d.fonts&&d.fonts.load){var k=d.createElement('link');k.rel='stylesheet';k.href=g.href;k.setAttribute('data-fonts-applied','latin');" +
+  "k.onload=function(){Promise.all([d.fonts.load(\"800 1em Fraunces\"),d.fonts.load(\"700 1em Fraunces\")]).then(show,show);};k.onerror=show;d.head.appendChild(k);}" +
+  "else show();" +
+  "setTimeout(show,3000);" +
+  "setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},10000);})();";
 
 /** CSP source that allows exactly HERO_SHELL_SCRIPT and nothing else. */
 export const HERO_SHELL_SCRIPT_CSP = `'sha256-${createHash('sha256').update(HERO_SHELL_SCRIPT).digest('base64')}'`;

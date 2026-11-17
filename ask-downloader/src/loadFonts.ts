@@ -38,7 +38,10 @@ function addScriptFonts(lang: string | null | undefined) {
 export function loadFonts(): void {
   const preload = document.getElementById('google-fonts') as HTMLLinkElement | null;
   if (!preload || added.has('latin')) return;
-  addSheet(preload.href, 'latin');
+  // On the home page the small script of server/heroShell.ts may have applied
+  // this stylesheet already (so the early heading uses the real font).
+  if (document.querySelector('link[data-fonts-applied="latin"]')) added.add('latin');
+  else addSheet(preload.href, 'latin');
 
   // A returning Urdu/Arabic/Hindi reader gets their font right away…
   try {
