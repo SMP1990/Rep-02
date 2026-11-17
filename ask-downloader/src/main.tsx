@@ -4,6 +4,7 @@ import App from './App.tsx';
 import { LanguageProvider } from './context/LanguageContext.tsx';
 import { ThemeProvider } from './context/ThemeContext.tsx';
 import { ErrorBoundary } from './components/ErrorBoundary.tsx';
+import './fraunces.css';
 import './index.css';
 import { loadFonts } from './loadFonts.ts';
 

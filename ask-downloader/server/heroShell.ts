@@ -72,8 +72,7 @@ export function heroShellHtml(landingContent: any): string {
  * Runs before the first paint (inline, allowed by its hash in the CSP):
  * - sets dark mode early, with the same rule as src/context/ThemeContext.tsx;
  * - removes the shell at once for visitors who chose another language;
- * - applies the Latin font stylesheet early and shows the heading text when
- *   Fraunces is ready (at the latest after 3 s);
+ * - shows the heading text when Fraunces is ready (at the latest after 3 s);
  * - removes it after 10 s in any case.
  */
 export const HERO_SHELL_SCRIPT =
@@ -87,9 +86,9 @@ export const HERO_SHELL_SCRIPT =
   // narrower fallback font, the real heading would later count as a new,
   // larger "largest paint" and the speed gain would be lost.
   "var p=s.querySelector('p'),shown=0,show=function(){if(!shown&&p){shown=1;p.style.visibility='';}};" +
-  "var g=d.getElementById('google-fonts');" +
-  "if(g&&d.fonts&&d.fonts.load){var k=d.createElement('link');k.rel='stylesheet';k.href=g.href;k.setAttribute('data-fonts-applied','latin');" +
-  "k.onload=function(){Promise.all([d.fonts.load(\"800 1em Fraunces\"),d.fonts.load(\"700 1em Fraunces\")]).then(show,show);};k.onerror=show;d.head.appendChild(k);}" +
+  // Fraunces is declared in the site's own CSS (src/fraunces.css) and its Latin
+  // file is preloaded in <head>, so it can be awaited right away.
+  "if(d.fonts&&d.fonts.load){Promise.all([d.fonts.load(\"800 1em Fraunces\"),d.fonts.load(\"700 1em Fraunces\")]).then(show,show);}" +
   "else show();" +
   "setTimeout(show,3000);" +
   "setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},10000);})();";
