@@ -94,8 +94,13 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
       setIsScrolled(window.scrollY > 12);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+    // Read the scroll position after the first paint: reading it while the page is
+    // still being laid out forced an early (slow) layout on phones.
+    const first = window.requestAnimationFrame(handleScroll);
+    return () => {
+      window.cancelAnimationFrame(first);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   // Lock body scroll when mobile off-canvas drawer is active
